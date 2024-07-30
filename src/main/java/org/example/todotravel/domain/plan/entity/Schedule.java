@@ -1,14 +1,13 @@
 package org.example.todotravel.domain.plan.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "schedules")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Schedule {
@@ -18,18 +17,6 @@ public class Schedule {
     @Column(name = "schedule_id", nullable = false)
     private Long scheduleId;
 
-//    @Column(name = "plan_id", nullable = false)
-//    private Long planId;
-//
-//    @Column(name = "location_id", nullable = false)
-//    private Long locationId;
-//
-//    @Column(name = "vehicle_id", nullable = false)
-//    private Long vehicleId;
-//
-//    @Column(name = "budget_id", nullable = false, length = 255)
-//    private String budgetId;
-
     @Column(name = "status", nullable = false)
     private Boolean status;
 
@@ -38,4 +25,20 @@ public class Schedule {
 
     @Column(name = "description")
     private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "plan_id", nullable = false)
+    private Plan planId;
+
+    @ManyToOne
+    @JoinColumn(name = "location_id", nullable = false)
+    private Location locationId;
+
+    @ManyToOne
+    @JoinColumn(name = "vehicle_id", nullable = false)
+    private Vehicle vehicleId;
+
+    @ManyToOne
+    @JoinColumn(name = "budget_id", nullable = false)
+    private Budget budgetId;
 }

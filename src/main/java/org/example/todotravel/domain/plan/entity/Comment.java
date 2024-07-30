@@ -1,28 +1,29 @@
 package org.example.todotravel.domain.plan.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import jakarta.persistence.*;
+import org.example.todotravel.domain.user.entity.User;
 
 @Entity
 @Table(name = "comments")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Comment {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id", nullable = false)
     private Long commentId;
 
-//    @Column(name = "user_id", nullable = false)
-//    private Long userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User commentUser;
 
-//    @Column(name = "plan_id", nullable = false)
-//    private Long planId;
+    @ManyToOne
+    @JoinColumn(name = "plan_id", nullable = false)
+    private Plan planId;
 
     @Column(name = "content", nullable = false)
     private String content;
