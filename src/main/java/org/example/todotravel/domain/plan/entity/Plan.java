@@ -1,15 +1,18 @@
 package org.example.todotravel.domain.plan.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
+
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+
 import org.example.todotravel.domain.user.entity.User;
 
 @Entity
 @Table(name = "plans")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Plan {
@@ -18,9 +21,6 @@ public class Plan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "plan_id", nullable = false)
     private Long planId;
-
-//    @Column(name = "user_id", nullable = false)
-//    private Long userId;
 
     @Column(name = "title", nullable = false, length = 100)
     private String title;
@@ -49,8 +49,17 @@ public class Plan {
     @Column(name = "total_budget")
     private Long totalBudget;
 
+    //생성자
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User planUser;
+
+    //각 플랜 유저
+    @OneToMany(mappedBy = "plan_users")
+    private Set<PlanUser> planUsers;
+
+    //일정 받아오기
+    @OneToMany(mappedBy = "schedules")
+    private List<Schedule> schedules;
 
 }

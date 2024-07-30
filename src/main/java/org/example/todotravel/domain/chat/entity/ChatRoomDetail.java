@@ -1,15 +1,14 @@
 package org.example.todotravel.domain.chat.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "chat_room_details")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 //@IdClass(ChatRoomDetailId.class)
