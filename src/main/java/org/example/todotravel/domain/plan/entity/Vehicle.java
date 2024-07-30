@@ -1,18 +1,16 @@
 package org.example.todotravel.domain.plan.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "vehicles")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Vehicle {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vehicle_id", nullable = false)
@@ -23,6 +21,6 @@ public class Vehicle {
     private VehicleType vehicle;
 
     public enum VehicleType {
-        CAR, AIRPLANE, TRAIN, BUS, BIKE, WALK
+        CAR, AIRPLANE, TRAIN, BUS, BIKE, WALK, TAXI
     }
 }

@@ -1,15 +1,14 @@
 package org.example.todotravel.domain.chat.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import jakarta.persistence.*;
 import org.example.todotravel.domain.user.entity.User;
 
 @Entity
 @Table(name = "chat_rooms")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatRoom {

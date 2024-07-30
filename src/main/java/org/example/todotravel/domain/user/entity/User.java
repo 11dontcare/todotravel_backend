@@ -24,7 +24,8 @@ import org.example.todotravel.domain.plan.entity.Plan;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
