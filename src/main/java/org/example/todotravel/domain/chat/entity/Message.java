@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import org.example.todotravel.domain.user.entity.User;
 
 @Entity
 @Table(name = "messages")
@@ -31,6 +32,11 @@ public class Message {
     @Column(name = "chat_date", nullable = false)
     private LocalDateTime chatDate;
 
-    @Column(name = "plan_id", nullable = false)
-    private Long planId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", nullable = false, insertable = false, updatable = false)
+    private ChatRoom chatRoom;
 }

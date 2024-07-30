@@ -12,16 +12,11 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-//@IdClass(ChatRoomDetailId.class)
 public class ChatRoomDetail {
 
     @Id
     @Column(name = "room_id", nullable = false)
     private Long roomId;
-
-//    @Id
-//    @Column(name = "plan_id", nullable = false)
-//    private Long planId;
 
     @Column(name = "room_name", nullable = false, length = 50)
     private String roomName;
