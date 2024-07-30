@@ -1,6 +1,8 @@
 package org.example.todotravel.domain.chat.entity;
 
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -8,8 +10,7 @@ import org.example.todotravel.domain.user.entity.User;
 
 @Entity
 @Table(name = "messages")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Message {
