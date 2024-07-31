@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.global.exception.JwtExceptionCode;
 import org.example.todotravel.global.security.CustomUserDetails;
 import org.example.todotravel.global.security.jwt.token.JwtAuthenticationToken;
@@ -18,14 +19,14 @@ import org.example.todotravel.global.security.jwt.util.JwtTokenizer;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * JWT 토큰 인증 필터 클래스
@@ -38,9 +39,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     /**
      * 필터 메서드 - 각 요청마다 JWT 토큰을 검증하고 인증을 설정
      *
-     * @param request           요청 객체
-     * @param response          응답 객체
-     * @param filterChain       필터 체인
+     * @param request     요청 객체
+     * @param response    응답 객체
+     * @param filterChain 필터 체인
      * @throws ServletException 서블릿 예외
      * @throws IOException      입출력 예외
      */
@@ -86,31 +87,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //        Long userId = claims.get("userId", Long.class);
 //        String name = claims.get("name", String.class);
         String username = claims.get("username", String.class); // username을 가져옴
-        List<GrantedAuthority> authorities = getGrantedAuthorities(claims); // 사용자 권한을 가져옴
+        Role role = Role.valueOf(claims.get("role", String.class)); // 단일 역할을 가져옴
+
+        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role.name()));
 
         CustomUserDetails userDetails = new CustomUserDetails(
             email,
             username,
             "",
-            authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList())
+            role // Role 객체를 직접 전달
         );
 
         Authentication authentication = new JwtAuthenticationToken(authorities, userDetails, null); // 인증 객체 생성
         SecurityContextHolder.getContext().setAuthentication(authentication); // SecurityContextHolder 인증 객체 설정
-    }
-
-    private List<GrantedAuthority> getGrantedAuthorities(Claims claims) {
-        List<String> roles = ((List<?>) claims.get("roles")).stream()
-            .filter(role -> role instanceof String)
-            .map(role -> (String) role)
-            .toList();
-        List<GrantedAuthority> authorities = new ArrayList<>();
-
-        for (String role : roles) {
-            authorities.add(() -> role);
-        }
-
-        return authorities;
     }
 
     /**

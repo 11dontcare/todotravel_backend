@@ -1,11 +1,13 @@
 package org.example.todotravel.global.security;
 
 import lombok.Getter;
+import org.example.todotravel.domain.user.entity.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,18 +25,16 @@ public class CustomUserDetails implements UserDetails {
     /**
      * 생성자
      *
-     * @param email     이메일
-     * @param username  이름
-     * @param password  비밀번호
-     * @param roles     권한 목록
+     * @param email    이메일
+     * @param username 이름
+     * @param password 비밀번호
+     * @param role    권한 목록
      */
-    public CustomUserDetails(String email, String username, String password, List<String> roles) {
+    public CustomUserDetails(String email, String username, String password, Role role) {
         this.username = username;
         this.password = password;
         this.email = email;
-        this.authorities = roles.stream()
-            .map(SimpleGrantedAuthority::new)
-            .collect(Collectors.toList());
+        this.authorities = Collections.singletonList(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override

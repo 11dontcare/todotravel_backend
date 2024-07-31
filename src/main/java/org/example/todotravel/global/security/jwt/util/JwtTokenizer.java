@@ -1,7 +1,6 @@
 package org.example.todotravel.global.security.jwt.util;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
@@ -9,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.user.entity.RefreshToken;
+import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.impl.RefreshTokenServiceImpl;
 import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -49,48 +48,48 @@ public class JwtTokenizer {
     /**
      * AccessToken 생성
      *
-     * @param userId
-     * @param username
-     * @param email
-     * @param roles
+     * @param userId    사용자 PK
+     * @param username  사용자 아이디
+     * @param email     사용자 이메일
+     * @param role      사용자 역할
      * @return AccessToken
      */
-    public String createAccessToken(Long userId, String username, String email, List<String> roles) {
-        return createToken(userId, username, email, roles, ACCESS_TOKEN_EXPIRATION_COUNT, accessSecret);
+    public String createAccessToken(Long userId, String username, String email, Role role) {
+        return createToken(userId, username, email, role, ACCESS_TOKEN_EXPIRATION_COUNT, accessSecret);
     }
 
     /**
      * RefreshToken 생성
      *
-     * @param userId
-     * @param username
-     * @param email
-     * @param roles
+     * @param userId    사용자 PK
+     * @param username  사용자 아이디
+     * @param email     사용자 이메일
+     * @param role      사용자 역할
      * @return RefreshToken
      */
-    public String createRefreshToken(Long userId, String username, String email, List<String> roles) {
-        return createToken(userId, username, email, roles, REFRESH_TOKEN_EXPIRATION_COUNT, refreshSecret);
+    public String createRefreshToken(Long userId, String username, String email, Role role) {
+        return createToken(userId, username, email, role, REFRESH_TOKEN_EXPIRATION_COUNT, refreshSecret);
     }
 
     /**
      * Jwts 빌더를 사용하여 token 생성
      *
-     * @param userId
-     * @param username
-     * @param email
-     * @param roles
-     * @param expire
-     * @param secretKey
-     * @return
+     * @param userId    사용자 PK
+     * @param username  사용자 아이디
+     * @param email     사용자 이메일
+     * @param role      사용자 역할
+     * @param expire    토큰 만료 기간
+     * @param secretKey 토큰 키 값
+     * @return Jwts
      */
-    private String createToken(Long userId, String username, String email, List<String> roles,
+    private String createToken(Long userId, String username, String email, Role role,
                                Long expire, byte[] secretKey) {
         // 기본으로 가지고 있는 Claim : subject
         Claims claims = Jwts.claims().setSubject(email);
 
         claims.put("userId", userId);
         claims.put("username", username);
-        claims.put("roles", roles);
+        claims.put("roles", role.name());
 
         return Jwts.builder()
             .setClaims(claims)
@@ -134,14 +133,13 @@ public class JwtTokenizer {
     /**
      * AccessToken, RefreshToken 동시에 생성
      *
-     * @param response
-     * @param user
-     * @param roles
+     * @param response  응답 객체
+     * @param user      사용자
      */
-    public void issueTokenAndSetCookies(HttpServletResponse response, User user, List<String> roles) {
+    public void issueTokenAndSetCookies(HttpServletResponse response, User user) {
         // 토큰 발급
-        String accessToken = createAccessToken(user.getUserId(), user.getEmail(), user.getUsername(), roles);
-        String refreshToken = createRefreshToken(user.getUserId(), user.getEmail(), user.getUsername(), roles);
+        String accessToken = createAccessToken(user.getUserId(), user.getEmail(), user.getUsername(), user.getRole());
+        String refreshToken = createRefreshToken(user.getUserId(), user.getEmail(), user.getUsername(), user.getRole());
 
         // 리프레쉬 토큰을 DB에 저장
         Optional<RefreshToken> refreshTokenOptional = refreshTokenService.getRefreshTokenByUserId(user.getUserId());
@@ -173,9 +171,9 @@ public class JwtTokenizer {
     /**
      * RefreshToken으로 AccessToken 재발급
      *
-     * @param request
-     * @param response
-     * @param refreshToken
+     * @param request       요청 객체
+     * @param response      응답 객체
+     * @param refreshToken  refresh token
      */
     public void renewAccessToken(HttpServletRequest request, HttpServletResponse response,
                                  String refreshToken) {
@@ -185,12 +183,8 @@ public class JwtTokenizer {
         User user = userService.getUserByUserId(userId).orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
 
         // accessToken 생성
-        List<String> roles = ((List<?>) claims.get("roles")).stream()
-            .filter(role -> role instanceof String)
-            .map(role -> (String) role)
-            .toList();
         String email = claims.getSubject();
-        String accessToken = createAccessToken(userId, email, user.getUsername(), roles);
+        String accessToken = createAccessToken(userId, email, user.getUsername(), user.getRole());
 
         // 쿠키 생성 후 response에 담기
         Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
