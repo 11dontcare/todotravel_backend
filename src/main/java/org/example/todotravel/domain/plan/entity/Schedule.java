@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "schedules")
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

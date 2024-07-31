@@ -41,5 +41,11 @@ public class ScheduleController {
     }
 
     //여행 일정 status 관리
+    @PutMapping("/{plan_id}/course/{course_id}/status")
+    public ApiResponse<Void> updateScheduleStatus(@PathVariable("plan_id") Long planId,
+                                          @PathVariable("course_id") Long scheduleId) {
+        scheduleService.updateStatus(scheduleId);
 
+        return new ApiResponse<>(true, "일정 불러오기");
+    }
 }

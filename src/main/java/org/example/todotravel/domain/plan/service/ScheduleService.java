@@ -16,4 +16,5 @@ public interface ScheduleService {
     Schedule createSchedule(Long planId, ScheduleCreateRequestDto dto);
     void destroySchedule(Long scheduleId);
     ScheduleResponseDto getSchedule(Long scheduleId);
+    Schedule updateStatus(Long scheduleId);
 }

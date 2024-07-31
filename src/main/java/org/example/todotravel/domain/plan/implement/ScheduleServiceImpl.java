@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.plan.dto.request.ScheduleCreateRequestDto;
 import org.example.todotravel.domain.plan.dto.response.ScheduleResponseDto;
 import org.example.todotravel.domain.plan.entity.Location;
+import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.Schedule;
 import org.example.todotravel.domain.plan.repository.ScheduleRepository;
 import org.example.todotravel.domain.plan.service.ScheduleService;
@@ -17,6 +18,7 @@ import java.util.Optional;
 public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final LocationServiceImpl locationService;
+    private final PlanServiceImpl planService;
 
     //여행 일정 찾기
     @Override
@@ -37,8 +39,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     @Transactional
     public Schedule createSchedule(Long planId, ScheduleCreateRequestDto dto) {
-//        Plan plan = planRepository.findById(planId)
-//                .orElseThrow(() -> new RuntimeException("계획을 찾을 수 없습니다."));
+        Plan plan = planService.getPlan(planId);
 
         Location location = locationService.findByLocationId(dto.getLocationId())
                 .orElseThrow(() -> new RuntimeException("장소를 찾을 수 없습니다."));
@@ -47,7 +48,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .status(false)
                 .travelDayCount(dto.getTravelDayCount())
                 .description(dto.getDescription())
-//                .plan(plan)
+                .plan(plan)
                 .location(location)
 //                .vehicle(dto.getVehicleId())
 //                .budget(dto.getBudgetId())
@@ -60,5 +61,14 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Transactional
     public void destroySchedule(Long scheduleId) {
         scheduleRepository.delete(findByScheduleId(scheduleId));
+    }
+
+    //여행 일정 수정하기 - status
+    @Override
+    @Transactional
+    public Schedule updateStatus(Long scheduleId) {
+        Schedule schedule = findByScheduleId(scheduleId);
+        schedule.setStatus(!schedule.getStatus());
+        return scheduleRepository.save(schedule);
     }
 }
