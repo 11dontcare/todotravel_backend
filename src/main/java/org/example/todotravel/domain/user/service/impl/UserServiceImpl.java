@@ -6,6 +6,7 @@ import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.repository.UserRepository;
 import org.example.todotravel.domain.user.service.UserService;
+import org.example.todotravel.global.exception.DuplicateUserException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User registerNewUser(UserRegisterRequestDto dto, PasswordEncoder passwordEncoder) {
+        checkDuplicateUsername(dto.getUsername());
+        checkDuplicateEmail(dto.getEmail());
+        checkDuplicateNickname(dto.getNickname());
+
         User newUser = User.builder()
             .username(dto.getUsername())
             .password(passwordEncoder.encode(dto.getPassword()))
@@ -41,5 +46,32 @@ public class UserServiceImpl implements UserService {
             .build();
 
         return userRepository.save(newUser);
+    }
+
+    // 사용자 아이디 중복 검사
+    @Override
+    @Transactional(readOnly = true)
+    public void checkDuplicateUsername(String username) {
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new DuplicateUserException("이미 존재하는 사용자명입니다.");
+        }
+    }
+
+    // 사용자 이메일 중복 검사
+    @Override
+    @Transactional(readOnly = true)
+    public void checkDuplicateEmail(String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new DuplicateUserException("이미 존재하는 이메일입니다.");
+        }
+    }
+
+    // 사용자 닉네임 중복 검사
+    @Override
+    @Transactional(readOnly = true)
+    public void checkDuplicateNickname(String nickname) {
+        if (userRepository.findByNickname(nickname).isPresent()) {
+            throw new DuplicateUserException("이미 존재하는 닉네임입니다.");
+        }
     }
 }

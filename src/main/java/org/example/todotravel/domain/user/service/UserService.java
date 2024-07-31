@@ -12,4 +12,10 @@ public interface UserService {
     Optional<User> getUserByUserId(Long userId);
 
     User registerNewUser(UserRegisterRequestDto dto, PasswordEncoder passwordEncoder);
+
+    void checkDuplicateUsername(String username);
+
+    void checkDuplicateEmail(String email);
+
+    void checkDuplicateNickname(String nickname);
 }
