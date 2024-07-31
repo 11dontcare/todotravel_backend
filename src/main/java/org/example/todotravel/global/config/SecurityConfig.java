@@ -1,5 +1,8 @@
 package org.example.todotravel.global.config;
 
+import lombok.RequiredArgsConstructor;
+import org.example.todotravel.global.security.jwt.filter.JwtAuthenticationFilter;
+import org.example.todotravel.global.security.jwt.util.JwtTokenizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Spring Security 설정 클래스
@@ -14,7 +18,9 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final JwtTokenizer jwtTokenizer;
 
     // 모든 유저 허용 URI
     String[] allAllowPage = new String[]{
@@ -47,6 +53,9 @@ public class SecurityConfig {
             .formLogin(auth -> auth.disable()) // 기본 login form 비활성화
             .logout(auth -> auth.disable()) // 기본 logout 비활성화
             .sessionManagement(auth -> auth.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 서버가 클라이언트 상태 저장 X
+
+            // jwt 관련 설정
+            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenizer), UsernamePasswordAuthenticationFilter.class)
 
         ;
 

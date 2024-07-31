@@ -66,6 +66,10 @@ public class User {
     @Column(name = "birth_date", nullable = false)
     private LocalDateTime birthDate;
 
+    // 여러 디바이스에서 접속한다고 가정하면 1:N
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RefreshToken> refreshTokens;
+
     @OneToMany(mappedBy = "followerUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Follow> followers;
 
