@@ -9,6 +9,7 @@ import org.example.todotravel.domain.plan.repository.PlanRepository;
 import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.user.entity.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -19,6 +20,7 @@ public class PlanServiceImpl implements PlanService {
     private final PlanRepository planRepository;
 
     @Override
+    @Transactional
     public Plan createPlan(PlanRequestDto planRequestDto) {
         //플랜 생성 시 일정과 메모가 빈 플랜이 db에 생성
 
@@ -33,11 +35,13 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Plan getPlan(Long planId) {
         return planRepository.findByPlanId(planId);
     }
 
     @Override
+    @Transactional
     public void updatePlan(Long planId, PlanRequestDto dto) {
         Plan plan = planRepository.findByPlanId(planId);
         plan.setTitle(dto.getTitle());
@@ -50,6 +54,7 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    @Transactional
     public void deletePlan(Long planId) {
         planRepository.deleteByPlanId(planId);
     }
