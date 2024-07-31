@@ -1,6 +1,9 @@
 package org.example.todotravel.domain.chat.entity;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -11,16 +14,11 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-//@IdClass(ChatRoomDetailId.class)
 public class ChatRoomDetail {
 
     @Id
     @Column(name = "room_id", nullable = false)
     private Long roomId;
-
-//    @Id
-//    @Column(name = "plan_id", nullable = false)
-//    private Long planId;
 
     @Column(name = "room_name", nullable = false, length = 50)
     private String roomName;

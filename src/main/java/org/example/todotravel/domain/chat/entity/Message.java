@@ -1,9 +1,13 @@
 package org.example.todotravel.domain.chat.entity;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import org.example.todotravel.domain.user.entity.User;
 
 @Entity
 @Table(name = "messages")
@@ -18,11 +22,13 @@ public class Message {
     @Column(name = "message_id", nullable = false)
     private Long messageId;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
+    private User user;
 
-    @Column(name = "room_id", nullable = false)
-    private Long roomId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", nullable = false, insertable = false, updatable = false)
+    private ChatRoom chatRoom;
 
     @Column(name = "message")
     private String message;
@@ -30,6 +36,9 @@ public class Message {
     @Column(name = "chat_date", nullable = false)
     private LocalDateTime chatDate;
 
-    @Column(name = "plan_id", nullable = false)
-    private Long planId;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
+    @Column(name = "room_id", nullable = false)
+    private Long roomId;
 }
