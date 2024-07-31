@@ -1,7 +1,8 @@
 package org.example.todotravel.domain.plan.implement;
 
 import lombok.RequiredArgsConstructor;
-import org.example.todotravel.domain.plan.dto.request.ScheduleRequestDto;
+import org.example.todotravel.domain.plan.dto.request.ScheduleCreateRequestDto;
+import org.example.todotravel.domain.plan.dto.response.ScheduleResponseDto;
 import org.example.todotravel.domain.plan.entity.Location;
 import org.example.todotravel.domain.plan.entity.Schedule;
 import org.example.todotravel.domain.plan.repository.ScheduleRepository;
@@ -20,14 +21,22 @@ public class ScheduleServiceImpl implements ScheduleService {
     //여행 일정 찾기
     @Override
     @Transactional(readOnly = true)
-    public Optional<Schedule> findByScheduleId(Long scheduleId) {
-        return scheduleRepository.findById(scheduleId);
+    public Schedule findByScheduleId(Long scheduleId) {
+        return scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new RuntimeException("일정을 찾을 수 없습니다."));
+    }
+
+    //여행 일정 responseDto로 전달
+    @Override
+    @Transactional(readOnly = true)
+    public ScheduleResponseDto getSchedule(Long scheduleId) {
+        return ScheduleResponseDto.fromEntity(findByScheduleId(scheduleId));
     }
 
     //여행 일정 생성하기
     @Override
     @Transactional
-    public Schedule createSchedule(Long planId, ScheduleRequestDto dto) {
+    public Schedule createSchedule(Long planId, ScheduleCreateRequestDto dto) {
 //        Plan plan = planRepository.findById(planId)
 //                .orElseThrow(() -> new RuntimeException("계획을 찾을 수 없습니다."));
 
@@ -50,9 +59,6 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     @Transactional
     public void destroySchedule(Long scheduleId) {
-        Schedule schedule = findByScheduleId(scheduleId)
-                .orElseThrow(() -> new RuntimeException("일정을 찾을 수 없습니다."));
-        scheduleRepository.delete(schedule);
+        scheduleRepository.delete(findByScheduleId(scheduleId));
     }
-
 }
