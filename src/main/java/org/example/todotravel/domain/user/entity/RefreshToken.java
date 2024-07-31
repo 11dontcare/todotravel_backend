@@ -13,7 +13,8 @@ import lombok.Setter;
 public class RefreshToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "refresh_token_id")
+    private Long refreshTokenId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

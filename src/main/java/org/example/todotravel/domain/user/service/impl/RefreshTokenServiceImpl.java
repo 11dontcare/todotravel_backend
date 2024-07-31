@@ -22,7 +22,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public Optional<RefreshToken> getRefreshTokenByUserId(Long userId) {
-        return refreshTokenRepository.findByUserId(userId);
+        return refreshTokenRepository.findByUser_UserId(userId);
     }
 
     @Override
