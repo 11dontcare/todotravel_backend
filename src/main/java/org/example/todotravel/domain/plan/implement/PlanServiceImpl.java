@@ -11,6 +11,7 @@ import org.example.todotravel.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,23 @@ public class PlanServiceImpl implements PlanService {
         PlanUser planUser = new PlanUser();
         plan.setPlanUsers(Collections.singleton(planUser));
         return planRepository.save(plan);
+    }
+
+    @Override
+    public Plan getPlan(Long planId) {
+        return planRepository.findByPlanId(planId);
+    }
+
+    @Override
+    public void updatePlan(Long planId, PlanRequestDto dto) {
+        Plan plan = planRepository.findByPlanId(planId);
+        plan.setTitle(dto.getTitle());
+        plan.setLocation(dto.getLocation());
+        plan.setStartDate(dto.getStartDate());
+        plan.setEndDate(dto.getEndDate());
+        plan.setIsPublic(dto.getIsPublic());
+        plan.setTotalBudget(dto.getTotalBudget());
+        planRepository.save(plan);
     }
 
     @Override

@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PlanRepository extends JpaRepository<Plan, Long> {
     void deleteByPlanId(Long planId);
+    Plan findByPlanId(Long planId);
 }
