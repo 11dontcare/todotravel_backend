@@ -28,6 +28,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
+    //valid 의존성 추가 - 정유진
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
     // spring security
     implementation 'org.springframework.boot:spring-boot-starter-security'
 

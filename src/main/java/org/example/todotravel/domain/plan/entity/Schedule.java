@@ -35,10 +35,10 @@ public class Schedule {
     private Location locationId;
 
     @ManyToOne
-    @JoinColumn(name = "vehicle_id", nullable = false)
+    @JoinColumn(name = "vehicle_id")
     private Vehicle vehicleId;
 
     @ManyToOne
-    @JoinColumn(name = "budget_id", nullable = false)
+    @JoinColumn(name = "budget_id")
     private Budget budgetId;
 }
