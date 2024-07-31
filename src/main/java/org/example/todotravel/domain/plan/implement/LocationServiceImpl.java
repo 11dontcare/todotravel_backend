@@ -13,7 +13,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class LocationServiceImpl implements LocationService {
-    @Autowired
     private final LocationRepository locationRepository;
 
     //위치 찾기 - 좌표
@@ -33,7 +32,7 @@ public class LocationServiceImpl implements LocationService {
     //위치 저장하기
     @Override
     @Transactional
-    public Location saveLocation(String name, double latitude, double longitude) {
+    public Location createLocation(String name, double latitude, double longitude) {
         //이미 존재하는 경우 기존의 장소 전달
         Optional<Location> existingLocation = findByLocationPoint(latitude, longitude);
         if (existingLocation.isPresent()) {

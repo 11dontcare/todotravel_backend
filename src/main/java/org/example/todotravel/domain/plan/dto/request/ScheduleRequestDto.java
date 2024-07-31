@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ScheduleRequestDto {
     private Long locationId;
-    private Long planId;
     private Integer travelDayCount;
     private String description;
     //null 허용

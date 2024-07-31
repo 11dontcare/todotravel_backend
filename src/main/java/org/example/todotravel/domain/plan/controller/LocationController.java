@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.plan.dto.request.LocationRequestDto;
 import org.example.todotravel.domain.plan.entity.Location;
+import org.example.todotravel.domain.plan.implement.LocationServiceImpl;
 import org.example.todotravel.domain.plan.service.LocationService;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +15,11 @@ import jakarta.validation.Valid;
 @RequiredArgsConstructor
 @RequestMapping("/api/location")
 public class LocationController {
-    private final LocationService locationService;
+    private final LocationServiceImpl locationService;
 
     @PostMapping
     public ApiResponse<Location> insertLocation(@Valid @RequestBody LocationRequestDto dto) {
-        Location location = locationService.saveLocation(
+        Location location = locationService.createLocation(
                 dto.getName(), dto.getLatitude(), dto.getLongitude()
         );
         return new ApiResponse<>(true, "장소 저장 성공", location);
