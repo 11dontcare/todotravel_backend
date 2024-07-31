@@ -1,0 +1,36 @@
+package org.example.todotravel.domain.plan.dto.request;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.example.todotravel.domain.plan.entity.Plan;
+import org.example.todotravel.domain.user.entity.User;
+
+import java.time.LocalDateTime;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Builder
+public class PlanRequestDto {
+    private String title;
+    private String location;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+    private Boolean isPublic;
+    private Boolean status;
+    private Long totalBudget;
+
+    public Plan toEntity(){
+        return Plan.builder()
+                .title(title)
+                .location(location)
+                .startDate(startDate)
+                .endDate(endDate)
+                .isPublic(isPublic)
+                .status(status)
+                .totalBudget(totalBudget)
+                .build();
+    }
+}
