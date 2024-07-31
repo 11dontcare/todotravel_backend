@@ -55,11 +55,11 @@ public class Plan {
     private User planUser;
 
     //각 플랜 유저
-    @OneToMany(mappedBy = "plan_users")
+    @OneToMany(mappedBy = "planId", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PlanUser> planUsers;
 
     //일정 받아오기
-    @OneToMany(mappedBy = "schedules")
+    @OneToMany(mappedBy = "planId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Schedule> schedules;
 
 }
