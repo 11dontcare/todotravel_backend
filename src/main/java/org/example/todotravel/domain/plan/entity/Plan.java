@@ -13,6 +13,7 @@ import org.example.todotravel.domain.user.entity.User;
 @Table(name = "plans")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Plan {
