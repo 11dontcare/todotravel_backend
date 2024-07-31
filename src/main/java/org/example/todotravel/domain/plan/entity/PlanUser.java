@@ -13,20 +13,21 @@ import org.example.todotravel.domain.user.entity.User;
 @AllArgsConstructor
 public class PlanUser {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "plan_particiapant_id", nullable = false)
     private Long planParticipantId;
 
     private StatusType status;
 
     @ManyToOne
-    @Column(name = "user_id", nullable = false)
-    private User planUser;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne
-    @Column(name = "plan_id", nullable = false)
+    @JoinColumn(name = "plan_id", nullable = false)
     private Plan planId;
 
-    private enum StatusType {
+    public enum StatusType {
         PENDING, ACCEPTED, REJECTED
     }
 
