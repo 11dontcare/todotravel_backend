@@ -1,6 +1,7 @@
 package org.example.todotravel.domain.plan.service;
 
 import org.example.todotravel.domain.plan.dto.request.ScheduleCreateRequestDto;
+import org.example.todotravel.domain.plan.dto.request.VehicleRequestDto;
 import org.example.todotravel.domain.plan.dto.response.ScheduleResponseDto;
 import org.example.todotravel.domain.plan.entity.Schedule;
 import org.springframework.stereotype.Service;
@@ -16,5 +17,8 @@ public interface ScheduleService {
     Schedule createSchedule(Long planId, ScheduleCreateRequestDto dto);
     void destroySchedule(Long scheduleId);
     ScheduleResponseDto getSchedule(Long scheduleId);
+
     Schedule updateStatus(Long scheduleId);
+    Schedule updateVehicle(Long scheduleId, VehicleRequestDto dto);
+    Schedule deleteVehicle(Long scheduleId);
 }

@@ -31,6 +31,14 @@ public class Schedule {
     @Column(name = "travel_time")
     private LocalTime travelTime;
 
+    @Column(name = "vehicle", nullable = true)
+    @Enumerated(EnumType.STRING)
+    private VehicleType vehicle;
+
+    public enum VehicleType {
+        CAR, AIRPLANE, TRAIN, BUS, BIKE, WALK, TAXI
+    }
+
     @ManyToOne
     @JoinColumn(name = "plan_id", nullable = false)
     private Plan plan;
@@ -38,10 +46,6 @@ public class Schedule {
     @ManyToOne
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
-
-    @ManyToOne
-    @JoinColumn(name = "vehicle_id")
-    private Vehicle vehicle;
 
     @ManyToOne
     @JoinColumn(name = "budget_id")

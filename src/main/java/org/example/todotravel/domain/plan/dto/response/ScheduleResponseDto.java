@@ -19,9 +19,9 @@ public class ScheduleResponseDto {
     private Integer travelDayCount;
     private String description;
     private LocalTime travelTime;
+    private String vehicle;
     private Long planId;
     private Long locationId;
-    private Long vehicleId;
     private Long budgetId;
 
 
@@ -34,7 +34,7 @@ public class ScheduleResponseDto {
                 .travelTime(schedule.getTravelTime())
                 .planId(schedule.getPlan().getPlanId())
                 .locationId(schedule.getLocation().getLocationId())
-                .vehicleId(schedule.getVehicle() != null ? schedule.getVehicle().getVehicleId() : null)
+                .vehicle(schedule.getVehicle() != null ? schedule.getVehicle().name() : null)
                 .budgetId(schedule.getBudget() != null ? schedule.getBudget().getBudgetId() : null)
                 .build();
     }
