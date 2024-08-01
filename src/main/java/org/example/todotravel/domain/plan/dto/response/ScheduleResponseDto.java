@@ -20,10 +20,9 @@ public class ScheduleResponseDto {
     private String description;
     private LocalTime travelTime;
     private String vehicle;
+    private Long price;
     private Long planId;
     private Long locationId;
-    private Long budgetId;
-
 
     public static ScheduleResponseDto fromEntity(Schedule schedule) {
         return ScheduleResponseDto.builder()
@@ -35,7 +34,7 @@ public class ScheduleResponseDto {
                 .planId(schedule.getPlan().getPlanId())
                 .locationId(schedule.getLocation().getLocationId())
                 .vehicle(schedule.getVehicle() != null ? schedule.getVehicle().name() : null)
-                .budgetId(schedule.getBudget() != null ? schedule.getBudget().getBudgetId() : null)
+                .price(schedule.getPrice() != null ? schedule.getPrice() : null)
                 .build();
     }
 }

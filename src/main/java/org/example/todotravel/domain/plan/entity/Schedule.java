@@ -39,6 +39,9 @@ public class Schedule {
         CAR, AIRPLANE, TRAIN, BUS, BIKE, WALK, TAXI
     }
 
+    @Column(name = "price", nullable = true)
+    private Long price;
+
     @ManyToOne
     @JoinColumn(name = "plan_id", nullable = false)
     private Plan plan;
@@ -46,8 +49,4 @@ public class Schedule {
     @ManyToOne
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
-
-    @ManyToOne
-    @JoinColumn(name = "budget_id")
-    private Budget budget;
 }

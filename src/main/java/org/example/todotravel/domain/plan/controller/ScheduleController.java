@@ -3,7 +3,6 @@ package org.example.todotravel.domain.plan.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.plan.dto.request.ScheduleCreateRequestDto;
-import org.example.todotravel.domain.plan.dto.request.VehicleRequestDto;
 import org.example.todotravel.domain.plan.dto.response.ScheduleResponseDto;
 import org.example.todotravel.domain.plan.entity.Schedule;
 import org.example.todotravel.domain.plan.service.implement.ScheduleServiceImpl;
@@ -50,10 +49,10 @@ public class ScheduleController {
 
     //여행 일정 vehicle 관리 - 수정(등록)
     @PutMapping("/{schedule_id}/vehicle")
-    public ApiResponse<Void> updateScheduleVehicle(@PathVariable("schedule_id") Long scheduleId,
-                                                   @RequestBody VehicleRequestDto dto) {
-        scheduleService.updateVehicle(scheduleId, dto);
-        return new ApiResponse<>(true, "이동수단 저장 완료");
+    public ApiResponse<String> updateScheduleVehicle(@PathVariable("schedule_id") Long scheduleId,
+                                                   @RequestBody String vehicle) {
+        scheduleService.updateVehicle(scheduleId, vehicle);
+        return new ApiResponse<>(true, "이동수단 저장 완료", vehicle);
     }
 
     //여행 일정 vehicle 관리 - 삭제
@@ -61,5 +60,21 @@ public class ScheduleController {
     public ApiResponse<Void> deleteScheduleVehicle(@PathVariable("schedule_id") Long scheduleId) {
         scheduleService.deleteVehicle(scheduleId);
         return new ApiResponse<>(true, "이동수단 삭제 완료");
+    }
+
+    //여행 일정 price 관리 - 수정(등록)
+    @PutMapping("/{schedule_id}/price")
+    public ApiResponse<Long> updateSchedulePrice(@PathVariable("schedule_id") Long scheduleId,
+                                                   @RequestBody Long price) {
+        System.out.println("Received price: " + price);
+        scheduleService.updatePrice(scheduleId, price);
+        return new ApiResponse<>(true, "예산 저장 완료", price);
+    }
+
+    //여행 일정 price 관리 - 삭제
+    @DeleteMapping("/{schedule_id}/price")
+    public ApiResponse<Void> deleteSchedulePrice(@PathVariable("schedule_id") Long scheduleId) {
+        scheduleService.deletePrice(scheduleId);
+        return new ApiResponse<>(true, "예산 삭제 완료");
     }
 }

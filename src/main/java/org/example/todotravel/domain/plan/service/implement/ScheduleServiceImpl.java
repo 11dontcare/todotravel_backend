@@ -2,7 +2,6 @@ package org.example.todotravel.domain.plan.service.implement;
 
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.plan.dto.request.ScheduleCreateRequestDto;
-import org.example.todotravel.domain.plan.dto.request.VehicleRequestDto;
 import org.example.todotravel.domain.plan.dto.response.ScheduleResponseDto;
 import org.example.todotravel.domain.plan.entity.Location;
 import org.example.todotravel.domain.plan.entity.Plan;
@@ -74,9 +73,9 @@ public class ScheduleServiceImpl implements ScheduleService {
     //여행 일정 등록(수정)하기 - vehicle
     @Override
     @Transactional
-    public Schedule updateVehicle(Long scheduleId, VehicleRequestDto dto) {
+    public Schedule updateVehicle(Long scheduleId, String vehicle) {
         Schedule schedule = findByScheduleId(scheduleId);
-        schedule.setVehicle(Schedule.VehicleType.valueOf(dto.getVehicle()));
+        schedule.setVehicle(Schedule.VehicleType.valueOf(vehicle));
         return scheduleRepository.save(schedule);
     }
 
@@ -86,6 +85,24 @@ public class ScheduleServiceImpl implements ScheduleService {
     public Schedule deleteVehicle(Long scheduleId) {
         Schedule schedule = findByScheduleId(scheduleId);
         schedule.setVehicle(null);
+        return scheduleRepository.save(schedule);
+    }
+
+    //여행 일정 등록(수정)하기 - price
+    @Override
+    @Transactional
+    public Schedule updatePrice(Long scheduleId, Long price) {
+        Schedule schedule = findByScheduleId(scheduleId);
+        schedule.setPrice(price);
+        return scheduleRepository.save(schedule);
+    }
+
+    //여행 일정 삭제하기 - price
+    @Override
+    @Transactional
+    public Schedule deletePrice(Long scheduleId) {
+        Schedule schedule = findByScheduleId(scheduleId);
+        schedule.setPrice(null);
         return scheduleRepository.save(schedule);
     }
 }
