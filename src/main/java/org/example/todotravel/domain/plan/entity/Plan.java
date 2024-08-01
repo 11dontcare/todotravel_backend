@@ -13,6 +13,7 @@ import org.example.todotravel.domain.user.entity.User;
 @Table(name = "plans")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Plan {
@@ -55,11 +56,11 @@ public class Plan {
     private User planUser;
 
     //각 플랜 유저
-    @OneToMany(mappedBy = "planId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PlanUser> planUsers;
 
     //일정 받아오기
-    @OneToMany(mappedBy = "planId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Schedule> schedules;
 
 }

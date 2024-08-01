@@ -13,5 +13,5 @@ public interface LocationService {
     Optional<Location> findByLocationId(Long locationId);
 
     //비즈니스 로직 처리
-    Location saveLocation(String name, double latitude, double longitude);
+    Location createLocation(String name, double latitude, double longitude);
 }
