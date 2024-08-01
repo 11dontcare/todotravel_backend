@@ -18,4 +18,6 @@ public interface UserService {
     void checkDuplicateEmail(String email);
 
     void checkDuplicateNickname(String nickname);
+
+    User checkLoginAvailable(String username, String password, PasswordEncoder passwordEncoder);
 }
