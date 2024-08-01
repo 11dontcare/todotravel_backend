@@ -2,7 +2,10 @@ package org.example.todotravel.global.handler;
 
 
 import java.time.LocalDateTime;
+
 import lombok.extern.slf4j.Slf4j;
+import org.example.todotravel.global.exception.CustomJwtException;
+import org.example.todotravel.global.exception.DuplicateUserException;
 import org.example.todotravel.global.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,23 +20,31 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class) // 발생할 모든 exception을 처리할 것
-    public final ResponseEntity<ErrorDetails> handleAllException(Exception ex, WebRequest request) throws Exception {
+    public final ResponseEntity<ErrorDetails> handleAllException(Exception ex, WebRequest request) {
         // 정의한 custom exception structure 만들기
-        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(),
-                request.getDescription(false));
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
         // 만든 예외구조를 반환하는 기능
-        return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     // 유저가 존재하지 않을 때의 exception
     @ExceptionHandler(UserNotFoundException.class)
-    public final ResponseEntity<ErrorDetails> handleUserNotFoundException(Exception ex, WebRequest request)
-            throws Exception {
+    public final ResponseEntity<ErrorDetails> handleUserNotFoundException(Exception ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+    }
 
-        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(),
-                request.getDescription(false));
+    // CustomJwtException 예외를 처리하는 핸들러
+    @ExceptionHandler(CustomJwtException.class)
+    public ResponseEntity<ErrorDetails> handleCustomJwtException(Exception ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+    }
 
-        return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.NOT_FOUND);
-
+    // DuplicateUserException 예외를 처리하는 핸들러
+    @ExceptionHandler(DuplicateUserException.class)
+    public ResponseEntity<ErrorDetails> handleDuplicateUserException(Exception ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
     }
 }

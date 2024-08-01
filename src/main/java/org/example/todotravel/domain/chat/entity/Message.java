@@ -16,7 +16,6 @@ import org.example.todotravel.domain.user.entity.User;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Message {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "message_id", nullable = false)
