@@ -16,7 +16,6 @@ import org.example.todotravel.domain.plan.entity.Plan;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatRoom {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "room_id", nullable = false)

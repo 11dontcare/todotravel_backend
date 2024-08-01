@@ -25,7 +25,7 @@ public class PlanUser {
 
     @ManyToOne
     @JoinColumn(name = "plan_id", nullable = false)
-    private Plan planId;
+    private Plan plan;
 
     public enum StatusType {
         PENDING, ACCEPTED, REJECTED
