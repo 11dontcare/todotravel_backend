@@ -87,7 +87,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //        Long userId = claims.get("userId", Long.class);
 //        String name = claims.get("name", String.class);
         String username = claims.get("username", String.class); // username을 가져옴
-        Role role = Role.valueOf(claims.get("role", String.class)); // 단일 역할을 가져옴
+        Role role = Role.valueOf(claims.get("roles", String.class)); // 단일 역할을 가져옴
 
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role.name()));
 
