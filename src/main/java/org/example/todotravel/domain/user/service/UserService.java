@@ -19,5 +19,7 @@ public interface UserService {
 
     void checkDuplicateNickname(String nickname);
 
+    void setTempPassword(String email, String tempPassword, PasswordEncoder passwordEncoder);
+
     User checkLoginAvailable(String username, String password, PasswordEncoder passwordEncoder);
 }

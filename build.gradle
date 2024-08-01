@@ -30,7 +30,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // oauth2
     implementation 'org.springframework.boot:spring-boot-starter-security'      // spring security
     implementation 'org.springframework.boot:spring-boot-starter-validation'    // validation
+    implementation 'org.springframework.boot:spring-boot-starter-mail'          // Spring Boot Starter Mail
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'     // Thymeleaf for Mail Form
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // 메일 Context에 Thymeleaf 적용을 위한 의존성
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 
     // JWT
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'

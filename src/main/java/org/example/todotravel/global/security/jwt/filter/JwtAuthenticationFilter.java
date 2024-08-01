@@ -26,6 +26,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,11 +38,16 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenizer jwtTokenizer;
 
+    String[] notFilter = {
+        "/api/auth",
+        "/api/send-mail"
+    };
+
     // 인증이 필요 없는 경로는 필터 적용하지 않도록 설정
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return "/api/auth/login".equals(path) || "/api/auth/signup".equals(path);
+        return Arrays.stream(notFilter).anyMatch(path::startsWith);
     }
 
     /**
