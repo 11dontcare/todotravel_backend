@@ -24,30 +24,36 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'     // jdbc
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'      // jpa
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // oauth2
+    implementation 'org.springframework.boot:spring-boot-starter-security'      // spring security
+    implementation 'org.springframework.boot:spring-boot-starter-validation'    // validation
+    implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    //valid 의존성 추가 - 정유진
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-    // spring security
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-
-    // jwt & json
+    // JWT
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 
-    // gson - json 메시지를 다루기 위한 라이브러리
+    // JSON Processing
     implementation 'com.google.code.gson:gson'
 
+    // 추후 삭제해도 될 것으로 보임
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.2.RELEASE'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
+
+    // Development Tools
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // Database
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // Test Dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
