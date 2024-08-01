@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.plan.dto.request.ScheduleCreateRequestDto;
 import org.example.todotravel.domain.plan.dto.response.ScheduleResponseDto;
 import org.example.todotravel.domain.plan.entity.Schedule;
-import org.example.todotravel.domain.plan.implement.ScheduleServiceImpl;
+import org.example.todotravel.domain.plan.service.implement.ScheduleServiceImpl;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 

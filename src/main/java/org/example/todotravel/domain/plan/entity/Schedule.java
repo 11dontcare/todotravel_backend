@@ -4,6 +4,8 @@ import lombok.*;
 
 import jakarta.persistence.*;
 
+import java.time.LocalTime;
+
 @Entity
 @Table(name = "schedules")
 @Getter
@@ -25,6 +27,9 @@ public class Schedule {
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "travel_time")
+    private LocalTime travelTime;
 
     @ManyToOne
     @JoinColumn(name = "plan_id", nullable = false)

@@ -1,4 +1,4 @@
-package org.example.todotravel.domain.plan.implement;
+package org.example.todotravel.domain.plan.service.implement;
 
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.plan.dto.request.ScheduleCreateRequestDto;
@@ -10,8 +10,6 @@ import org.example.todotravel.domain.plan.repository.ScheduleRepository;
 import org.example.todotravel.domain.plan.service.ScheduleService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +46,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .status(false)
                 .travelDayCount(dto.getTravelDayCount())
                 .description(dto.getDescription())
+                .travelTime(dto.getTravelTime())
                 .plan(plan)
                 .location(location)
 //                .vehicle(dto.getVehicleId())

@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalTime;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -14,11 +16,11 @@ import lombok.NoArgsConstructor;
 public class ScheduleCreateRequestDto {
     @NotNull
     private Long locationId;
-    @NotBlank
+    @NotNull
     private Integer travelDayCount;
-
-    private String description;
     //null 허용
+    private String description;
+    private LocalTime travelTime;
     private Long vehicleId;
     private Long budgetId;
 }

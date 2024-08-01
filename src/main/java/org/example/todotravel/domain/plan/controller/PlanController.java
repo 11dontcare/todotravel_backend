@@ -3,13 +3,9 @@ package org.example.todotravel.domain.plan.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.plan.dto.request.PlanRequestDto;
 import org.example.todotravel.domain.plan.entity.Plan;
-import org.example.todotravel.domain.plan.implement.PlanServiceImpl;
+import org.example.todotravel.domain.plan.service.implement.PlanServiceImpl;
 import org.example.todotravel.global.controller.ApiResponse;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
