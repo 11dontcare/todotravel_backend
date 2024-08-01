@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.user.entity.Role;
+import org.example.todotravel.global.exception.CustomJwtException;
 import org.example.todotravel.global.exception.JwtExceptionCode;
 import org.example.todotravel.global.security.CustomUserDetails;
 import org.example.todotravel.global.security.jwt.token.JwtAuthenticationToken;
@@ -36,6 +37,13 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenizer jwtTokenizer;
 
+    // 인증이 필요 없는 경로는 필터 적용하지 않도록 설정
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return "/api/auth/login".equals(path) || "/api/auth/signup".equals(path);
+    }
+
     /**
      * 필터 메서드 - 각 요청마다 JWT 토큰을 검증하고 인증을 설정
      *
@@ -47,30 +55,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = getToken(request); //accessToken 얻어냄.
+        if (shouldNotFilter(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        if (StringUtils.hasText(token)) {
+        String token = getAccessToken(request); // accessToken 얻어냄.
+
+        if (!StringUtils.hasText(token)) {
+            handleTokenRenewal(request, response, false);
+        } else {
             try {
                 getAuthentication(token);   // 토큰을 사용하여 인증 설정
             } catch (ExpiredJwtException e) {
-                request.setAttribute("exception", JwtExceptionCode.EXPIRED_TOKEN.getCode());
-                log.error("Expired Token : {}", token, e);
-                throw new BadCredentialsException("Expired token exception", e);
+                handleTokenRenewal(request, response, true);
             } catch (UnsupportedJwtException e) {
-                request.setAttribute("exception", JwtExceptionCode.UNSUPPORTED_TOKEN.getCode());
                 log.error("Unsupported Token: {}", token, e);
-                throw new BadCredentialsException("Unsupported token exception", e);
+                throw new CustomJwtException(JwtExceptionCode.UNSUPPORTED_TOKEN);
             } catch (MalformedJwtException e) {
-                request.setAttribute("exception", JwtExceptionCode.INVALID_TOKEN.getCode());
                 log.error("Invalid Token: {}", token, e);
-                throw new BadCredentialsException("Invalid token exception", e);
+                throw new CustomJwtException(JwtExceptionCode.INVALID_TOKEN);
             } catch (IllegalArgumentException e) {
-                request.setAttribute("exception", JwtExceptionCode.NOT_FOUND_TOKEN.getCode());
                 log.error("Token not found: {}", token, e);
-                throw new BadCredentialsException("Token not found exception", e);
+                throw new CustomJwtException(JwtExceptionCode.NOT_FOUND_TOKEN);
             } catch (Exception e) {
                 log.error("JWT Filter - Internal Error: {}", token, e);
-                throw new BadCredentialsException("JWT filter internal exception", e);
+                throw new CustomJwtException(JwtExceptionCode.UNKNOWN_ERROR);
             }
         }
         filterChain.doFilter(request, response); // 다음 필터로 요청을 전달
@@ -87,7 +97,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //        Long userId = claims.get("userId", Long.class);
 //        String name = claims.get("name", String.class);
         String username = claims.get("username", String.class); // username을 가져옴
-        Role role = Role.valueOf(claims.get("role", String.class)); // 단일 역할을 가져옴
+        Role role = Role.valueOf(claims.get("roles", String.class)); // 단일 역할을 가져옴
 
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role.name()));
 
@@ -103,12 +113,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * 요청에서 토큰을 추출
+     * 요청에서 accessToken 추출
      *
      * @param request - 요청 객체
-     * @return - JWT 토큰
+     * @return - accessToken
      */
-    private String getToken(HttpServletRequest request) {
+    private String getAccessToken(HttpServletRequest request) {
         String authorization = request.getHeader("Authorization");
         if (StringUtils.hasText(authorization) && authorization.startsWith("Bearer ")) {
             return authorization.substring(7);
@@ -124,5 +134,54 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return null;
+    }
+
+    /**
+     * 요청에서 refreshToken 추출
+     *
+     * @param request - 요청 객체
+     * @return - refreshToken
+     */
+    private String getRefreshToken(HttpServletRequest request) {
+        String authorization = request.getHeader("Refresh-Token");
+        if (StringUtils.hasText(authorization) && authorization.startsWith("Bearer ")) {
+            return authorization.substring(7);
+        }
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * AccessToken 갱신을 다루는 메서드
+     *
+     * @param request   요청 객체
+     * @param response  응답 객체
+     * @param isExpired accessToken 만료 여부
+     */
+    private void handleTokenRenewal(HttpServletRequest request, HttpServletResponse response, boolean isExpired) {
+        String refreshToken = getRefreshToken(request);
+        if (refreshToken != null) {
+            try {
+                jwtTokenizer.renewAccessToken(request, response, refreshToken);
+            } catch (Exception e) {
+                log.error("Failed to renew access token", e);
+                throw new CustomJwtException(JwtExceptionCode.EXPIRED_TOKEN);
+            }
+        } else {
+            if (isExpired) {
+                throw new CustomJwtException(JwtExceptionCode.EXPIRED_TOKEN);
+            } else {
+                throw new CustomJwtException(JwtExceptionCode.NOT_FOUND_TOKEN);
+            }
+        }
     }
 }
