@@ -1,4 +1,4 @@
-package org.example.todotravel.domain.plan.implement;
+package org.example.todotravel.domain.plan.service.implement;
 
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.plan.dto.request.ScheduleCreateRequestDto;
@@ -10,8 +10,6 @@ import org.example.todotravel.domain.plan.repository.ScheduleRepository;
 import org.example.todotravel.domain.plan.service.ScheduleService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -48,10 +46,9 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .status(false)
                 .travelDayCount(dto.getTravelDayCount())
                 .description(dto.getDescription())
+                .travelTime(dto.getTravelTime())
                 .plan(plan)
                 .location(location)
-//                .vehicle(dto.getVehicleId())
-//                .budget(dto.getBudgetId())
                 .build();
         return scheduleRepository.save(schedule);
     }
@@ -60,6 +57,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     @Transactional
     public void destroySchedule(Long scheduleId) {
+
         scheduleRepository.delete(findByScheduleId(scheduleId));
     }
 
@@ -69,6 +67,42 @@ public class ScheduleServiceImpl implements ScheduleService {
     public Schedule updateStatus(Long scheduleId) {
         Schedule schedule = findByScheduleId(scheduleId);
         schedule.setStatus(!schedule.getStatus());
+        return scheduleRepository.save(schedule);
+    }
+
+    //여행 일정 등록(수정)하기 - vehicle
+    @Override
+    @Transactional
+    public Schedule updateVehicle(Long scheduleId, String vehicle) {
+        Schedule schedule = findByScheduleId(scheduleId);
+        schedule.setVehicle(Schedule.VehicleType.valueOf(vehicle));
+        return scheduleRepository.save(schedule);
+    }
+
+    //여행 일정 삭제하기 - vehicle
+    @Override
+    @Transactional
+    public Schedule deleteVehicle(Long scheduleId) {
+        Schedule schedule = findByScheduleId(scheduleId);
+        schedule.setVehicle(null);
+        return scheduleRepository.save(schedule);
+    }
+
+    //여행 일정 등록(수정)하기 - price
+    @Override
+    @Transactional
+    public Schedule updatePrice(Long scheduleId, Long price) {
+        Schedule schedule = findByScheduleId(scheduleId);
+        schedule.setPrice(price);
+        return scheduleRepository.save(schedule);
+    }
+
+    //여행 일정 삭제하기 - price
+    @Override
+    @Transactional
+    public Schedule deletePrice(Long scheduleId) {
+        Schedule schedule = findByScheduleId(scheduleId);
+        schedule.setPrice(null);
         return scheduleRepository.save(schedule);
     }
 }
