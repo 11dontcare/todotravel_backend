@@ -77,6 +77,18 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    // 임시 비밀번호 재설정
+    @Override
+    @Transactional
+    public void setTempPassword(String email, String tempPassword, PasswordEncoder passwordEncoder) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+
+        user.setPassword(passwordEncoder.encode(tempPassword));
+
+        userRepository.save(user);
+    }
+
     // 로그인 가능한지 확인
     @Override
     @Transactional(readOnly = true)
@@ -84,7 +96,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new UserNotFoundException("존재하지 않는 아이디입니다."));
 
-        if(!passwordEncoder.matches(password, user.getPassword())) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
 
