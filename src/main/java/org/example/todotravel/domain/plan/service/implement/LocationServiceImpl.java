@@ -1,4 +1,4 @@
-package org.example.todotravel.domain.plan.implement;
+package org.example.todotravel.domain.plan.service.implement;
 
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.plan.entity.Location;

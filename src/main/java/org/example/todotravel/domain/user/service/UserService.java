@@ -5,6 +5,7 @@ import org.example.todotravel.domain.user.entity.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,4 +19,7 @@ public interface UserService {
     void checkDuplicateEmail(String email);
 
     void checkDuplicateNickname(String nickname);
+
+    //플랜에 사용자 초대 시 모든 사용자 목록을 return - 김민정
+    List<User> getAllUsers();
 }

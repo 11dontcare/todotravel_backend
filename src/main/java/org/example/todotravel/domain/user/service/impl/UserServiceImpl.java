@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -73,5 +74,11 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByNickname(nickname).isPresent()) {
             throw new DuplicateUserException("이미 존재하는 닉네임입니다.");
         }
+    }
+
+    //플랜에 사용자 초대 시 모든 사용자 목록을 return - 김민정
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }

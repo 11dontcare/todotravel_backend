@@ -3,7 +3,7 @@ package org.example.todotravel.domain.plan.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.plan.dto.request.LocationCreateRequestDto;
 import org.example.todotravel.domain.plan.entity.Location;
-import org.example.todotravel.domain.plan.implement.LocationServiceImpl;
+import org.example.todotravel.domain.plan.service.implement.LocationServiceImpl;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;

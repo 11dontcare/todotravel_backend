@@ -13,7 +13,7 @@ import org.example.todotravel.domain.user.entity.User;
 @Table(name = "plans")
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Plan {
@@ -44,7 +44,8 @@ public class Plan {
     @Column(name = "status", nullable = false)
     private Boolean status;
 
-    @Column(name = "participants_count", nullable = false)
+    //Not Null -> Null로 변경
+    @Column(name = "participants_count")
     private Integer participantsCount;
 
     @Column(name = "total_budget")
