@@ -1,4 +1,4 @@
-package org.example.todotravel.global.security.jwt.filter;
+package org.example.todotravel.global.jwt.filter;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -15,8 +15,8 @@ import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.global.exception.CustomJwtException;
 import org.example.todotravel.global.exception.JwtExceptionCode;
 import org.example.todotravel.global.security.CustomUserDetails;
-import org.example.todotravel.global.security.jwt.token.JwtAuthenticationToken;
-import org.example.todotravel.global.security.jwt.util.JwtTokenizer;
+import org.example.todotravel.global.jwt.token.JwtAuthenticationToken;
+import org.example.todotravel.global.jwt.util.JwtTokenizer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

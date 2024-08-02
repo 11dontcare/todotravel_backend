@@ -12,7 +12,7 @@ import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.impl.RefreshTokenServiceImpl;
 import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
 import org.example.todotravel.global.controller.ApiResponse;
-import org.example.todotravel.global.security.jwt.util.JwtTokenizer;
+import org.example.todotravel.global.jwt.util.JwtTokenizer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 

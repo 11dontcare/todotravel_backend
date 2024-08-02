@@ -1,4 +1,4 @@
-package org.example.todotravel.global.security.jwt.token;
+package org.example.todotravel.global.jwt.token;
 
 import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;

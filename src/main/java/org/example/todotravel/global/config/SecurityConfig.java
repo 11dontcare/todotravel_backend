@@ -1,8 +1,8 @@
 package org.example.todotravel.global.config;
 
 import lombok.RequiredArgsConstructor;
-import org.example.todotravel.global.security.jwt.filter.JwtAuthenticationFilter;
-import org.example.todotravel.global.security.jwt.util.JwtTokenizer;
+import org.example.todotravel.global.jwt.filter.JwtAuthenticationFilter;
+import org.example.todotravel.global.jwt.util.JwtTokenizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

@@ -1,4 +1,4 @@
-package org.example.todotravel.global.security.jwt.util;
+package org.example.todotravel.global.jwt.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
