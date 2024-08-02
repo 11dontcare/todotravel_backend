@@ -1,4 +1,4 @@
-package org.example.todotravel.global.security.jwt.filter;
+package org.example.todotravel.global.jwt.filter;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -15,9 +15,8 @@ import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.global.exception.CustomJwtException;
 import org.example.todotravel.global.exception.JwtExceptionCode;
 import org.example.todotravel.global.security.CustomUserDetails;
-import org.example.todotravel.global.security.jwt.token.JwtAuthenticationToken;
-import org.example.todotravel.global.security.jwt.util.JwtTokenizer;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.example.todotravel.global.jwt.token.JwtAuthenticationToken;
+import org.example.todotravel.global.jwt.util.JwtTokenizer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -107,49 +106,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role.name()));
 
-        CustomUserDetails userDetails = new CustomUserDetails(
-            email,
-            username,
-            "",
-            role // Role 객체를 직접 전달
-        );
-
+        CustomUserDetails userDetails = new CustomUserDetails(email, username, "", role);
         Authentication authentication = new JwtAuthenticationToken(authorities, userDetails, null); // 인증 객체 생성
         SecurityContextHolder.getContext().setAuthentication(authentication); // SecurityContextHolder 인증 객체 설정
     }
 
-    /**
-     * 요청에서 accessToken 추출
-     *
-     * @param request - 요청 객체
-     * @return - accessToken
-     */
     private String getAccessToken(HttpServletRequest request) {
-        String authorization = request.getHeader("Authorization");
-        if (StringUtils.hasText(authorization) && authorization.startsWith("Bearer ")) {
-            return authorization.substring(7);
-        }
+        return getToken(request, "Authorization", "accessToken");
+    }
 
-        Cookie[] cookies = request.getCookies(); // 쿠키에서 토큰 찾기
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-
-        return null;
+    private String getRefreshToken(HttpServletRequest request) {
+        return getToken(request, "Refresh-Token", "refreshToken");
     }
 
     /**
-     * 요청에서 refreshToken 추출
+     * 지정한 토큰을 반환하는 메서드
      *
-     * @param request - 요청 객체
-     * @return - refreshToken
+     * @param request    요청 객체
+     * @param headerName 요청의 헤더 이름
+     * @param cookieName 쿠키 이름
+     * @return cookieValue
      */
-    private String getRefreshToken(HttpServletRequest request) {
-        String authorization = request.getHeader("Refresh-Token");
+    private String getToken(HttpServletRequest request, String headerName, String cookieName) {
+        String authorization = request.getHeader(headerName);
         if (StringUtils.hasText(authorization) && authorization.startsWith("Bearer ")) {
             return authorization.substring(7);
         }
@@ -157,7 +136,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("refreshToken".equals(cookie.getName())) {
+                if (cookieName.equals(cookie.getName())) {
                     return cookie.getValue();
                 }
             }
@@ -177,7 +156,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String refreshToken = getRefreshToken(request);
         if (refreshToken != null) {
             try {
-                jwtTokenizer.renewAccessToken(request, response, refreshToken);
+                jwtTokenizer.renewAccessToken(response, refreshToken);
             } catch (Exception e) {
                 log.error("Failed to renew access token", e);
                 throw new CustomJwtException(JwtExceptionCode.EXPIRED_TOKEN);
