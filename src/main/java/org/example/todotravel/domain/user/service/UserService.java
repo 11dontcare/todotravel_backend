@@ -20,6 +20,8 @@ public interface UserService {
 
     void checkDuplicateNickname(String nickname);
 
+    User checkLoginAvailable(String username, String password, PasswordEncoder passwordEncoder);
+
     //플랜에 사용자 초대 시 모든 사용자 목록을 return - 김민정
     List<User> getAllUsers();
 }
