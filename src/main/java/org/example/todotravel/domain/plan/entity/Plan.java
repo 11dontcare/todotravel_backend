@@ -45,6 +45,7 @@ public class Plan {
     private Boolean status;
 
     //Not Null -> Null로 변경
+    //db에 반영 안 될 시 alter table plans modify column participants_count int null;
     @Column(name = "participants_count")
     private Integer participantsCount;
 
