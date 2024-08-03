@@ -7,6 +7,7 @@ import org.example.todotravel.domain.plan.entity.PlanUser;
 import org.example.todotravel.domain.plan.repository.PlanRepository;
 import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.user.entity.User;
+import org.example.todotravel.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class PlanServiceImpl implements PlanService {
     private final PlanRepository planRepository;
+    private final UserRepository userRepository;//push 전 제거 (테스트용)
 
     @Override
     @Transactional
@@ -26,8 +28,12 @@ public class PlanServiceImpl implements PlanService {
         //현재 로그인 중인 사용자 user
         User user = new User();
         plan.setPlanUser(user);
-        //planUsers에 플랜 생성자 추가, 나중엔 user에서 정보 받아오도록
-        PlanUser planUser = new PlanUser();
+        //planUsers에 플랜 생성자 추가
+        PlanUser planUser = PlanUser.builder()
+                .status(PlanUser.StatusType.PENDING)
+                .user(user)
+                .plan(plan)
+                .build();
         plan.setPlanUsers(Collections.singleton(planUser));
         return planRepository.save(plan);
     }
@@ -40,26 +46,26 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     @Transactional
-    public void updatePlan(Long planId, PlanRequestDto dto) {
+    public Plan updatePlan(Long planId, PlanRequestDto dto) {
         Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("여행 플랜을 찾을 수 없습니다."));
-//        plan.setTitle(dto.getTitle());
-//        plan.setLocation(dto.getLocation());
-//        plan.setStartDate(dto.getStartDate());
-//        plan.setEndDate(dto.getEndDate());
-//        plan.setIsPublic(dto.getIsPublic());
-//        plan.setTotalBudget(dto.getTotalBudget());
+        plan.setTitle(dto.getTitle());
+        plan.setLocation(dto.getLocation());
+        plan.setStartDate(dto.getStartDate());
+        plan.setEndDate(dto.getEndDate());
+        plan.setIsPublic(dto.getIsPublic());
+        plan.setTotalBudget(dto.getTotalBudget());
 
         //수정을 위해 toBuilder 사용
-        plan.toBuilder()
-                .title(dto.getTitle())
-                .location(dto.getLocation())
-                .startDate(dto.getStartDate())
-                .endDate(dto.getEndDate())
-                .isPublic(dto.getIsPublic())
-                .totalBudget(dto.getTotalBudget())
-                .build();
+//        plan.toBuilder()
+//                .title(dto.getTitle())
+//                .location(dto.getLocation())
+//                .startDate(dto.getStartDate())
+//                .endDate(dto.getEndDate())
+//                .isPublic(dto.getIsPublic())
+//                .totalBudget(dto.getTotalBudget())
+//                .build();
 
-        planRepository.save(plan);
+        return planRepository.save(plan);
     }
 
     @Override

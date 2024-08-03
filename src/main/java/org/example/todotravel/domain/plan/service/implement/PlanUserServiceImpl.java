@@ -61,9 +61,9 @@ public class PlanUserServiceImpl implements PlanUserService {
 
     @Override
     @Transactional
-    public PlanUser removePlanUser(Long planId, Long userId) {
+    public void removePlanUser(Long planId, Long userId) {
         Plan plan = planService.getPlan(planId);
         User user = userService.getUserByUserId(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-        return planUserRepository.deletePlanUserByPlanAndUser(plan, user);
+        planUserRepository.deletePlanUserByPlanAndUser(plan, user);
     }
 }

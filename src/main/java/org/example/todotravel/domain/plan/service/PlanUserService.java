@@ -11,5 +11,5 @@ public interface PlanUserService {
     PlanUser rejected(Long planParticipantId);
     PlanUser accepted(Long planParticipantId);
     List<PlanUser> getAllPlanUser(Long planId);
-    PlanUser removePlanUser(Long planId, Long userId);
+    void removePlanUser(Long planId, Long userId);
 }

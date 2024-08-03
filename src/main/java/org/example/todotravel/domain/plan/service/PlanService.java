@@ -9,7 +9,7 @@ public interface PlanService {
     Plan createPlan(PlanRequestDto planRequestDto);
     void deletePlan(Long planId);
     Plan getPlan(Long planId);
-    void updatePlan(Long planId, PlanRequestDto dto);
+    Plan updatePlan(Long planId, PlanRequestDto dto);
 
 
 }
