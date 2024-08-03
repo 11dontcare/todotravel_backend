@@ -36,9 +36,9 @@ public class PlanController {
     }
     //플랜 수정
     @PutMapping("/{plan_id}")
-    public ApiResponse<Plan> updatePlan(@PathVariable("plan_id") Long planId, @RequestBody PlanRequestDto dto){
-        planService.updatePlan(planId, dto);
-        return new ApiResponse<>(true, "플랜 수정 성공");
+    public ApiResponse<Plan> updatePlan(@PathVariable("plan_id") Long planId, @Valid @RequestBody PlanRequestDto dto){
+        Plan plan = planService.updatePlan(planId, dto);
+        return new ApiResponse<>(true, "플랜 수정 성공", plan);
     }
     //플랜 삭제
     @DeleteMapping("/{plan_id}")
@@ -50,12 +50,12 @@ public class PlanController {
     @GetMapping("/{plan_id}/invite")
     public ApiResponse<List<User>> invite(@PathVariable("plan_id") Long planId){
         List<User> users = userService.getAllUsers();
-        Plan plan = planService.getPlan(planId);
         //해당 플랜에 참여하고 있지 않은 사용자만
-        users.forEach(user -> {
-            if(user.getPlans().contains(plan))
-                users.remove(user);
-        });
+        List<PlanUser> planUsers = planUserService.getAllPlanUser(planId);
+        for (PlanUser planUser : planUsers){
+            if (users.contains(planUser.getUser()))
+                users.remove(planUser.getUser());
+        }
         return new ApiResponse<>(true, "사용자 목록 조회 성공", users);
     }
     //플랜 사용자 초대
