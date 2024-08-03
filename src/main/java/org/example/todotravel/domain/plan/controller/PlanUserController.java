@@ -34,7 +34,7 @@ public class PlanUserController {
     //플랜 나가기, 초대 취소
     @DeleteMapping("/plan/{plan_id}/participant/{user_id}")
     public ApiResponse<PlanUser> deletePlanUser(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId){
-        PlanUser planUser = planUserService.removePlanUser(planId, userId);
-        return new ApiResponse<>(true, "플랜 참여자 삭제 성공", planUser);
+        planUserService.removePlanUser(planId, userId);
+        return new ApiResponse<>(true, "플랜 참여자 삭제 성공");
     }
 }
