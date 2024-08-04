@@ -1,28 +1,27 @@
 package org.example.todotravel.domain.plan.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.example.todotravel.domain.user.entity.User;
 
 @Entity
 @Table(name = "bookmarks")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Bookmark {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bookmark_id", nullable = false)
     private String bookmarkId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User likeUser;
+    private User bookmarkUser;
 
     @ManyToOne
     @JoinColumn(name = "plan_id", nullable = false)
-    private Plan planId;
+    private Plan plan;
 }

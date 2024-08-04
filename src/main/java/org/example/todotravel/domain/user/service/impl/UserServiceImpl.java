@@ -2,6 +2,7 @@ package org.example.todotravel.domain.user.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.user.dto.request.UserRegisterRequestDto;
+import org.example.todotravel.domain.user.dto.request.UsernameRequestDto;
 import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.repository.UserRepository;
@@ -78,18 +79,6 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    // 임시 비밀번호 재설정
-    @Override
-    @Transactional
-    public void setTempPassword(String email, String tempPassword, PasswordEncoder passwordEncoder) {
-        User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
-
-        user.setPassword(passwordEncoder.encode(tempPassword));
-
-        userRepository.save(user);
-    }
-
     // 로그인 가능한지 확인
     @Override
     @Transactional(readOnly = true)
@@ -102,6 +91,28 @@ public class UserServiceImpl implements UserService {
         }
 
         return user;
+    }
+
+    // 임시 비밀번호 재설정
+    @Override
+    @Transactional
+    public void setTempPassword(String email, String tempPassword, PasswordEncoder passwordEncoder) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+
+        user.setPassword(passwordEncoder.encode(tempPassword));
+
+        userRepository.save(user);
+    }
+
+    // 이름, 이메일로 아이디 찾기
+    @Override
+    @Transactional
+    public String getUsername(UsernameRequestDto dto) {
+        User user = userRepository.findByNameAndEmail(dto.getName(), dto.getEmail())
+            .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+
+        return user.getUsername();
     }
 
     //플랜에 사용자 초대 시 모든 사용자 목록을 return - 김민정
