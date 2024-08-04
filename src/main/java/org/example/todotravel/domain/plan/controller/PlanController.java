@@ -3,6 +3,8 @@ package org.example.todotravel.domain.plan.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.plan.dto.request.PlanRequestDto;
+import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
+import org.example.todotravel.domain.plan.dto.response.PlanResponseDto;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
 import org.example.todotravel.domain.plan.service.implement.PlanServiceImpl;
@@ -63,5 +65,23 @@ public class PlanController {
     public ApiResponse<PlanUser> inviteUser(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId){
         PlanUser planUser = planUserService.addPlanUser(planId, userId);
         return new ApiResponse<>(true, "사용자 초대 성공", planUser);
+    }
+    //플랜 조회
+    @GetMapping("/get")
+    public ApiResponse<List<PlanListResponseDto>> viewPlanList(){
+        List<PlanListResponseDto> planList = planService.getPublicPlans();
+        return new ApiResponse<>(true, "플랜 목록 조회 성공", planList);
+    }
+    //플랜 상세 조회
+    @GetMapping("/specific/{plan_id}")
+    public ApiResponse<PlanResponseDto> viewPlan(@PathVariable("plan_id") Long planId){
+        PlanResponseDto planDetails = planService.getPlanDetails(planId);
+        return new ApiResponse<>(true, "플랜 조회 성공", planDetails);
+    }
+    //플랜 불러오기
+    @PostMapping("/{plan_id}/load")
+    public ApiResponse<Plan> loadPlan(@PathVariable("plan_id") Long planId){
+        Plan plan = planService.copyPlan(planId);
+        return new ApiResponse<>(true, "플랜 불러오기 성공", plan);
     }
 }
