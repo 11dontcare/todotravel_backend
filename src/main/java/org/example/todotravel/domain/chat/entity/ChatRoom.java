@@ -21,6 +21,9 @@ public class ChatRoom {
     @Column(name = "room_id", nullable = false)
     private Long roomId;
 
+    @Column(name = "room_name", nullable = false)
+    private String roomName;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User chatUser;

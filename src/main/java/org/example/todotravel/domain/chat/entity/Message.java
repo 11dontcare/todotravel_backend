@@ -34,10 +34,4 @@ public class Message {
 
     @Column(name = "chat_date", nullable = false)
     private LocalDateTime chatDate;
-
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
-    @Column(name = "room_id", nullable = false)
-    private Long roomId;
 }
