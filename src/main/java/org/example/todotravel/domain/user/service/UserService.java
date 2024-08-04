@@ -1,6 +1,7 @@
 package org.example.todotravel.domain.user.service;
 
 import org.example.todotravel.domain.user.dto.request.UserRegisterRequestDto;
+import org.example.todotravel.domain.user.dto.request.UsernameRequestDto;
 import org.example.todotravel.domain.user.entity.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,9 +21,11 @@ public interface UserService {
 
     void checkDuplicateNickname(String nickname);
 
-    void setTempPassword(String email, String tempPassword, PasswordEncoder passwordEncoder);
-
     User checkLoginAvailable(String username, String password, PasswordEncoder passwordEncoder);
+
+    String getUsername(UsernameRequestDto dto);
+
+    void setTempPassword(String email, String tempPassword, PasswordEncoder passwordEncoder);
 
     //플랜에 사용자 초대 시 모든 사용자 목록을 return - 김민정
     List<User> getAllUsers();
