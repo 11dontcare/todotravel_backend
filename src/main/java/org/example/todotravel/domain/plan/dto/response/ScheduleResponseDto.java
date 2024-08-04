@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.example.todotravel.domain.plan.entity.Schedule;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,11 +18,11 @@ public class ScheduleResponseDto {
     private Boolean status;
     private Integer travelDayCount;
     private String description;
+    private LocalTime travelTime;
+    private String vehicle;
+    private Long price;
     private Long planId;
     private Long locationId;
-    private Long vehicleId;
-    private Long budgetId;
-
 
     public static ScheduleResponseDto fromEntity(Schedule schedule) {
         return ScheduleResponseDto.builder()
@@ -29,10 +30,11 @@ public class ScheduleResponseDto {
                 .status(schedule.getStatus())
                 .travelDayCount(schedule.getTravelDayCount())
                 .description(schedule.getDescription())
+                .travelTime(schedule.getTravelTime())
                 .planId(schedule.getPlan().getPlanId())
                 .locationId(schedule.getLocation().getLocationId())
-                .vehicleId(schedule.getVehicle() != null ? schedule.getVehicle().getVehicleId() : null)
-                .budgetId(schedule.getBudget() != null ? schedule.getBudget().getBudgetId() : null)
+                .vehicle(schedule.getVehicle() != null ? schedule.getVehicle().name() : null)
+                .price(schedule.getPrice() != null ? schedule.getPrice() : null)
                 .build();
     }
 }

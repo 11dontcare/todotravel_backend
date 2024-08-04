@@ -5,11 +5,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.todotravel.domain.user.dto.request.LoginRequestDto;
 import org.example.todotravel.domain.user.dto.request.UserRegisterRequestDto;
+import org.example.todotravel.domain.user.dto.response.LoginResponseDto;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.impl.RefreshTokenServiceImpl;
 import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
 import org.example.todotravel.global.controller.ApiResponse;
+import org.example.todotravel.global.jwt.util.JwtTokenizer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +23,7 @@ public class UserController {
     private final UserServiceImpl userService;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenServiceImpl refreshTokenService;
+    private final JwtTokenizer jwtTokenizer;
 
     @PostMapping("/signup")
     public ApiResponse<?> registerUser(@Valid @RequestBody UserRegisterRequestDto dto) {
@@ -43,6 +47,23 @@ public class UserController {
     public ApiResponse<?> checkNickname(@RequestParam String nickname) {
         userService.checkDuplicateUsername(nickname);
         return new ApiResponse<>(true, "닉네임 사용 가능", nickname);
+    }
+
+    @PostMapping("/login")
+    public ApiResponse<?> login(@Valid @RequestBody LoginRequestDto dto,
+                                HttpServletResponse response) {
+        User loginUser = userService.checkLoginAvailable(dto.getUsername(), dto.getPassword(), passwordEncoder);
+
+        // accessToken, refreshToken 발급
+        jwtTokenizer.issueTokenAndSetCookies(response, loginUser);
+
+        LoginResponseDto loginResponseDto = LoginResponseDto.builder()
+            .userId(loginUser.getUserId())
+            .nickname(loginUser.getNickname())
+            .role(loginUser.getRole().name())
+            .build();
+
+        return new ApiResponse<>(true, "로그인 성공", loginResponseDto);
     }
 
     @PostMapping("/logout")

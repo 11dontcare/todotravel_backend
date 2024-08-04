@@ -9,6 +9,7 @@ import org.example.todotravel.domain.user.entity.User;
 @Table(name = "plan_users")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlanUser {

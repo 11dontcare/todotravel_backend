@@ -21,6 +21,7 @@ import org.example.todotravel.domain.plan.entity.Plan;
 @Entity
 @Table(name = "users")
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,40 +32,53 @@ public class User {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    // ID
     @Column(name = "username", nullable = false, length = 50)
     private String username;
 
+    // 이메일
+    @Column(name = "email", nullable = false, length = 100)
+    private String email;
+
+    // 비밀번호
     @Column(name = "password", nullable = false, length = 100)
     private String password;
 
-    @Column(name = "nickname", nullable = false, length = 50)
-    private String nickname;
-
+    // 이름
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
+    // 닉네임
+    @Column(name = "nickname", nullable = false, length = 50)
+    private String nickname;
+
+    // 성별
     @Column(name = "gender", nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(name = "email", nullable = false, length = 100)
-    private String email;
-
-    @Column(name = "provider", length = 50)
-    private String provider;
-
-    @Column(name = "social_id", length = 255)
-    private String socialId;
-
+    // 가입 날짜
     @Column(name = "created_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdDate;
 
+    // 생년월일
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
 
+    // 권한설정
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    // 소셜 타입, KAKAO, NAVER, GOOGLE
+    @Column(name = "social_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType;
+
+    // 로그인한 소셜 타입의 식별자 값, 일반인 경우 null
+    @Column(name = "social_id", length = 255)
+    private String socialId;
+
 
     // 여러 디바이스에서 접속한다고 가정하면 1:N
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

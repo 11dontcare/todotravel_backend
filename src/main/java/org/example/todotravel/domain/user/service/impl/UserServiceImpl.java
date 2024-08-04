@@ -7,11 +7,14 @@ import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.repository.UserRepository;
 import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.exception.DuplicateUserException;
+import org.example.todotravel.global.exception.UserNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -73,5 +76,37 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByNickname(nickname).isPresent()) {
             throw new DuplicateUserException("이미 존재하는 닉네임입니다.");
         }
+    }
+
+    // 임시 비밀번호 재설정
+    @Override
+    @Transactional
+    public void setTempPassword(String email, String tempPassword, PasswordEncoder passwordEncoder) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+
+        user.setPassword(passwordEncoder.encode(tempPassword));
+
+        userRepository.save(user);
+    }
+
+    // 로그인 가능한지 확인
+    @Override
+    @Transactional(readOnly = true)
+    public User checkLoginAvailable(String username, String password, PasswordEncoder passwordEncoder) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UserNotFoundException("존재하지 않는 아이디입니다."));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
+        }
+
+        return user;
+    }
+
+    //플랜에 사용자 초대 시 모든 사용자 목록을 return - 김민정
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }
