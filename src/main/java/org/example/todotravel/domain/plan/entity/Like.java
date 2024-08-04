@@ -9,10 +9,12 @@ import org.example.todotravel.domain.user.entity.User;
 @Table(name = "likes")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Like {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "like_id", nullable = false)
     private String likeId;
 
@@ -22,5 +24,5 @@ public class Like {
 
     @ManyToOne
     @JoinColumn(name = "plan_id", nullable = false)
-    private Plan planId;
+    private Plan plan;
 }

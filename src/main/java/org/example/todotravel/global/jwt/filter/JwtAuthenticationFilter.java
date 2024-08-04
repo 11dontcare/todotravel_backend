@@ -39,7 +39,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     String[] notFilter = {
         "/api/auth",
-        "/api/send-mail"
+        "/api/send-mail",
+            "/api/plan"
     };
 
     // 인증이 필요 없는 경로는 필터 적용하지 않도록 설정
