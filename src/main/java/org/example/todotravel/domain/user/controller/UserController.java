@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.user.dto.request.LoginRequestDto;
+import org.example.todotravel.domain.user.dto.request.OAuth2UserLoginRequestDto;
 import org.example.todotravel.domain.user.dto.request.UserRegisterRequestDto;
 import org.example.todotravel.domain.user.dto.request.UsernameRequestDto;
 import org.example.todotravel.domain.user.dto.response.LoginResponseDto;
@@ -31,6 +32,14 @@ public class UserController {
     public ApiResponse<?> registerUser(@Valid @RequestBody UserRegisterRequestDto dto) {
         User newUser = userService.registerNewUser(dto, passwordEncoder);
         return new ApiResponse<>(true, "회원가입 성공", newUser);
+    }
+
+    // OAuth 추가 로그인
+    @PostMapping("/oauth2/signup")
+    public ApiResponse<?> oAuth2UserLogin(@Valid @RequestBody OAuth2UserLoginRequestDto dto, HttpServletResponse response) {
+        User newOAuth2User = userService.loginOAuth2User(dto);
+        jwtTokenizer.issueTokenAndSetCookies(response, newOAuth2User);
+        return new ApiResponse<>(true, "회원가입 성공", newOAuth2User);
     }
 
     // 사용자 아이디 중복 검사

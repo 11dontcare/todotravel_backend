@@ -1,5 +1,6 @@
 package org.example.todotravel.domain.user.service;
 
+import org.example.todotravel.domain.user.dto.request.OAuth2UserLoginRequestDto;
 import org.example.todotravel.domain.user.dto.request.UserRegisterRequestDto;
 import org.example.todotravel.domain.user.dto.request.UsernameRequestDto;
 import org.example.todotravel.domain.user.entity.User;
@@ -14,6 +15,8 @@ public interface UserService {
     Optional<User> getUserByUserId(Long userId);
 
     User registerNewUser(UserRegisterRequestDto dto, PasswordEncoder passwordEncoder);
+
+    User loginOAuth2User(OAuth2UserLoginRequestDto dto);
 
     void checkDuplicateUsername(String username);
 

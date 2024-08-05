@@ -1,6 +1,7 @@
 package org.example.todotravel.domain.user.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.example.todotravel.domain.user.dto.request.OAuth2UserLoginRequestDto;
 import org.example.todotravel.domain.user.dto.request.UserRegisterRequestDto;
 import org.example.todotravel.domain.user.dto.request.UsernameRequestDto;
 import org.example.todotravel.domain.user.entity.Role;
@@ -50,6 +51,19 @@ public class UserServiceImpl implements UserService {
             .build();
 
         return userRepository.save(newUser);
+    }
+
+    // Oauth2 회원가입 유저 등록
+    @Override
+    @Transactional
+    public User loginOAuth2User(OAuth2UserLoginRequestDto dto) {
+
+        User newOAuth2User = User.builder()
+                .birthDate(dto.getBirthDate())
+                .role(Role.ROLE_USER)
+                .build();
+
+        return  userRepository.save(newOAuth2User);
     }
 
     // 사용자 아이디 중복 검사
