@@ -3,15 +3,11 @@ package org.example.todotravel.global.jwt.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.example.todotravel.domain.user.entity.RefreshToken;
 import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.impl.RefreshTokenServiceImpl;
 import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
-import org.example.todotravel.global.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,8 +21,6 @@ import java.util.Date;
 @Slf4j
 @Component
 public class JwtTokenizer {
-    private final RefreshTokenServiceImpl refreshTokenService;
-    private final UserServiceImpl userService;
     private final byte[] accessSecret;
     private final byte[] refreshSecret;
 
@@ -39,16 +33,18 @@ public class JwtTokenizer {
                         UserServiceImpl userService) {
         this.accessSecret = accessSecret.getBytes(StandardCharsets.UTF_8);
         this.refreshSecret = refreshSecret.getBytes(StandardCharsets.UTF_8);
-        this.refreshTokenService = refreshTokenService;
-        this.userService = userService;
     }
 
-    public String createAccessToken(Long userId, String username, String email, Role role) {
-        return createToken(userId, username, email, role, ACCESS_TOKEN_EXPIRATION_COUNT, accessSecret);
+    public String createAccessToken(User user) {
+        return createToken(
+            user.getUserId(), user.getUsername(), user.getEmail(), user.getRole(), ACCESS_TOKEN_EXPIRATION_COUNT, accessSecret
+        );
     }
 
-    public String createRefreshToken(Long userId, String username, String email, Role role) {
-        return createToken(userId, username, email, role, REFRESH_TOKEN_EXPIRATION_COUNT, refreshSecret);
+    public String createRefreshToken(User user) {
+        return createToken(
+            user.getUserId(), user.getUsername(), user.getEmail(), user.getRole(), REFRESH_TOKEN_EXPIRATION_COUNT, refreshSecret
+        );
     }
 
     /**
@@ -103,66 +99,5 @@ public class JwtTokenizer {
 
     public static Key getSigningKey(byte[] secretKey) {
         return Keys.hmacShaKeyFor(secretKey);
-    }
-
-    /**
-     * AccessToken, RefreshToken 동시에 생성
-     *
-     * @param response 응답 객체
-     * @param user     사용자
-     */
-    public void issueTokenAndSetCookies(HttpServletResponse response, User user) {
-        // 토큰 생성
-        String accessToken = createAccessToken(user.getUserId(), user.getEmail(), user.getUsername(), user.getRole());
-        String refreshToken = createRefreshToken(user.getUserId(), user.getEmail(), user.getUsername(), user.getRole());
-
-        // 리프레쉬 토큰을 DB에 저장
-        RefreshToken refreshTokenEntity = refreshTokenService.getRefreshTokenByUserId(user.getUserId())
-            .orElseGet(() -> {
-                RefreshToken newToken = new RefreshToken();
-                newToken.setUser(user);
-                return newToken;
-            });
-        refreshTokenEntity.setValue(refreshToken);
-        refreshTokenService.saveRefreshToken(refreshTokenEntity);
-
-        addTokenCookie(response, "accessToken", accessToken, ACCESS_TOKEN_EXPIRATION_COUNT);
-        addTokenCookie(response, "refreshToken", refreshToken, REFRESH_TOKEN_EXPIRATION_COUNT);
-    }
-
-    /**
-     * RefreshToken으로 AccessToken 재발급
-     *
-     * @param response     응답 객체
-     * @param refreshToken refresh token
-     */
-    public void renewAccessToken(HttpServletResponse response, String refreshToken) {
-        // 토큰으로부터 정보 얻기
-        Claims claims = parseRefreshToken(refreshToken);
-        Long userId = Long.valueOf((Integer) claims.get("userId"));
-        User user = userService.getUserByUserId(userId)
-            .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
-
-        // accessToken 생성
-        String email = claims.getSubject();
-        String accessToken = createAccessToken(userId, email, user.getUsername(), user.getRole());
-
-        addTokenCookie(response, "accessToken", accessToken, ACCESS_TOKEN_EXPIRATION_COUNT);
-    }
-
-    /**
-     * 쿠키 생성 메서드
-     *
-     * @param response       응답 객체
-     * @param tokenName      토큰 이름
-     * @param tokenValue     토큰 값
-     * @param expirationTime 토큰 만료 시간
-     */
-    private void addTokenCookie(HttpServletResponse response, String tokenName, String tokenValue, Long expirationTime) {
-        Cookie tokenCookie = new Cookie(tokenName, tokenValue);
-        tokenCookie.setPath("/");
-        tokenCookie.setHttpOnly(true);
-        tokenCookie.setMaxAge(Math.toIntExact(expirationTime / 1000)); // milliseconds to seconds
-        response.addCookie(tokenCookie);
     }
 }

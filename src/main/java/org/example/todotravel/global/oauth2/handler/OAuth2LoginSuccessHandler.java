@@ -52,7 +52,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     // 로그인 성공했을떄의 리턴값
     private void loginSuccess(HttpServletResponse response, User user) throws IOException {
         if (user != null) {
-            jwtTokenizer.issueTokenAndSetCookies(response, user);
+//            jwtTokenizer.issueTokenAndSetCookies(response, user);
         }
     }
 }

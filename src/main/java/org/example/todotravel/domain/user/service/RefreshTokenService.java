@@ -7,9 +7,9 @@ import java.util.Optional;
 
 @Service
 public interface RefreshTokenService {
-    public void saveRefreshToken(RefreshToken refreshToken);
+    void saveRefreshToken(RefreshToken refreshToken);
 
-    public Optional<RefreshToken> getRefreshTokenByUserId(Long userId);
+    Optional<RefreshToken> getRefreshTokenByUserId(Long userId);
 
-    public void deleteRefreshToken(String refreshToken);
+    void deleteRefreshToken(Long userId);
 }
