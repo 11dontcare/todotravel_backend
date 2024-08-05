@@ -71,7 +71,7 @@ public class User {
     private Role role;
 
     // 소셜 타입, KAKAO, NAVER, GOOGLE
-    @Column(name = "social_type", nullable = false)
+    @Column(name = "social_type")
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 

@@ -3,6 +3,9 @@ package org.example.todotravel.global.config;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.global.jwt.filter.JwtAuthenticationFilter;
 import org.example.todotravel.global.jwt.util.JwtTokenizer;
+import org.example.todotravel.global.oauth2.handler.OAuth2LoginFailureHandler;
+import org.example.todotravel.global.oauth2.handler.OAuth2LoginSuccessHandler;
+import org.example.todotravel.global.oauth2.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,6 +24,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtTokenizer jwtTokenizer;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     // 모든 유저 허용 URI
     String[] allAllowPage = new String[]{
@@ -57,6 +63,13 @@ public class SecurityConfig {
             // jwt 관련 설정
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenizer), UsernamePasswordAuthenticationFilter.class)
 
+                // oauth 관련 설정
+                .oauth2Login(oauth2 -> oauth2
+                        .redirectionEndpoint(endpoint -> endpoint.baseUri("/oauth2/callback/**")) // oauth 응답 url
+                        .userInfoEndpoint(endpoint -> endpoint.userService(customOAuth2UserService)) // oauth User에 대한 서비스
+                        .successHandler(oAuth2LoginSuccessHandler) // oauth 로그인 성공시의 핸들러
+                        .failureHandler(oAuth2LoginFailureHandler)
+                )
         ;
 
         return http.build();
