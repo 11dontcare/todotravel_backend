@@ -14,6 +14,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.Arrays;
 
 /**
  * Spring Security 설정 클래스
@@ -48,28 +51,36 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 유저별 URI 접근 허용
+            /* 유저별 URI 접근 허용 */
             .authorizeHttpRequests(auth -> auth
                 .anyRequest().permitAll())
 
-            // rest api 설정
-            .csrf(csrf -> csrf.disable()) // csrf 비활성화 -> cookie를 사용하지 않으면 꺼도 된다. (cookie를 사용할 경우 httpOnly(XSS 방어), sameSite(CSRF 방어)로 방어해야 한다.)
-            .cors(cors -> cors.disable()) // cors 비활성화 -> 프론트와 연결 시 따로 설정 필요
+            /* rest api 설정 */
+            .csrf(csrf -> csrf.disable()) // JWT 사용으로 csrf 비활성화 -> 쿠키 자체 설정
+            .cors(cors -> cors.configurationSource(request -> {
+                CorsConfiguration configuration = new CorsConfiguration();
+                configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));            // 허용된 출처(Origin)
+                configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));     // 메서드 허용
+                configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));    // 헤더 허용
+                configuration.setAllowCredentials(true);    // 인증 정보(쿠키 등)를 포함할 수 있도록
+                configuration.setMaxAge(3600L);             // CORS 프리플라이트 요청의 캐시 시간을 1시간으로 설정
+                return configuration;
+            }))
             .httpBasic(auth -> auth.disable()) // 기본 인증 로그인 비활성화
             .formLogin(auth -> auth.disable()) // 기본 login form 비활성화
             .logout(auth -> auth.disable()) // 기본 logout 비활성화
             .sessionManagement(auth -> auth.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 서버가 클라이언트 상태 저장 X
 
-            // jwt 관련 설정
+            /* jwt 관련 설정 */
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenizer), UsernamePasswordAuthenticationFilter.class)
 
-                // oauth 관련 설정
-                .oauth2Login(oauth2 -> oauth2
-                        .redirectionEndpoint(endpoint -> endpoint.baseUri("/oauth2/callback/**")) // oauth 응답 url
-                        .userInfoEndpoint(endpoint -> endpoint.userService(customOAuth2UserService)) // oauth User에 대한 서비스
-                        .successHandler(oAuth2LoginSuccessHandler) // oauth 로그인 성공시의 핸들러
-                        .failureHandler(oAuth2LoginFailureHandler)
-                )
+            /* oauth 관련 설정 */
+            .oauth2Login(oauth2 -> oauth2
+                .redirectionEndpoint(endpoint -> endpoint.baseUri("/oauth2/callback/**")) // oauth 응답 url
+                .userInfoEndpoint(endpoint -> endpoint.userService(customOAuth2UserService)) // oauth User에 대한 서비스
+                .successHandler(oAuth2LoginSuccessHandler) // oauth 로그인 성공시의 핸들러
+                .failureHandler(oAuth2LoginFailureHandler)
+            )
         ;
 
         return http.build();
