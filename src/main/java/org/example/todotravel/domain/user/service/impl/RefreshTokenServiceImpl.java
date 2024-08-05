@@ -21,12 +21,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<RefreshToken> getRefreshTokenByUserId(Long userId) {
         return refreshTokenRepository.findByUser_UserId(userId);
     }
 
     @Override
-    public void deleteRefreshToken(String refreshToken) {
-        refreshTokenRepository.findByValue(refreshToken).ifPresent(refreshTokenRepository::delete);
+    @Transactional
+    public void deleteRefreshToken(Long userId) {
+        getRefreshTokenByUserId(userId).ifPresent(refreshTokenRepository::delete);
     }
 }
