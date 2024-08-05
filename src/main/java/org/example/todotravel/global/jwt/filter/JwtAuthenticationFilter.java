@@ -24,6 +24,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,6 +35,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenizer jwtTokenizer;
+
+    String[] notFilter = {
+        "/api/auth",
+        "/api/send-mail",
+        "/api/plan"
+    };
+
+    // 인증이 필요 없는 경로는 필터 적용하지 않도록 설정
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return Arrays.stream(notFilter).anyMatch(path::startsWith);
+    }
 
     /**
      * 필터 메서드 - 각 요청마다 JWT 토큰을 검증하고 인증을 설정
@@ -46,7 +60,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        if (shouldNotFilter(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = getJwtFromRequest(request); // accessToken 얻어냄.
+        log.info("request uri::{}", request.getRequestURI());
 
         if (!StringUtils.hasText(token)) {
             try {
