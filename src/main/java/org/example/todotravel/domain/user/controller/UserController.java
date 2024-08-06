@@ -100,7 +100,6 @@ public class UserController {
             .role(loginUser.getRole().name())
             .accessToken(accessToken)
             .refreshToken(refreshToken)
-            .accessTokenExpirationTime(System.currentTimeMillis() + JwtTokenizer.ACCESS_TOKEN_EXPIRATION_COUNT)
             .build();
 
         return new ApiResponse<>(true, "로그인 성공", loginResponseDto);
@@ -131,7 +130,5 @@ public class UserController {
         } catch (Exception e) {
             return new ApiResponse<>(false, "로그아웃 실패");
         }
-
-
     }
 }

@@ -15,5 +15,4 @@ public class LoginResponseDto {
     private String role;
     private String accessToken;
     private String refreshToken;
-    private Long accessTokenExpirationTime;
 }
