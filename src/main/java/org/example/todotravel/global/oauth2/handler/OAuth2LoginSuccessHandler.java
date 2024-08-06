@@ -5,11 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.repository.UserRepository;
-import org.example.todotravel.global.oauth2.CustomOAuth2User;
-import org.example.todotravel.global.jwt.filter.JwtAuthenticationFilter;
 import org.example.todotravel.global.jwt.util.JwtTokenizer;
+import org.example.todotravel.global.oauth2.CustomOAuth2User;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -53,7 +51,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     // 로그인 성공했을떄의 리턴값
     private void loginSuccess(HttpServletResponse response, User user) throws IOException {
         if (user != null) {
-            jwtTokenizer.issueTokenAndSetCookies(response, user);
+//            jwtTokenizer.issueTokenAndSetCookies(response, user);
         }
     }
 }

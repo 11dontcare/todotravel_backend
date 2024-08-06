@@ -1,6 +1,8 @@
 package org.example.todotravel.domain.chat.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.todotravel.domain.chat.dto.request.ChatRoomCreateRequestDto;
+import org.example.todotravel.domain.chat.dto.request.ChatRoomUpdateRequestDto;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomResponseDto;
 import org.example.todotravel.domain.chat.service.ChatService;
 import org.springframework.http.ResponseEntity;
@@ -14,17 +16,14 @@ public class ChatController {
     private final ChatService chatService;
 
     @PostMapping("/create")
-    public ResponseEntity<ChatRoomResponseDto> createChatRoom(@RequestParam Long userId,
-                                                              @RequestParam Long planId,
-                                                              @RequestParam String roomName) {
-        ChatRoomResponseDto chatRoomResponseDto = chatService.createChatRoom(userId, planId, roomName);
+    public ResponseEntity<ChatRoomResponseDto> createChatRoom(@RequestBody ChatRoomCreateRequestDto dto) {
+        ChatRoomResponseDto chatRoomResponseDto = chatService.createChatRoom(dto.getUserId(), dto.getPlanId(), dto.getRoomName());
         return ResponseEntity.ok(chatRoomResponseDto);
     }
 
-    @PutMapping("/update-name/{roomId}")
-    public ResponseEntity<Void> updateChatRoomName(@PathVariable Long roomId,
-                                                   @RequestParam String newName) {
-        chatService.updateChatRoomName(roomId, newName);
+    @PutMapping("/update-name")
+    public ResponseEntity<Void> updateChatRoomName(@RequestBody ChatRoomUpdateRequestDto dto) {
+        chatService.updateChatRoomName(dto.getRoomId(), dto.getNewRoomName());
         return ResponseEntity.ok().build();
     }
 

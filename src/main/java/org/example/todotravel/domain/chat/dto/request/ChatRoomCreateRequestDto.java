@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class ChatRoomCreateRequestDto {
     private Long planId;
     private Long userId;
+    private String roomName; // 이 필드를 추가했습니다.
 }

@@ -33,12 +33,14 @@ public class SecurityConfig {
 
     // 모든 유저 허용 URI
     String[] allAllowPage = new String[]{
-
+        "api/plan/**"
+        // 우선 "/api/plan/**" 전부 허용해두었습니다.
     };
 
     // 비로그인 유저 허용 URI
-    String[] notLoggedAlloPage = new String[]{
-
+    String[] notLoggedAllowPage = new String[]{
+        "/api/auth/**",
+        "/api/send-mail/**"
     };
 
     /**
@@ -53,7 +55,10 @@ public class SecurityConfig {
         http
             /* 유저별 URI 접근 허용 */
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll())
+                .requestMatchers(allAllowPage).permitAll()  // 모든 유저
+                .requestMatchers(notLoggedAllowPage).not().authenticated() // 비로그인 유저
+                .anyRequest().authenticated()
+            )
 
             /* rest api 설정 */
             .csrf(csrf -> csrf.disable()) // JWT 사용으로 csrf 비활성화 -> 쿠키 자체 설정

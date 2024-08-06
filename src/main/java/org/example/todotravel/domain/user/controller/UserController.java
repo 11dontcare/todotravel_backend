@@ -1,7 +1,6 @@
 package org.example.todotravel.domain.user.controller;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +9,7 @@ import org.example.todotravel.domain.user.dto.request.OAuth2UserLoginRequestDto;
 import org.example.todotravel.domain.user.dto.request.UserRegisterRequestDto;
 import org.example.todotravel.domain.user.dto.request.UsernameRequestDto;
 import org.example.todotravel.domain.user.dto.response.LoginResponseDto;
+import org.example.todotravel.domain.user.entity.RefreshToken;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.impl.RefreshTokenServiceImpl;
 import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
@@ -38,7 +38,7 @@ public class UserController {
     @PostMapping("/oauth2/signup")
     public ApiResponse<?> oAuth2UserLogin(@Valid @RequestBody OAuth2UserLoginRequestDto dto, HttpServletResponse response) {
         User newOAuth2User = userService.loginOAuth2User(dto);
-        jwtTokenizer.issueTokenAndSetCookies(response, newOAuth2User);
+//        jwtTokenizer.issueTokenAndSetCookies(response, newOAuth2User);
         return new ApiResponse<>(true, "회원가입 성공", newOAuth2User);
     }
 
@@ -65,17 +65,30 @@ public class UserController {
 
     // 로그인
     @PostMapping("/login")
-    public ApiResponse<?> login(@Valid @RequestBody LoginRequestDto dto,
-                                HttpServletResponse response) {
+    public ApiResponse<?> login(@Valid @RequestBody LoginRequestDto dto) {
         User loginUser = userService.checkLoginAvailable(dto.getUsername(), dto.getPassword(), passwordEncoder);
 
-        // accessToken, refreshToken 발급
-        jwtTokenizer.issueTokenAndSetCookies(response, loginUser);
+        // accessToken, refreshToken 생성
+        String accessToken = jwtTokenizer.createAccessToken(loginUser);
+        String refreshToken = jwtTokenizer.createRefreshToken(loginUser);
+
+        // refreshToken을 DB에 저장
+        RefreshToken refreshTokenEntity = refreshTokenService.getRefreshTokenByUserId(loginUser.getUserId())
+            .orElseGet(() -> {
+                RefreshToken newToken = new RefreshToken();
+                newToken.setUser(loginUser);
+                return newToken;
+            });
+        refreshTokenEntity.setValue(refreshToken);
+        refreshTokenService.saveRefreshToken(refreshTokenEntity);
 
         LoginResponseDto loginResponseDto = LoginResponseDto.builder()
             .userId(loginUser.getUserId())
             .nickname(loginUser.getNickname())
             .role(loginUser.getRole().name())
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .accessTokenExpirationTime(System.currentTimeMillis() + JwtTokenizer.ACCESS_TOKEN_EXPIRATION_COUNT)
             .build();
 
         return new ApiResponse<>(true, "로그인 성공", loginResponseDto);
@@ -90,29 +103,23 @@ public class UserController {
 
     // 로그아웃
     @PostMapping("/logout")
-    public ApiResponse<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
+    public ApiResponse<?> logout(@RequestHeader("Authorization") String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        try {
+            // AccessToken에서 사용자 정보 추출
+            Claims claims = jwtTokenizer.parseAccessToken(token);
+            Long userId = Long.valueOf((Integer) claims.get("userId"));
 
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("accessToken") || cookie.getName().equals("refreshToken")) {
-                    invalidateCookie(cookie, response);
-                }
-            }
+            // RefreshToken을 DB에서 삭제
+            refreshTokenService.deleteRefreshToken(userId);
+
+            return new ApiResponse<>(true, "로그아웃 성공");
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "로그아웃 실패");
         }
 
-        return new ApiResponse<>(true, "로그아웃 성공", null);
-    }
 
-    // accessToken, refreshToken 제거 (refreshToken은 DB에서도 제거)
-    private void invalidateCookie(Cookie cookie, HttpServletResponse response) {
-        if (cookie.getName().equals("refreshToken")) {
-            refreshTokenService.deleteRefreshToken(cookie.getValue());
-            return;
-        }
-        cookie.setValue("");
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
     }
 }
