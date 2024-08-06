@@ -53,7 +53,7 @@ public class User {
     private String nickname;
 
     // 성별
-    @Column(name = "gender", nullable = false)
+    @Column(name = "gender")
     @Enumerated(EnumType.STRING)
     private Gender gender;
 

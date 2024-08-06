@@ -53,19 +53,6 @@ public class NaverOAuth2UserInfo extends OAuth2UserInfo {
     }
 
 
-    public Gender getGender() {
-        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-        if (response == null) {
-            return null;
-        }
-        String gender = (String) response.get("gender");
-        if (gender == null) {
-            return null;
-        }
-        return gender.equalsIgnoreCase("F") ? Gender.WOMAN : Gender.MAN;
-    }
-
-
 //    @Override
 //    public String getImageUrl() {
 //        Map<String, Object> response = (Map<String, Object>) attributes.get("response");

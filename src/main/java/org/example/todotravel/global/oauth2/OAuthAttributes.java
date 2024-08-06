@@ -82,7 +82,6 @@ public class OAuthAttributes {
                 .email(oauth2UserInfo.getEmail())
                 .nickname(oauth2UserInfo.getNickname())
                 .name(oauth2UserInfo.getName())
-                .gender(oauth2UserInfo.getGender())
                 .createdDate(LocalDateTime.now())
                 .role(Role.ROLE_GUEST)
                 .build();
