@@ -2,6 +2,7 @@ package org.example.todotravel.domain.user.controller;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.user.dto.request.LoginRequestDto;
@@ -15,6 +16,7 @@ import org.example.todotravel.domain.user.service.impl.RefreshTokenServiceImpl;
 import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.example.todotravel.global.jwt.util.JwtTokenizer;
+import org.example.todotravel.global.oauth2.CustomOAuth2User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +42,16 @@ public class UserController {
         User newOAuth2User = userService.loginOAuth2User(dto);
 //        jwtTokenizer.issueTokenAndSetCookies(response, newOAuth2User);
         return new ApiResponse<>(true, "회원가입 성공", newOAuth2User);
+    }
+
+    // OAuth2 사용자 정보 조회
+    @GetMapping("/oauth2/signup")
+    public ApiResponse<?> getOAuth2UserInfo(HttpSession session) {
+        CustomOAuth2User oauthUser = (CustomOAuth2User) session.getAttribute("oauthUser");
+        if (oauthUser == null) {
+            return new ApiResponse<>(false, "User not found", null);
+        }
+        return new ApiResponse<>(true, "User info", oauthUser);
     }
 
     // 사용자 아이디 중복 검사

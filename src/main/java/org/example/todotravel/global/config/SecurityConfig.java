@@ -33,14 +33,15 @@ public class SecurityConfig {
 
     // 모든 유저 허용 URI
     String[] allAllowPage = new String[]{
-        "api/plan/**"
+        "/api/plan/**",
+        "/index.html",
         // 우선 "/api/plan/**" 전부 허용해두었습니다.
     };
 
     // 비로그인 유저 허용 URI
     String[] notLoggedAllowPage = new String[]{
         "/api/auth/**",
-        "/api/send-mail/**"
+        "/api/send-mail/**",
     };
 
     /**
