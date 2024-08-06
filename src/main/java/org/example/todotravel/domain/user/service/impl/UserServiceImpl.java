@@ -59,9 +59,10 @@ public class UserServiceImpl implements UserService {
     public User loginOAuth2User(OAuth2UserLoginRequestDto dto) {
 
         User newOAuth2User = User.builder()
-                .birthDate(dto.getBirthDate())
-                .role(Role.ROLE_USER)
-                .build();
+            .gender(dto.getGender())
+            .birthDate(dto.getBirthDate())
+            .role(Role.ROLE_USER)
+            .build();
 
         return  userRepository.save(newOAuth2User);
     }
