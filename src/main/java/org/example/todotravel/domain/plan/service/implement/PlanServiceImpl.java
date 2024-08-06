@@ -22,8 +22,8 @@ import java.util.List;
 public class PlanServiceImpl implements PlanService {
     private final PlanRepository planRepository;
     private final UserRepository userRepository;//테스트용
-    private final BookmarkServiceImpl bookmarkService;
-    private final LikeServiceImpl likeService;
+//    private final BookmarkServiceImpl bookmarkService;
+//    private final LikeServiceImpl likeService;
 
     @Override
     @Transactional
@@ -94,50 +94,50 @@ public class PlanServiceImpl implements PlanService {
                             .description(plan.getDescription())
                             .startDate(plan.getStartDate())
                             .endDate(plan.getEndDate())
-                            .bookmarkNumber(bookmarkService.countBookmark(plan))
-                            .likeNumber(likeService.countLike(plan))
+//                            .bookmarkNumber(bookmarkService.countBookmark(plan))
+//                            .likeNumber(likeService.countLike(plan))
                     .build());
         }
         return planList;
     }
-
-    @Override
-    @Transactional
-    public PlanResponseDto getPlanDetails(Long planId) {
-        Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("플랜을 찾을 수 없습니다."));
-        return PlanResponseDto.builder()
-                .plan(plan)
-                .bookmarkNumber(bookmarkService.countBookmark(plan))
-                .likeNumber(likeService.countLike(plan))
-                .comments(null)
-                .build();
-    }
-
-    @Override
-    @Transactional
-    public Plan copyPlan(Long planId) {
-        Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("플랜을 찾을 수 없습니다."));
-        //현재 로그인 중인 사용자 user
-        User user = new User();
-        Plan newPlan = Plan.builder()
-                .title(plan.getTitle())
-                .location(plan.getLocation())
-                .description(plan.getDescription())
-                .startDate(plan.getStartDate())
-                .endDate(plan.getEndDate())
-                .isPublic(false)
-                .status(false)
-                .totalBudget(plan.getTotalBudget())
-                .planUser(user)
-                .schedules(plan.getSchedules())
-                .build();
-        //planUsers에 플랜 생성자 추가
-        PlanUser planUser = PlanUser.builder()
-                .status(PlanUser.StatusType.ACCEPTED)
-                .user(user)
-                .plan(newPlan)
-                .build();
-        newPlan.setPlanUsers(Collections.singleton(planUser));
-        return planRepository.save(newPlan);
-    }
+//    @Override
+//    @Transactional
+//    public PlanResponseDto getPlanDetails(Long planId) {
+//        Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("플랜을 찾을 수 없습니다."));
+//        return PlanResponseDto.builder()
+//                .plan(plan)
+//                .bookmarkNumber(bookmarkService.countBookmark(plan))
+//                .likeNumber(likeService.countLike(plan))
+//                .comments(null)
+//                .build();
+//    }
+//
+//    @Override
+//    @Transactional
+//    public Plan copyPlan(Long planId) {
+//        Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("플랜을 찾을 수 없습니다."));
+//        //현재 로그인 중인 사용자 user
+//        User user = new User();
+//        Plan newPlan = Plan.builder()
+//                .title(plan.getTitle())
+//                .location(plan.getLocation())
+//                .description(plan.getDescription())
+//                .startDate(plan.getStartDate())
+//                .endDate(plan.getEndDate())
+//                .isPublic(false)
+//                .status(false)
+//                .totalBudget(plan.getTotalBudget())
+//                .planUser(user)
+//                .schedules(plan.getSchedules())
+//                .build();
+//        //planUsers에 플랜 생성자 추가
+//        PlanUser planUser = PlanUser.builder()
+//                .status(PlanUser.StatusType.ACCEPTED)
+//                .user(user)
+//                .plan(newPlan)
+//                .build();
+//        newPlan.setPlanUsers(Collections.singleton(planUser));
+//        return planRepository.save(newPlan);
+//    }
+//
 }

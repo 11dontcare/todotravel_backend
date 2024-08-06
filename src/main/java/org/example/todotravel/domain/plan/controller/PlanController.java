@@ -72,16 +72,16 @@ public class PlanController {
         List<PlanListResponseDto> planList = planService.getPublicPlans();
         return new ApiResponse<>(true, "플랜 목록 조회 성공", planList);
     }
-    //플랜 상세 조회
-    @GetMapping("/specific/{plan_id}")
-    public ApiResponse<PlanResponseDto> viewPlan(@PathVariable("plan_id") Long planId){
-        PlanResponseDto planDetails = planService.getPlanDetails(planId);
-        return new ApiResponse<>(true, "플랜 조회 성공", planDetails);
-    }
-    //플랜 불러오기
-    @PostMapping("/{plan_id}/load")
-    public ApiResponse<Plan> loadPlan(@PathVariable("plan_id") Long planId){
-        Plan plan = planService.copyPlan(planId);
-        return new ApiResponse<>(true, "플랜 불러오기 성공", plan);
-    }
+//    //플랜 상세 조회
+//    @GetMapping("/specific/{plan_id}")
+//    public ApiResponse<PlanResponseDto> viewPlan(@PathVariable("plan_id") Long planId){
+//        PlanResponseDto planDetails = planService.getPlanDetails(planId);
+//        return new ApiResponse<>(true, "플랜 조회 성공", planDetails);
+//    }
+//    //플랜 불러오기
+//    @PostMapping("/{plan_id}/load")
+//    public ApiResponse<Plan> loadPlan(@PathVariable("plan_id") Long planId){
+//        Plan plan = planService.copyPlan(planId);
+//        return new ApiResponse<>(true, "플랜 불러오기 성공", plan);
+//    }
 }
