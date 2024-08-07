@@ -24,7 +24,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,20 +35,6 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenizer jwtTokenizer;
 
-    String[] notFilter = {
-        "/api/auth",
-        "/api/send-mail",
-        "/api/plan",
-        "/index.html",
-    };
-
-    // 인증이 필요 없는 경로는 필터 적용하지 않도록 설정
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getRequestURI();
-        return Arrays.stream(notFilter).anyMatch(path::startsWith);
-    }
-
     /**
      * 필터 메서드 - 각 요청마다 JWT 토큰을 검증하고 인증을 설정
      *
@@ -59,18 +44,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * @throws ServletException 서블릿 예외
      * @throws IOException      입출력 예외
      */
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (shouldNotFilter(request)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         String token = getJwtFromRequest(request); // accessToken 얻어냄.
-        log.info("request uri::{}", request.getRequestURI());
+        log.info("request url::{}", request.getRequestURI());
 
-        if (!StringUtils.hasText(token)) {
+        if (StringUtils.hasText(token)) {
             try {
                 Claims claims = jwtTokenizer.parseAccessToken(token);
                 setAuthenticationToContext(claims);
@@ -91,10 +70,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 throw new CustomJwtException(JwtExceptionCode.UNKNOWN_ERROR);
             }
         }
-        log.info("finish");
+
         filterChain.doFilter(request, response); // 다음 필터로 요청을 전달
     }
 
+    // 요청 헤더에 있는 토큰 꺼내오기
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {

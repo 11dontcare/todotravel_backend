@@ -20,6 +20,6 @@ public class RefreshToken {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "value")
+    @Column(name = "value", length = 500)
     private String value;
 }
