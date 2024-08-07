@@ -1,16 +1,18 @@
 package org.example.todotravel.domain.user.controller;
 
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.user.dto.request.LoginRequestDto;
 import org.example.todotravel.domain.user.dto.request.OAuth2UserLoginRequestDto;
 import org.example.todotravel.domain.user.dto.request.UserRegisterRequestDto;
 import org.example.todotravel.domain.user.dto.request.UsernameRequestDto;
 import org.example.todotravel.domain.user.dto.response.LoginResponseDto;
-import org.example.todotravel.domain.user.entity.RefreshToken;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.impl.RefreshTokenServiceImpl;
 import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
@@ -20,6 +22,7 @@ import org.example.todotravel.global.oauth2.CustomOAuth2User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
@@ -77,29 +80,17 @@ public class UserController {
 
     // 로그인
     @PostMapping("/login")
-    public ApiResponse<?> login(@Valid @RequestBody LoginRequestDto dto) {
+    public ApiResponse<?> login(@Valid @RequestBody LoginRequestDto dto, HttpServletResponse response) {
         User loginUser = userService.checkLoginAvailable(dto.getUsername(), dto.getPassword(), passwordEncoder);
 
         // accessToken, refreshToken 생성
-        String accessToken = jwtTokenizer.createAccessToken(loginUser);
-        String refreshToken = jwtTokenizer.createRefreshToken(loginUser);
-
-        // refreshToken을 DB에 저장
-        RefreshToken refreshTokenEntity = refreshTokenService.getRefreshTokenByUserId(loginUser.getUserId())
-            .orElseGet(() -> {
-                RefreshToken newToken = new RefreshToken();
-                newToken.setUser(loginUser);
-                return newToken;
-            });
-        refreshTokenEntity.setValue(refreshToken);
-        refreshTokenService.saveRefreshToken(refreshTokenEntity);
+        String accessToken = jwtTokenizer.issueTokenAndSetCookies(response, loginUser);
 
         LoginResponseDto loginResponseDto = LoginResponseDto.builder()
             .userId(loginUser.getUserId())
             .nickname(loginUser.getNickname())
             .role(loginUser.getRole().name())
             .accessToken(accessToken)
-            .refreshToken(refreshToken)
             .build();
 
         return new ApiResponse<>(true, "로그인 성공", loginResponseDto);
@@ -114,21 +105,35 @@ public class UserController {
 
     // 로그아웃
     @PostMapping("/logout")
-    public ApiResponse<?> logout(@RequestHeader("Authorization") String token) {
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
+    public ApiResponse<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        // RefreshToken 쿠키 삭제
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    cookie.setValue("");
+                    cookie.setPath("/");
+                    cookie.setMaxAge(0);
+                    response.addCookie(cookie);
+                    break;
+                }
+            }
         }
-        try {
-            // AccessToken에서 사용자 정보 추출
-            Claims claims = jwtTokenizer.parseAccessToken(token);
-            Long userId = Long.valueOf((Integer) claims.get("userId"));
 
-            // RefreshToken을 DB에서 삭제
-            refreshTokenService.deleteRefreshToken(userId);
-
-            return new ApiResponse<>(true, "로그아웃 성공");
-        } catch (Exception e) {
-            return new ApiResponse<>(false, "로그아웃 실패");
+        // DB에서 RefreshToken 삭제
+        String accessToken = request.getHeader("Authorization");
+        if (accessToken != null && accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+            try {
+                Claims claims = jwtTokenizer.parseAccessToken(accessToken);
+                Long userId = Long.valueOf((Integer) claims.get("userId"));
+                refreshTokenService.deleteRefreshToken(userId);
+            } catch (Exception e) {
+                log.error("Failed to delete refresh token", e);
+            }
         }
+
+        // 클라이언트에게 AccessToken 삭제 지시 (프론트엔드에서 처리)
+        return new ApiResponse<>(true, "로그아웃 성공", null);
     }
 }

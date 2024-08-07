@@ -3,11 +3,13 @@ package org.example.todotravel.global.jwt.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.example.todotravel.domain.user.entity.RefreshToken;
 import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.impl.RefreshTokenServiceImpl;
-import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,7 @@ import java.util.Date;
 @Slf4j
 @Component
 public class JwtTokenizer {
+    private final RefreshTokenServiceImpl refreshTokenService;
     private final byte[] accessSecret;
     private final byte[] refreshSecret;
 
@@ -29,10 +32,10 @@ public class JwtTokenizer {
 
     public JwtTokenizer(@Value("${jwt.secretKey}") String accessSecret,
                         @Value("${jwt.refreshKey}") String refreshSecret,
-                        RefreshTokenServiceImpl refreshTokenService,
-                        UserServiceImpl userService) {
+                        RefreshTokenServiceImpl refreshTokenService) {
         this.accessSecret = accessSecret.getBytes(StandardCharsets.UTF_8);
         this.refreshSecret = refreshSecret.getBytes(StandardCharsets.UTF_8);
+        this.refreshTokenService = refreshTokenService;
     }
 
     public String createAccessToken(User user) {
@@ -99,5 +102,62 @@ public class JwtTokenizer {
 
     public static Key getSigningKey(byte[] secretKey) {
         return Keys.hmacShaKeyFor(secretKey);
+    }
+
+    /**
+     * AccessToken, RefreshToken 동시에 생성
+     *
+     * @param response 응답 객체
+     * @param user     사용자
+     * @return 클라이언트에게 넘겨줄 AccessToken
+     */
+    public String issueTokenAndSetCookies(HttpServletResponse response, User user) {
+        // 토큰 생성
+        String accessToken = createAccessToken(user);
+        String refreshToken = createRefreshToken(user);
+
+        // 리프레쉬 토큰을 DB에 저장
+        RefreshToken refreshTokenEntity = refreshTokenService.getRefreshTokenByUserId(user.getUserId())
+            .orElseGet(() -> {
+                RefreshToken newToken = new RefreshToken();
+                newToken.setUser(user);
+                return newToken;
+            });
+        refreshTokenEntity.setValue(refreshToken);
+        refreshTokenService.saveRefreshToken(refreshTokenEntity);
+
+        addTokenCookie(response, refreshToken, REFRESH_TOKEN_EXPIRATION_COUNT);
+
+        return accessToken;
+    }
+
+    /**
+     * refreshToken 쿠키 생성 메서드
+     *
+     * @param response       응답 객체
+     * @param tokenValue     토큰 값
+     * @param expirationTime 토큰 만료 시간
+     */
+    private void addTokenCookie(HttpServletResponse response, String tokenValue, Long expirationTime) {
+        Cookie tokenCookie = new Cookie("refreshToken", tokenValue);
+        tokenCookie.setPath("/");
+        tokenCookie.setHttpOnly(true);
+        tokenCookie.setMaxAge(Math.toIntExact(expirationTime / 1000)); // milliseconds to seconds
+        response.addCookie(tokenCookie);
+    }
+
+    /**
+     * refreshTOken 유효성 검증
+     *
+     * @param refreshToken 토큰 값
+     * @return 유효성 결과
+     */
+    public boolean validateRefreshToken(String refreshToken) {
+        try {
+            Jwts.parserBuilder().setSigningKey(getSigningKey(refreshSecret)).build().parseClaimsJws(refreshToken);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
