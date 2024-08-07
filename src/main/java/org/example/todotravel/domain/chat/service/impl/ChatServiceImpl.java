@@ -22,9 +22,9 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public ChatRoomResponseDto createChatRoom(Long userId, Long planId, String roomName) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
+                .orElseThrow(() -> new RuntimeException("Invalid user ID"));
         Plan plan = planRepository.findById(planId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid plan ID"));
+                .orElseThrow(() -> new RuntimeException("Invalid plan ID"));
 
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setChatUser(user);
@@ -42,7 +42,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public void updateChatRoomName(Long roomId, String newName) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid room ID"));
+                .orElseThrow(() -> new RuntimeException("Invalid room ID"));
         chatRoom.setRoomName(newName);
         chatRoomRepository.save(chatRoom);
     }
@@ -50,9 +50,9 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public void addUserToChatRoom(Long roomId, Long userId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid room ID"));
+                .orElseThrow(() -> new RuntimeException("Invalid room ID"));
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
+                .orElseThrow(() -> new RuntimeException("Invalid user ID"));
         chatRoom.setChatUser(user);
         chatRoomRepository.save(chatRoom);
     }
@@ -60,7 +60,9 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public void removeUserFromChatRoom(Long roomId, Long userId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid room ID"));
+                .orElseThrow(() -> new RuntimeException("Invalid room ID"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Invalid user ID"));
         chatRoom.setChatUser(null);
         chatRoomRepository.save(chatRoom);
     }
