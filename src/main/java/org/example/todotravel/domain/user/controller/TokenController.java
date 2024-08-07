@@ -7,10 +7,7 @@ import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.example.todotravel.global.exception.UserNotFoundException;
 import org.example.todotravel.global.jwt.util.JwtTokenizer;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 
@@ -22,12 +19,8 @@ public class TokenController {
     private final UserService userService;
 
     @PostMapping("/refresh")
-    public ApiResponse<?> refreshToken(@RequestHeader("Authorization") String refreshToken) {
-        if (refreshToken != null && refreshToken.startsWith("Bearer ")) {
-            refreshToken = refreshToken.substring(7);
-        }
-
-        try {
+    public ApiResponse<?> refreshToken(@CookieValue(name = "refreshToken") String refreshToken) {
+        if (jwtTokenizer.validateRefreshToken(refreshToken)) {
             Claims claims = jwtTokenizer.parseRefreshToken(refreshToken);
             Long userId = Long.valueOf((Integer) claims.get("userId"));
             User user = userService.getUserByUserId(userId)
@@ -36,8 +29,7 @@ public class TokenController {
             String newAccessToken = jwtTokenizer.createAccessToken(user);
 
             return new ApiResponse<>(true, "토큰 갱신 성공", Collections.singletonMap("accessToken", newAccessToken));
-        } catch (Exception e) {
-            return new ApiResponse<>(false, "토큰 갱신에 실패");
         }
+        return new ApiResponse<>(false, "토큰 갱신 실패", null);
     }
 }
