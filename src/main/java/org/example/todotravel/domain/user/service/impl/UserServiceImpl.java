@@ -154,6 +154,14 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
     }
 
+    // userId로 사용자 찾기
+    @Override
+    @Transactional(readOnly = true)
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+    }
+
     // 이메일로 userId 찾기
     @Override
     @Transactional(readOnly = true)
