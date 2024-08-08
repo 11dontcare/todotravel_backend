@@ -22,8 +22,8 @@ import java.util.List;
 public class PlanServiceImpl implements PlanService {
     private final PlanRepository planRepository;
     private final UserRepository userRepository;//테스트용
-    private final BookmarkServiceImpl bookmarkService;
-    private final LikeServiceImpl likeService;
+//    private final BookmarkServiceImpl bookmarkService;
+//    private final LikeServiceImpl likeService;
 
     @Override
     @Transactional
@@ -88,8 +88,8 @@ public class PlanServiceImpl implements PlanService {
                             .description(plan.getDescription())
                             .startDate(plan.getStartDate())
                             .endDate(plan.getEndDate())
-                            .bookmarkNumber(bookmarkService.countBookmark(plan))
-                            .likeNumber(likeService.countLike(plan))
+//                            .bookmarkNumber(bookmarkService.countBookmark(plan))
+//                            .likeNumber(likeService.countLike(plan))
                     .build());
         }
         return planList;

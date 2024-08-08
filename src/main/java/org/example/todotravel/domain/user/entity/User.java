@@ -17,6 +17,8 @@ import lombok.*;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
+import org.example.todotravel.domain.notification.entity.Alarm;
 import org.example.todotravel.domain.plan.entity.Plan;
 
 @Entity
@@ -80,7 +82,6 @@ public class User {
     @Column(name = "social_id", length = 255)
     private String socialId;
 
-
     // 여러 디바이스에서 접속한다고 가정하면 1:N
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<RefreshToken> refreshTokens;
@@ -93,4 +94,7 @@ public class User {
 
     @OneToMany(mappedBy = "planUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Plan> plans;
+
+    @OneToMany(mappedBy = "alarmUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Alarm> alarms;
 }

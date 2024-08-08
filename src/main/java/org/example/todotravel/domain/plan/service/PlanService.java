@@ -15,6 +15,7 @@ public interface PlanService {
     Plan getPlan(Long planId);
     Plan updatePlan(Long planId, PlanRequestDto dto);
     List<PlanListResponseDto> getPublicPlans();
+
     PlanResponseDto getPlanDetails(Long planId);
     Plan copyPlan(Long planId);
     List<PlanListResponseDto> getSpecificPlans(String keyword);

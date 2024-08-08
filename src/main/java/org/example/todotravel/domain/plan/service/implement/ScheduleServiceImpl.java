@@ -1,6 +1,8 @@
 package org.example.todotravel.domain.plan.service.implement;
 
 import lombok.RequiredArgsConstructor;
+import org.example.todotravel.domain.notification.dto.request.AlarmRequestDto;
+import org.example.todotravel.domain.notification.service.implement.AlarmServiceImpl;
 import org.example.todotravel.domain.plan.dto.request.ScheduleCreateRequestDto;
 import org.example.todotravel.domain.plan.dto.response.ScheduleResponseDto;
 import org.example.todotravel.domain.plan.entity.Location;
@@ -50,7 +52,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .plan(plan)
                 .location(location)
                 .build();
-        return scheduleRepository.save(schedule);
+        return  scheduleRepository.save(schedule);
     }
 
     //여행 일정 삭제하기

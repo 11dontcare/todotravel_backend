@@ -8,7 +8,6 @@ import org.example.todotravel.domain.user.repository.UserRepository;
 import org.example.todotravel.global.jwt.util.JwtTokenizer;
 import org.example.todotravel.global.oauth2.CustomOAuth2User;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
