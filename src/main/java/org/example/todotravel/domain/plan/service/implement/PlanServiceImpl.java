@@ -1,6 +1,8 @@
 package org.example.todotravel.domain.plan.service.implement;
 
 import lombok.RequiredArgsConstructor;
+import org.example.todotravel.domain.notification.dto.request.AlarmRequestDto;
+import org.example.todotravel.domain.notification.service.implement.AlarmServiceImpl;
 import org.example.todotravel.domain.plan.dto.request.PlanRequestDto;
 import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanResponseDto;
@@ -22,8 +24,9 @@ import java.util.List;
 public class PlanServiceImpl implements PlanService {
     private final PlanRepository planRepository;
     private final UserRepository userRepository;//테스트용
-//    private final BookmarkServiceImpl bookmarkService;
-//    private final LikeServiceImpl likeService;
+    private final BookmarkServiceImpl bookmarkService;
+    private final LikeServiceImpl likeService;
+    private final AlarmServiceImpl alarmService; //알림 자동 생성
 
     @Override
     @Transactional
@@ -66,7 +69,13 @@ public class PlanServiceImpl implements PlanService {
                 .totalBudget(dto.getTotalBudget())
                 .build();
 
-        return planRepository.save(plan);
+        Plan updatedPlan = planRepository.save(plan);
+
+        AlarmRequestDto requestDto = new AlarmRequestDto(plan.getPlanUser().getUserId(),
+                "[" + plan.getTitle() + "] 플랜이 수정되었습니다.");
+        alarmService.createAlarm(requestDto);
+
+        return updatedPlan;
     }
 
     @Override
