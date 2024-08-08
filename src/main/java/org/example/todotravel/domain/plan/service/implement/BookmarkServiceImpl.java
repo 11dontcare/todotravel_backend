@@ -1,6 +1,8 @@
 package org.example.todotravel.domain.plan.service.implement;
 
 import lombok.RequiredArgsConstructor;
+import org.example.todotravel.domain.notification.dto.request.AlarmRequestDto;
+import org.example.todotravel.domain.notification.service.implement.AlarmServiceImpl;
 import org.example.todotravel.domain.plan.entity.Bookmark;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.repository.BookmarkRepository;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BookmarkServiceImpl implements BookmarkService {
     private final BookmarkRepository bookmarkRepository;
+    private final AlarmServiceImpl alarmService; //알림 자동 생성
 
     @Override
     @Transactional
@@ -21,7 +24,13 @@ public class BookmarkServiceImpl implements BookmarkService {
                 .bookmarkUser(user)
                 .plan(plan)
                 .build();
-        return bookmarkRepository.save(bookmark);
+        Bookmark newBookmark = bookmarkRepository.save(bookmark);
+
+        AlarmRequestDto requestDto = new AlarmRequestDto(plan.getPlanUser().getUserId(),
+                user.getNickname()+ "님이 [" + plan.getTitle() + "] 플랜을 북마크 했습니다.");
+        alarmService.createAlarm(requestDto);
+
+        return newBookmark;
     }
 
     @Override
