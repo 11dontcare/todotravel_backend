@@ -1,6 +1,8 @@
 package org.example.todotravel.domain.plan.service.implement;
 
 import lombok.RequiredArgsConstructor;
+import org.example.todotravel.domain.notification.dto.request.AlarmRequestDto;
+import org.example.todotravel.domain.notification.service.implement.AlarmServiceImpl;
 import org.example.todotravel.domain.plan.dto.request.PlanRequestDto;
 import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanResponseDto;
@@ -24,6 +26,7 @@ public class PlanServiceImpl implements PlanService {
     private final UserRepository userRepository;//테스트용
     private final BookmarkServiceImpl bookmarkService;
     private final LikeServiceImpl likeService;
+    private final AlarmServiceImpl alarmService; //알림 자동 생성
 
     @Override
     @Transactional
@@ -32,8 +35,8 @@ public class PlanServiceImpl implements PlanService {
 
         Plan plan = planRequestDto.toEntity();
         //현재 로그인 중인 사용자 user
-        User user = new User();
-//        User user = userRepository.findById(1L).orElseThrow();
+//        User user = new User();
+        User user = userRepository.findById(1L).orElseThrow();//테스트용
         plan.setPlanUser(user);
         //planUsers에 플랜 생성자 추가
         PlanUser planUser = PlanUser.builder()
@@ -55,24 +58,24 @@ public class PlanServiceImpl implements PlanService {
     @Transactional
     public Plan updatePlan(Long planId, PlanRequestDto dto) {
         Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("여행 플랜을 찾을 수 없습니다."));
-        plan.setTitle(dto.getTitle());
-        plan.setLocation(dto.getLocation());
-        plan.setStartDate(dto.getStartDate());
-        plan.setEndDate(dto.getEndDate());
-        plan.setIsPublic(dto.getIsPublic());
-        plan.setTotalBudget(dto.getTotalBudget());
 
         //수정을 위해 toBuilder 사용
-//        plan.toBuilder()
-//                .title(dto.getTitle())
-//                .location(dto.getLocation())
-//                .startDate(dto.getStartDate())
-//                .endDate(dto.getEndDate())
-//                .isPublic(dto.getIsPublic())
-//                .totalBudget(dto.getTotalBudget())
-//                .build();
+        plan = plan.toBuilder()
+                .title(dto.getTitle())
+                .location(dto.getLocation())
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .isPublic(dto.getIsPublic())
+                .totalBudget(dto.getTotalBudget())
+                .build();
 
-        return planRepository.save(plan);
+        Plan updatedPlan = planRepository.save(plan);
+
+        AlarmRequestDto requestDto = new AlarmRequestDto(plan.getPlanUser().getUserId(),
+                "[" + plan.getTitle() + "] 플랜이 수정되었습니다.");
+        alarmService.createAlarm(requestDto);
+
+        return updatedPlan;
     }
 
     @Override
@@ -94,8 +97,8 @@ public class PlanServiceImpl implements PlanService {
                             .description(plan.getDescription())
                             .startDate(plan.getStartDate())
                             .endDate(plan.getEndDate())
-                            .bookmarkNumber(bookmarkService.countBookmark(plan))
-                            .likeNumber(likeService.countLike(plan))
+//                            .bookmarkNumber(bookmarkService.countBookmark(plan))
+//                            .likeNumber(likeService.countLike(plan))
                     .build());
         }
         return planList;
@@ -105,11 +108,10 @@ public class PlanServiceImpl implements PlanService {
     @Transactional
     public PlanResponseDto getPlanDetails(Long planId) {
         Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("플랜을 찾을 수 없습니다."));
-        return PlanResponseDto.builder()
-                .plan(plan)
+        PlanResponseDto planResponseDto = PlanResponseDto.fromEntity(plan);
+        return planResponseDto.toBuilder()
                 .bookmarkNumber(bookmarkService.countBookmark(plan))
                 .likeNumber(likeService.countLike(plan))
-                .comments(null)
                 .build();
     }
 
@@ -139,5 +141,36 @@ public class PlanServiceImpl implements PlanService {
                 .build();
         newPlan.setPlanUsers(Collections.singleton(planUser));
         return planRepository.save(newPlan);
+    }
+
+    @Override
+    @Transactional
+    public List<PlanListResponseDto> getSpecificPlans(String keyword) {
+        List<Plan> plans = planRepository.findAllByIsPublicTrueAndTitleContains(keyword);
+        List<PlanListResponseDto> planList = new ArrayList<>();
+        for (Plan plan : plans){
+            planList.add(PlanListResponseDto.builder()
+                    .planId(plan.getPlanId())
+                    .title(plan.getTitle())
+                    .location(plan.getLocation())
+                    .description(plan.getDescription())
+                    .startDate(plan.getStartDate())
+                    .endDate(plan.getEndDate())
+                    .bookmarkNumber(bookmarkService.countBookmark(plan))
+                    .likeNumber(likeService.countLike(plan))
+                    .build());
+        }
+        return planList;
+    }
+
+    @Override
+    @Transactional
+    public PlanResponseDto getPlanForModify(Long planId) {
+        Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("여행 플랜을 찾을 수 없습니다."));
+        PlanResponseDto planResponseDto = PlanResponseDto.fromEntity(plan);
+        return planResponseDto.toBuilder()
+                .bookmarkNumber(bookmarkService.countBookmark(plan))
+                .likeNumber(likeService.countLike(plan))
+                .build();
     }
 }
