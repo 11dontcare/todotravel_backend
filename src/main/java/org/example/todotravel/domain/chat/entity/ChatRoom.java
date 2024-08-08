@@ -37,6 +37,9 @@ public class ChatRoom {
     private Set<ChatRoomUser> chatRoomUsers = new HashSet<>();
 
     public void addUser(User user) {
+        if (this.chatRoomUsers == null) {
+            this.chatRoomUsers = new HashSet<>();
+        }
         ChatRoomUser chatRoomUser = new ChatRoomUser(this, user);
         this.chatRoomUsers.add(chatRoomUser);
     }
