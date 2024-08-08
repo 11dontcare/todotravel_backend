@@ -39,7 +39,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     String[] notFilter = {
         "/api/auth",
         "/api/send-mail",
-        "/api/plan"
+        "/api/plan",
+        "/index.html",
     };
 
     // 인증이 필요 없는 경로는 필터 적용하지 않도록 설정
@@ -58,6 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * @throws ServletException 서블릿 예외
      * @throws IOException      입출력 예외
      */
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (shouldNotFilter(request)) {
@@ -89,6 +91,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 throw new CustomJwtException(JwtExceptionCode.UNKNOWN_ERROR);
             }
         }
+        log.info("finish");
         filterChain.doFilter(request, response); // 다음 필터로 요청을 전달
     }
 

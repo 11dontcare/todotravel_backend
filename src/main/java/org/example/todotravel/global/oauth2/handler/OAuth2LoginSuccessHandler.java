@@ -24,7 +24,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final JwtTokenizer jwtTokenizer;
     private final UserRepository userRepository;
 
-
     // oAuth2 로그인 권한 핸들러
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -37,9 +36,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
             if (oAuth2User.getRole() == Role.ROLE_GUEST) {
                 request.getSession().setAttribute("oauthUser", oAuth2User);
-//                jwtTokenizer.issueTokenAndSetCookies(response, user.get());
                 getRedirectStrategy().sendRedirect(request, response, "/api/auth/oauth2/signup");
-                response.sendRedirect("/api/auth/oauth2/signup");
             } else {
                 loginSuccess(response, user.orElse(null));
             }

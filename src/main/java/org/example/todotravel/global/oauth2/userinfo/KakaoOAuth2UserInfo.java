@@ -58,16 +58,4 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
         return (String) account.get("email");
     }
 
-    public Gender getGender() {
-        Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
-        if (account == null) {
-            return null;
-        }
-        String gender = (String) account.get("gender");
-        if (gender == null) {
-            return null;
-        }
-        return gender.equalsIgnoreCase("female") ? Gender.WOMAN : Gender.MAN;
-    }
-
 }

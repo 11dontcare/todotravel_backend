@@ -14,7 +14,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 class ChatServiceImplTest {
@@ -29,7 +32,7 @@ class ChatServiceImplTest {
     private UserRepository userRepository;
 
     @InjectMocks
-    private ChatServiceImpl chatServiceImpl;
+    private ChatServiceImpl chatService;
 
     @BeforeEach
     void setUp() {
@@ -38,79 +41,81 @@ class ChatServiceImplTest {
 
     @Test
     void createChatRoom() {
-        Long userId = 1L;
-        Long planId = 1L;
-        String roomName = "Test Room";
-
         User user = new User();
-        user.setUserId(userId);
+        user.setUserId(1L);
         Plan plan = new Plan();
-        plan.setPlanId(planId);
+        plan.setPlanId(1L);
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.setRoomId(1L);
+        chatRoom.setRoomName("Test Room");
+        chatRoom.setChatUser(user);
+        chatRoom.setPlan(plan);
 
-        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
-        when(planRepository.findById(planId)).thenReturn(java.util.Optional.of(plan));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(planRepository.findById(anyLong())).thenReturn(Optional.of(plan));
+        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(chatRoom);
 
-        ChatRoomResponseDto chatRoomResponseDto = chatServiceImpl.createChatRoom(userId, planId, roomName);
+        ChatRoomResponseDto responseDto = chatService.createChatRoom(1L, 1L, "Test Room");
 
-        assertNotNull(chatRoomResponseDto);
-        assertEquals(roomName, chatRoomResponseDto.getRoomName());
-        verify(chatRoomRepository, times(1)).save(any(ChatRoom.class));
+        assertNotNull(responseDto);
+        assertEquals(chatRoom.getRoomId(), responseDto.getRoomId());
+        assertEquals(chatRoom.getRoomName(), responseDto.getRoomName());
     }
 
     @Test
     void updateChatRoomName() {
-        Long roomId = 1L;
-        String newName = "Updated Room";
-
         ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setRoomId(roomId);
-        chatRoom.setRoomName("Old Room");
+        chatRoom.setRoomId(1L);
+        chatRoom.setRoomName("Old Name");
 
-        when(chatRoomRepository.findById(roomId)).thenReturn(java.util.Optional.of(chatRoom));
+        when(chatRoomRepository.findById(anyLong())).thenReturn(Optional.of(chatRoom));
+        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(chatRoom);
 
-        chatServiceImpl.updateChatRoomName(roomId, newName);
+        chatService.updateChatRoomName(1L, "New Name");
 
-        assertEquals(newName, chatRoom.getRoomName());
-        verify(chatRoomRepository, times(1)).save(chatRoom);
+        verify(chatRoomRepository, times(1)).findById(anyLong());
+        verify(chatRoomRepository, times(1)).save(any(ChatRoom.class));
+
+        assertEquals("New Name", chatRoom.getRoomName());
     }
 
     @Test
     void addUserToChatRoom() {
-        Long roomId = 1L;
-        Long userId = 1L;
-
         ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setRoomId(roomId);
-
+        chatRoom.setRoomId(1L);
         User user = new User();
-        user.setUserId(userId);
+        user.setUserId(1L);
 
-        when(chatRoomRepository.findById(roomId)).thenReturn(java.util.Optional.of(chatRoom));
-        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
+        when(chatRoomRepository.findById(anyLong())).thenReturn(Optional.of(chatRoom));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(chatRoom);
 
-        chatServiceImpl.addUserToChatRoom(roomId, userId);
+        chatService.addUserToChatRoom(1L, 1L);
+
+        verify(chatRoomRepository, times(1)).findById(anyLong());
+        verify(userRepository, times(1)).findById(anyLong());
+        verify(chatRoomRepository, times(1)).save(any(ChatRoom.class));
 
         assertEquals(user, chatRoom.getChatUser());
-        verify(chatRoomRepository, times(1)).save(chatRoom);
     }
 
     @Test
     void removeUserFromChatRoom() {
-        Long roomId = 1L;
-        Long userId = 1L;
-
         ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setRoomId(roomId);
-
+        chatRoom.setRoomId(1L);
         User user = new User();
-        user.setUserId(userId);
+        user.setUserId(1L);
 
-        when(chatRoomRepository.findById(roomId)).thenReturn(java.util.Optional.of(chatRoom));
-        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
+        when(chatRoomRepository.findById(anyLong())).thenReturn(Optional.of(chatRoom));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(chatRoom);
 
-        chatServiceImpl.removeUserFromChatRoom(roomId, userId);
+        chatService.removeUserFromChatRoom(1L, 1L);
+
+        verify(chatRoomRepository, times(1)).findById(anyLong());
+        verify(userRepository, times(1)).findById(anyLong());
+        verify(chatRoomRepository, times(1)).save(any(ChatRoom.class));
 
         assertNull(chatRoom.getChatUser());
-        verify(chatRoomRepository, times(1)).save(chatRoom);
     }
 }

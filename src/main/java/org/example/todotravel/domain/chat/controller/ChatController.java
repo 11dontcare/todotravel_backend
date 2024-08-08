@@ -5,7 +5,7 @@ import org.example.todotravel.domain.chat.dto.request.ChatRoomCreateRequestDto;
 import org.example.todotravel.domain.chat.dto.request.ChatRoomUpdateRequestDto;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomResponseDto;
 import org.example.todotravel.domain.chat.service.ChatService;
-import org.springframework.http.ResponseEntity;
+import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,26 +16,26 @@ public class ChatController {
     private final ChatService chatService;
 
     @PostMapping("/create")
-    public ResponseEntity<ChatRoomResponseDto> createChatRoom(@RequestBody ChatRoomCreateRequestDto dto) {
+    public ApiResponse<ChatRoomResponseDto> createChatRoom(@RequestBody ChatRoomCreateRequestDto dto) {
         ChatRoomResponseDto chatRoomResponseDto = chatService.createChatRoom(dto.getUserId(), dto.getPlanId(), dto.getRoomName());
-        return ResponseEntity.ok(chatRoomResponseDto);
+        return new ApiResponse<>(true, "채팅방 생성 성공", chatRoomResponseDto);
     }
 
     @PutMapping("/update-name")
-    public ResponseEntity<Void> updateChatRoomName(@RequestBody ChatRoomUpdateRequestDto dto) {
+    public ApiResponse<Void> updateChatRoomName(@RequestBody ChatRoomUpdateRequestDto dto) {
         chatService.updateChatRoomName(dto.getRoomId(), dto.getNewRoomName());
-        return ResponseEntity.ok().build();
+        return new ApiResponse<>(true, "채팅방 이름 수정 성공");
     }
 
     @PostMapping("/join/{roomId}")
-    public ResponseEntity<Void> joinChatRoom(@PathVariable Long roomId, @RequestParam Long userId) {
+    public ApiResponse<Void> joinChatRoom(@PathVariable Long roomId, @RequestParam Long userId) {
         chatService.addUserToChatRoom(roomId, userId);
-        return ResponseEntity.ok().build();
+        return new ApiResponse<>(true, "채팅방 참여 성공");
     }
 
     @PostMapping("/leave/{roomId}")
-    public ResponseEntity<Void> leaveChatRoom(@PathVariable Long roomId, @RequestParam Long userId) {
+    public ApiResponse<Void> leaveChatRoom(@PathVariable Long roomId, @RequestParam Long userId) {
         chatService.removeUserFromChatRoom(roomId, userId);
-        return ResponseEntity.ok().build();
+        return new ApiResponse<>(true, "채팅방 나가기 성공");
     }
 }

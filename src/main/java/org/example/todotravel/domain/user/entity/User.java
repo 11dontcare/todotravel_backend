@@ -53,7 +53,7 @@ public class User {
     private String nickname;
 
     // 성별
-    @Column(name = "gender", nullable = false)
+    @Column(name = "gender")
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
@@ -62,7 +62,7 @@ public class User {
     private LocalDateTime createdDate;
 
     // 생년월일
-    @Column(name = "birth_date", nullable = false)
+    @Column(name = "birth_date")
     private LocalDate birthDate;
 
     // 권한설정

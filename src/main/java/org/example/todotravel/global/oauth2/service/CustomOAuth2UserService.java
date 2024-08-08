@@ -1,5 +1,6 @@
 package org.example.todotravel.global.oauth2.service;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.user.entity.SocialType;
@@ -54,6 +55,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         // socialType에 따라 유저 정보를 통해 OAuthAttributes 객체 생성
         OAuthAttributes extractAttributes = OAuthAttributes.of(socialType, userNameAttributeName, attributes);
+        String email = extractAttributes.getOauth2UserInfo().getEmail();
+
+        Optional<User> existingUser = userRepository.findByEmail(email);
+        if (existingUser.isPresent()) {
+            throw new RuntimeException("유저 이메일 " + email + "이 이미 존재합니다.");
+        }
 
         User createdUser = getUser(extractAttributes, socialType); // getUser() 메소드로 User 객체 생성 후 반환
 
