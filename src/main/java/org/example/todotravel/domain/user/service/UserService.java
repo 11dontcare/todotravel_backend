@@ -38,6 +38,8 @@ public interface UserService {
 
     User getUserByEmail(String email);
 
+    User getUserById(Long userId);
+
     //플랜에 사용자 초대 시 모든 사용자 목록을 return - 김민정
     List<User> getAllUsers();
 }
