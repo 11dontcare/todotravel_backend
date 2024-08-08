@@ -23,8 +23,8 @@ public class ChatRoom {
     @Column(name = "room_id", nullable = false)
     private Long roomId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "plan_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "plan_id")
     private Plan plan;
 
     @Column(name = "room_name", nullable = false)

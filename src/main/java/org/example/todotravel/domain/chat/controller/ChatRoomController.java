@@ -1,15 +1,19 @@
 package org.example.todotravel.domain.chat.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.chat.dto.request.ChatRoomCreateRequestDto;
 import org.example.todotravel.domain.chat.dto.request.ChatRoomNameRequestDto;
 import org.example.todotravel.domain.chat.dto.request.FirstUserCheckRequestDto;
+import org.example.todotravel.domain.chat.dto.request.OneToOneChatRoomRequestDto;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomListResponseDto;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomNameResponseDto;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomResponseDto;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomUserResponseDto;
 import org.example.todotravel.domain.chat.service.ChatRoomService;
 import org.example.todotravel.domain.chat.service.ChatRoomUserService;
+import org.example.todotravel.domain.plan.entity.Plan;
+import org.example.todotravel.domain.plan.service.implement.PlanUserServiceImpl;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,12 +25,13 @@ import java.util.List;
 public class ChatRoomController {
     private final ChatRoomService chatRoomService;
     private final ChatRoomUserService chatRoomUserService;
+    private final PlanUserServiceImpl planUserService;
 
-    // 플랜 생성 시 채팅방 생성
-    @PostMapping
-    public ApiResponse<ChatRoomResponseDto> createChatRoom(@RequestBody ChatRoomCreateRequestDto dto) {
-        ChatRoomResponseDto chatRoomResponseDto = chatRoomService.createChatRoom(dto);
-        return new ApiResponse<>(true, "채팅방 생성 성공", chatRoomResponseDto);
+    // 1:1 채팅방 생성
+    @PostMapping("/one-to-one")
+    public ApiResponse<?> createOneToOneChatRoom(@Valid @RequestBody OneToOneChatRoomRequestDto dto) {
+        ChatRoomResponseDto chatRoomResponseDto = chatRoomService.createOneToOneChatRoom(dto);
+        return new ApiResponse<>(true, "1:1 채팅방 생성 성공", chatRoomResponseDto);
     }
 
     // 유저가 가진 채팅방 리스트 조회
@@ -57,17 +62,18 @@ public class ChatRoomController {
         return new ApiResponse<>(true, "채팅방 이름 수정 성공", updatedChatRoom);
     }
 
-    // 채팅방 참여하기
-    @PostMapping("/join/{roomId}")
-    public ApiResponse<Void> joinChatRoom(@PathVariable Long roomId, @RequestParam Long userId) {
-        chatRoomService.addUserToChatRoom(roomId, userId);
-        return new ApiResponse<>(true, "채팅방 참여 성공");
-    }
-
     // 채팅방에서 나가기 or 추방시키기
     @DeleteMapping("/leave/{roomId}")
     public ApiResponse<Void> leaveChatRoom(@PathVariable Long roomId, @RequestParam Long userId) {
+        // 채팅방에서 해당 유저 제거
         chatRoomService.removeUserFromChatRoom(roomId, userId);
+
+        // 플랜에서도 해당 유저 제거 - 1:1인 경우는 플랜이 없음
+        Plan plan = chatRoomService.getPlanByRoomId(roomId);
+        if (plan != null) {
+            planUserService.removePlanUser(plan.getPlanId(), userId);
+        }
+
         return new ApiResponse<>(true, "채팅방 나가기 성공");
     }
 

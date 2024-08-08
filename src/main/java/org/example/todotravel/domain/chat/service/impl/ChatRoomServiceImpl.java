@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.chat.dto.request.ChatRoomCreateRequestDto;
 import org.example.todotravel.domain.chat.dto.request.ChatRoomNameRequestDto;
+import org.example.todotravel.domain.chat.dto.request.OneToOneChatRoomRequestDto;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomNameResponseDto;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomResponseDto;
 import org.example.todotravel.domain.chat.entity.ChatRoom;
@@ -11,6 +12,7 @@ import org.example.todotravel.domain.chat.entity.ChatRoomUser;
 import org.example.todotravel.domain.chat.repository.ChatRoomRepository;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.service.implement.PlanServiceImpl;
+import org.example.todotravel.domain.plan.service.implement.PlanUserServiceImpl;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.chat.service.ChatRoomService;
 import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
@@ -23,30 +25,46 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
+
     private final ChatRoomUserServiceImpl chatRoomUserService;
+    private final PlanUserServiceImpl planUserService;
     private final PlanServiceImpl planService;
     private final UserServiceImpl userService;
 
     // 플랜 생성 시 채팅방 생성
     @Override
     @Transactional
-    public ChatRoomResponseDto createChatRoom(ChatRoomCreateRequestDto dto) {
-        User user = userService.getUserById(dto.getUserId());
-        Plan plan = planService.getPlan(dto.getPlanId());
-
+    public ChatRoomResponseDto createChatRoom(Plan plan) {
         ChatRoom chatRoom = ChatRoom.builder()
             .plan(plan)
-            .roomName(dto.getRoomName())
+            .roomName(plan.getTitle())
             .roomDate(LocalDateTime.now())
             .build();
-        chatRoom.addUser(user);
+        chatRoom.addUser(plan.getPlanUser());
 
-        chatRoomRepository.save(chatRoom);
+        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
 
-        return ChatRoomResponseDto.builder()
-            .roomId(chatRoom.getRoomId())
-            .roomName(chatRoom.getRoomName())
+        return new ChatRoomResponseDto(savedChatRoom);
+    }
+
+    // 1:1 채팅방 생성
+    @Override
+    @Transactional
+    public ChatRoomResponseDto createOneToOneChatRoom(OneToOneChatRoomRequestDto dto) {
+        User sender = userService.getUserById(dto.getSenderId());
+        User receiver = userService.getUserById(dto.getReceiverId());
+        String roomName = sender.getNickname() + " - " + receiver.getNickname();
+
+        ChatRoom chatRoom = ChatRoom.builder()
+            .roomName(roomName)
+            .roomDate(LocalDateTime.now())
             .build();
+        chatRoom.addUser(sender);
+        chatRoom.addUser(receiver);
+
+        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+
+        return new ChatRoomResponseDto(savedChatRoom);
     }
 
     // 채팅방 이름 수정
@@ -76,7 +94,24 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         chatRoomRepository.save(chatRoom);
     }
 
-    // 채팅방에서 사용자 제거
+    // planId로 채팅방 찾기
+    @Override
+    @Transactional(readOnly = true)
+    public ChatRoom getChatRoomByPlanId(Long planId) {
+        return chatRoomRepository.findByPlanId(planId)
+            .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다."));
+    }
+
+    // roomId로 plan 찾기
+    @Override
+    @Transactional(readOnly = true)
+    public Plan getPlanByRoomId(Long roomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+            .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다."));
+        return chatRoom.getPlan();
+    }
+
+    // 채팅방과 플랜에서 사용자 제거
     @Override
     @Transactional
     public void removeUserFromChatRoom(Long roomId, Long userId) {
