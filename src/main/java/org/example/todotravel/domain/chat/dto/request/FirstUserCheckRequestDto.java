@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatRoomCreateRequestDto {
-    private Long planId;
+public class FirstUserCheckRequestDto {
+    private Long roomId;
     private Long userId;
-    private String roomName;
 }
