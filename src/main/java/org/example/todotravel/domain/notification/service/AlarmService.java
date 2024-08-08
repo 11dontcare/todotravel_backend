@@ -12,8 +12,8 @@ public interface AlarmService {
     Alarm findByAlarmId(Long alarmId);
 
     Alarm createAlarm(AlarmRequestDto dto);
-    Alarm updateAlarm(Long alarmId);
-    Alarm updateAllAlarm(Long userId);
+    void updateAlarm(Long alarmId);
+    void updateAllAlarm(Long userId);
     void deleteAlarm(Long alarmId);
     void deleteAllAlarm(Long userId);
 }

@@ -1,6 +1,7 @@
 package org.example.todotravel.domain.plan.service.implement;
 
 import lombok.RequiredArgsConstructor;
+import org.example.todotravel.domain.notification.service.implement.AlarmServiceImpl;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
 import org.example.todotravel.domain.plan.repository.PlanUserRepository;
@@ -30,6 +31,7 @@ public class PlanUserServiceImpl implements PlanUserService {
                 .user(user)
                 .plan(plan)
                 .build();
+
         return planUserRepository.save(planUser);
     }
 

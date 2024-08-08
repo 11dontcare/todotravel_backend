@@ -37,7 +37,7 @@ public class AlarmController {
 
     //모든 알림 수정하기 (읽음)
     @PutMapping("/read/{user_id}")
-    public ApiResponse<Void> updateAllAlarm(@PathVariable("user_id") Long userId) {\
+    public ApiResponse<Void> updateAllAlarm(@PathVariable("user_id") Long userId) {
         alarmService.updateAllAlarm(userId);
         return new ApiResponse<>(true,"모든 알림 읽음 상태 수정 완료");
     }

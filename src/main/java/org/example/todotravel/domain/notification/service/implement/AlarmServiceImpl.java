@@ -24,7 +24,7 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     @Transactional(readOnly = true)
     public List<Alarm> findByUserId(Long userId) {
-        return alarmRepository.findByAlarmUserId(userId);
+        return alarmRepository.findByAlarmUser_UserId(userId);
     }
 
     //알림 찾기 - alarmId
@@ -54,16 +54,16 @@ public class AlarmServiceImpl implements AlarmService {
     //알림 수정하기 (읽음)
     @Override
     @Transactional
-    public Alarm updateAlarm(Long alarmId) {
+    public void updateAlarm(Long alarmId) {
         Alarm alarm = findByAlarmId(alarmId);
         alarm.setStatus(true);
-        return alarmRepository.save(alarm);
+        alarmRepository.save(alarm);
     }
 
     //모든 알림 수정하기 (읽음)
     @Override
     @Transactional
-    public Alarm updateAllAlarm(Long userId) {
+    public void updateAllAlarm(Long userId) {
         List<Alarm> alarmList = findByUserId(userId);
         for (Alarm alarm : alarmList) {
             alarm.setStatus(true);
@@ -75,6 +75,7 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     @Transactional
     public void deleteAlarm(Long alarmId) {
+
         alarmRepository.deleteById(alarmId);
     }
 
