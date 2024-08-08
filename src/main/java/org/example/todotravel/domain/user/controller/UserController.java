@@ -8,11 +8,9 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.todotravel.domain.user.dto.request.LoginRequestDto;
-import org.example.todotravel.domain.user.dto.request.OAuth2UserLoginRequestDto;
-import org.example.todotravel.domain.user.dto.request.UserRegisterRequestDto;
-import org.example.todotravel.domain.user.dto.request.UsernameRequestDto;
+import org.example.todotravel.domain.user.dto.request.*;
 import org.example.todotravel.domain.user.dto.response.LoginResponseDto;
+import org.example.todotravel.domain.user.dto.response.OAuth2SignUpResponseDto;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.impl.RefreshTokenServiceImpl;
 import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
@@ -39,22 +37,67 @@ public class UserController {
         return new ApiResponse<>(true, "회원가입 성공", newUser);
     }
 
-    // OAuth 추가 로그인
-    @PostMapping("/oauth2/signup")
-    public ApiResponse<?> oAuth2UserLogin(@Valid @RequestBody OAuth2UserLoginRequestDto dto, HttpServletResponse response) {
-        User newOAuth2User = userService.loginOAuth2User(dto);
-//        jwtTokenizer.issueTokenAndSetCookies(response, newOAuth2User);
-        return new ApiResponse<>(true, "회원가입 성공", newOAuth2User);
+    // OAuth2 첫 가입시 추가 정보 입력 후 로그인 처리
+    @PostMapping("/oauth2/additional-info")
+    public ApiResponse<?> updateOAuth2UserAdditionalInfo(@RequestBody OAuth2AdditionalInfoRequestDto dto,
+                                                         HttpServletResponse response) {
+        try {
+            User updateUser = userService.updateOAuth2UserAdditionalInfo(dto);
+
+            // accessToken, refreshToken 생성
+            String accessToken = jwtTokenizer.issueTokenAndSetCookies(response, updateUser);
+
+            LoginResponseDto loginResponseDto = LoginResponseDto.builder()
+                .userId(updateUser.getUserId())
+                .nickname(updateUser.getNickname())
+                .role(updateUser.getRole().name())
+                .accessToken(accessToken)
+                .build();
+
+            return new ApiResponse<>(true, "추가 정보 업데이트 성공", loginResponseDto);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "추가 정보 업데이트 실패");
+        }
     }
 
-    // OAuth2 사용자 정보 조회
+    // OAuth2 첫 가입시
     @GetMapping("/oauth2/signup")
-    public ApiResponse<?> getOAuth2UserInfo(HttpSession session) {
-        CustomOAuth2User oauthUser = (CustomOAuth2User) session.getAttribute("oauthUser");
-        if (oauthUser == null) {
-            return new ApiResponse<>(false, "User not found", null);
+    public ApiResponse<?> getOAuth2UserInfo(@RequestParam("token") String userInfoJwt) {
+        try {
+            Claims claims = jwtTokenizer.parseAccessToken(userInfoJwt);
+            String email = claims.getSubject();
+
+            OAuth2SignUpResponseDto oAuth2SignUpResponseDto = userService.getUserIdByEmail(email);
+
+            return new ApiResponse<>(true, "OAuth2 가입 성공", oAuth2SignUpResponseDto);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "OAuth2 가입 성공");
         }
-        return new ApiResponse<>(true, "User info", oauthUser);
+    }
+
+    // OAuth2 기존 가입 유저 로그인
+    @GetMapping("/oauth2/login")
+    public ApiResponse<?> oauth2UserLogin(@RequestParam("token") String userInfoJwt, HttpServletResponse response) {
+        try {
+            Claims claims = jwtTokenizer.parseAccessToken(userInfoJwt);
+            String email = claims.getSubject();
+
+            User user = userService.getUserByEmail(email);
+
+            // accessToken, refreshToken 생성
+            String accessToken = jwtTokenizer.issueTokenAndSetCookies(response, user);
+
+            LoginResponseDto loginResponseDto = LoginResponseDto.builder()
+                .userId(user.getUserId())
+                .nickname(user.getNickname())
+                .role(user.getRole().name())
+                .accessToken(accessToken)
+                .build();
+
+            return new ApiResponse<>(true, "OAuth2 로그인 성공", loginResponseDto);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "OAuth2 로그인 실패: " + e.getMessage(), null);
+        }
     }
 
     // 사용자 아이디 중복 검사

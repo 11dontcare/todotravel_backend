@@ -31,16 +31,24 @@ public class SecurityConfig {
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
-    // 모든 유저 허용 URI
+    // 모든 유저 허용 URL
     String[] allAllowPage = new String[]{
-        "/api/plan/**",
-        "/index.html",
-        // 우선 "/api/plan/**" 전부 허용해두었습니다.
+        "/api/plan/**", // 우선 "/api/plan/**" 전부 허용해두었습니다.
+        "/index.html", // 프론트 구현 완료시 삭제
+        "/api/location/**",
+        "/api/invite/**",
+        "/api/chat"
     };
 
-    // 비로그인 유저 허용 URI
+    // 비로그인 유저 허용 URL
     String[] notLoggedAllowPage = new String[]{
-        "/api/auth/**",
+        "/api/auth/signup",
+        "/api/auth/check-username",
+        "/api/auth/check-email",
+        "/api/auth/check-nickname",
+        "/api/auth/login",
+        "/api/auth/find-username",
+        "/api/auth/oauth2/**",
         "/api/send-mail/**",
     };
 
@@ -54,7 +62,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            /* 유저별 URI 접근 허용 */
+            /* 유저별 URL 접근 허용 */
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(allAllowPage).permitAll()  // 모든 유저
                 .requestMatchers(notLoggedAllowPage).not().authenticated() // 비로그인 유저

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.Optional;
 
@@ -36,20 +37,16 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             Optional<User> user = userRepository.findByEmail(oAuth2User.getEmail());
 
             if (oAuth2User.getRole() == Role.ROLE_GUEST) {
-                request.getSession().setAttribute("oauthUser", oAuth2User);
-                getRedirectStrategy().sendRedirect(request, response, "/api/auth/oauth2/signup");
+                String userInfoJwt = jwtTokenizer.createTempJwtForOAuth2User(oAuth2User);
+                String redirectUrl = String.format("/api/auth/oauth2/signup?token=%s", userInfoJwt);
+                getRedirectStrategy().sendRedirect(request, response, redirectUrl);
             } else {
-                loginSuccess(response, user.orElse(null));
+                String userInfoJwt = jwtTokenizer.createTempJwtForOAuth2User(oAuth2User);
+                String redirectUrl = String.format("/api/auth/oauth2/login?token=%s", userInfoJwt);
+                getRedirectStrategy().sendRedirect(request, response, redirectUrl);
             }
         } catch (Exception e) {
             throw e;
-        }
-    }
-
-    // 로그인 성공했을떄의 리턴값
-    private void loginSuccess(HttpServletResponse response, User user) throws IOException {
-        if (user != null) {
-//            jwtTokenizer.issueTokenAndSetCookies(response, user);
         }
     }
 }

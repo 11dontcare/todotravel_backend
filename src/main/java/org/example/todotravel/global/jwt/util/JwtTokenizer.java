@@ -10,6 +10,7 @@ import org.example.todotravel.domain.user.entity.RefreshToken;
 import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.impl.RefreshTokenServiceImpl;
+import org.example.todotravel.global.oauth2.CustomOAuth2User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -159,5 +160,18 @@ public class JwtTokenizer {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public String createTempJwtForOAuth2User(CustomOAuth2User oAuth2User) {
+        Claims claims = Jwts.claims().setSubject(oAuth2User.getEmail());
+        log.info("oAuth2User.getName:: {}", oAuth2User.getName());
+        claims.put("name", oAuth2User.getName());
+
+        return Jwts.builder()
+            .setClaims(claims)
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + 5 * 60 * 1000)) // 5분 유효
+            .signWith(getSigningKey(accessSecret))
+            .compact();
     }
 }
