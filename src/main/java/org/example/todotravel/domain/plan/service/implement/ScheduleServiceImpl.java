@@ -19,7 +19,6 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final LocationServiceImpl locationService;
     private final PlanServiceImpl planService;
-    private final AlarmServiceImpl alarmService;
 
     //여행 일정 찾기
     @Override
@@ -53,16 +52,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .plan(plan)
                 .location(location)
                 .build();
-        Schedule createdSchedule = scheduleRepository.save(schedule);
-
-        String content = "여행 일정이 생성되었습니다.";
-        AlarmRequestDto alarmRequestDto = AlarmRequestDto.builder()
-                .userId(plan.getPlanUser().getUserId()) // 계획의 소유자 또는 관련 사용자 ID를 사용
-                .alarmContent(content)
-                .build();
-        alarmService.createAlarm(alarmRequestDto);
-
-        return createdSchedule;
+        return  scheduleRepository.save(schedule);
     }
 
     //여행 일정 삭제하기

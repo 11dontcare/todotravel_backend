@@ -36,7 +36,7 @@ public class AlarmController {
     }
 
     //모든 알림 수정하기 (읽음)
-    @PutMapping("/read/{user_id}")
+    @PutMapping("/readAll/{user_id}")
     public ApiResponse<Void> updateAllAlarm(@PathVariable("user_id") Long userId) {
         alarmService.updateAllAlarm(userId);
         return new ApiResponse<>(true,"모든 알림 읽음 상태 수정 완료");
@@ -44,14 +44,14 @@ public class AlarmController {
 
 
     //알림 삭제하기
-    @DeleteMapping("delete/{alarm_id}")
+    @DeleteMapping("/delete/{alarm_id}")
     public ApiResponse<Void> deleteAlarm(@PathVariable("alarm_id") Long alarmId) {
         alarmService.deleteAlarm(alarmId);
         return new ApiResponse<>(true,"알림 삭제 완료");
     }
 
     //모든 알림 삭제하기
-    @DeleteMapping("delete/{user_id}")
+    @DeleteMapping("/deleteAll/{user_id}")
     public ApiResponse<Void> deleteAllAlarm(@PathVariable("user_id") Long userId) {
         alarmService.deleteAllAlarm(userId);
         return new ApiResponse<>(true,"모든 알림 삭제 완료");

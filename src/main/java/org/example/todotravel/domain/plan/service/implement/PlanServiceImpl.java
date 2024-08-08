@@ -33,12 +33,12 @@ public class PlanServiceImpl implements PlanService {
         Plan plan = planRequestDto.toEntity();
         //현재 로그인 중인 사용자 user
         User user = new User();
-        User loginuser = userRepository.findById(4L).orElseThrow();
-        plan.setPlanUser(loginuser);
+        //User user = userRepository.findById(1L).orElseThrow();
+        plan.setPlanUser(user);
         //planUsers에 플랜 생성자 추가
         PlanUser planUser = PlanUser.builder()
                 .status(PlanUser.StatusType.ACCEPTED)
-                .user(loginuser)
+                .user(user)
                 .plan(plan)
                 .build();
         plan.setPlanUsers(Collections.singleton(planUser));
