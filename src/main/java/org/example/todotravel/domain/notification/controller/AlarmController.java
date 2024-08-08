@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 public class AlarmController {
     final private AlarmServiceImpl alarmService;
 
+    //자동으로 알림 만들기
+
     //사용자에 대한 모든 알림 가져오기
     @GetMapping("/{user_id}")
     public ApiResponse<List<AlarmResponseDto>> showAllAlarms(@PathVariable("user_id") Long userId) {
