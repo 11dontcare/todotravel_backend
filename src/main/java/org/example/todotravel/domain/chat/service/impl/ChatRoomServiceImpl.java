@@ -98,7 +98,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     @Transactional(readOnly = true)
     public ChatRoom getChatRoomByPlanId(Long planId) {
-        return chatRoomRepository.findByPlanId(planId)
+        return chatRoomRepository.findByPlanPlanId(planId)
             .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다."));
     }
 
