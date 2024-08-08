@@ -64,7 +64,8 @@ public class ChatRoomController {
 
     // 채팅방에서 나가기 or 추방시키기
     @DeleteMapping("/leave/{roomId}")
-    public ApiResponse<Void> leaveChatRoom(@PathVariable Long roomId, @RequestParam Long userId) {
+    public ApiResponse<Void> leaveChatRoom(@PathVariable("roomId") Long roomId,
+                                           @RequestParam("userId") Long userId) {
         // 채팅방에서 해당 유저 제거
         chatRoomService.removeUserFromChatRoom(roomId, userId);
 
