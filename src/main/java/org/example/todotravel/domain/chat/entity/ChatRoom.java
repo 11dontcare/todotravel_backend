@@ -1,18 +1,20 @@
 package org.example.todotravel.domain.chat.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import jakarta.persistence.*;
-import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.plan.entity.Plan;
+import org.example.todotravel.domain.user.entity.User;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "chat_rooms")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatRoom {
@@ -21,14 +23,21 @@ public class ChatRoom {
     @Column(name = "room_id", nullable = false)
     private Long roomId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "plan_id", nullable = false)
+    private Plan plan;
+
     @Column(name = "room_name", nullable = false)
     private String roomName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User chatUser;
+    @Column(name = "room_date", nullable = false)
+    private LocalDateTime roomDate;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "plan_id", nullable = false)
-    private Plan plan;
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ChatRoomUser> chatRoomUsers = new HashSet<>();
+
+    public void addUser(User user) {
+        ChatRoomUser chatRoomUser = new ChatRoomUser(this, user);
+        this.chatRoomUsers.add(chatRoomUser);
+    }
 }
