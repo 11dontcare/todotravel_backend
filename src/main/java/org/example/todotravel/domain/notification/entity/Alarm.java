@@ -3,23 +3,26 @@ package org.example.todotravel.domain.notification.entity;
 import lombok.*;
 
 import jakarta.persistence.*;
+import org.example.todotravel.domain.user.entity.User;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "alarms")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Alarm {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "alarm_id", nullable = false)
     private Long alarmId;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User alarmUser;
 
     @Column(name = "alarm_content", nullable = false, length = 255)
     private String alarmContent;
