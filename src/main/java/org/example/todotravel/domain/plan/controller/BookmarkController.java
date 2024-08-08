@@ -20,11 +20,11 @@ public class BookmarkController {
 
     //북마크
     @PostMapping("/{plan_id}/bookmark/{user_id}")
-    public ApiResponse<Bookmark> bookmarkPlan(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId){
+    public ApiResponse<Long> bookmarkPlan(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId){
         Plan plan = planService.getPlan(planId);
         User user = userService.getUserByUserId(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
         Bookmark bookmark = bookmarkService.createBookmark(plan, user);
-        return new ApiResponse<>(true, "북마크 성공", bookmark);
+        return new ApiResponse<>(true, "북마크 성공", bookmark.getBookmarkId());
     }
 
     //북마크 취소

@@ -9,6 +9,7 @@ import org.example.todotravel.domain.user.entity.User;
 @Table(name = "comments")
 @Getter
 @Setter
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Comment {
@@ -23,7 +24,7 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "plan_id", nullable = false)
-    private Plan planId;
+    private Plan plan;
 
     @Column(name = "content", nullable = false)
     private String content;
