@@ -1,9 +1,11 @@
 package org.example.todotravel.domain.user.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.example.todotravel.domain.user.dto.request.OAuth2AdditionalInfoRequestDto;
 import org.example.todotravel.domain.user.dto.request.OAuth2UserLoginRequestDto;
 import org.example.todotravel.domain.user.dto.request.UserRegisterRequestDto;
 import org.example.todotravel.domain.user.dto.request.UsernameRequestDto;
+import org.example.todotravel.domain.user.dto.response.OAuth2SignUpResponseDto;
 import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.repository.UserRepository;
@@ -64,7 +66,21 @@ public class UserServiceImpl implements UserService {
             .role(Role.ROLE_USER)
             .build();
 
-        return  userRepository.save(newOAuth2User);
+        return userRepository.save(newOAuth2User);
+    }
+
+    // OAuth2 가입 유저 추가 정보 업데이트
+    @Override
+    @Transactional
+    public User updateOAuth2UserAdditionalInfo(OAuth2AdditionalInfoRequestDto dto) {
+        User user = getUserByUserId(dto.getUserId())
+            .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        user.setGender(dto.getGender());
+        user.setBirthDate(dto.getBirthDate());
+        user.setRole(Role.ROLE_USER);
+
+        return userRepository.save(user);
     }
 
     // 사용자 아이디 중복 검사
@@ -122,12 +138,32 @@ public class UserServiceImpl implements UserService {
 
     // 이름, 이메일로 아이디 찾기
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public String getUsername(UsernameRequestDto dto) {
         User user = userRepository.findByNameAndEmail(dto.getName(), dto.getEmail())
             .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
 
         return user.getUsername();
+    }
+
+    // 이메일로 사용자 찾기
+    @Override
+    @Transactional(readOnly = true)
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+            .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+    }
+
+    // 이메일로 userId 찾기
+    @Override
+    @Transactional(readOnly = true)
+    public OAuth2SignUpResponseDto getUserIdByEmail(String email) {
+        User user = userRepository.findUserIdByEmail(email)
+            .orElseThrow(() -> new UserNotFoundException(email + "::유저를 찾을 수 없습니다."));
+
+        return OAuth2SignUpResponseDto.builder()
+            .userId(user.getUserId())
+            .build();
     }
 
     //플랜에 사용자 초대 시 모든 사용자 목록을 return - 김민정
