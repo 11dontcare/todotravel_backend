@@ -40,7 +40,9 @@ public class PlanResponseDto {
 
     private Long likeNumber;
 
-//    private List<ScheduleResponseDto> scheduleList;
+    private List<ScheduleResponseDto> scheduleList;
+
+    private List<CommentResponseDto> commentList;
 
     public static PlanResponseDto fromEntity(Plan plan){
         return PlanResponseDto.builder()
@@ -57,6 +59,4 @@ public class PlanResponseDto {
                 .PlanUserId(plan.getPlanUser().getUserId())
                 .build();
     }
-
-    //일정이랑 댓글
 }
