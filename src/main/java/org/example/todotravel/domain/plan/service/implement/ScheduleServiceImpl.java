@@ -13,6 +13,9 @@ import org.example.todotravel.domain.plan.service.ScheduleService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
@@ -106,5 +109,16 @@ public class ScheduleServiceImpl implements ScheduleService {
         Schedule schedule = findByScheduleId(scheduleId);
         schedule.setPrice(null);
         return scheduleRepository.save(schedule);
+    }
+
+    //플랜 상세 조회 - 김민정
+    @Override
+    @Transactional
+    public List<ScheduleResponseDto> getSchedulesByPlan(Long planId) {
+        Plan plan = planService.getPlan(planId);
+        List<Schedule> schedules = scheduleRepository.findAllByPlan(plan);
+        List<ScheduleResponseDto> scheduleList = new ArrayList<>();
+        schedules.forEach(schedule -> scheduleList.add(ScheduleResponseDto.fromEntity(schedule)));
+        return scheduleList;
     }
 }
