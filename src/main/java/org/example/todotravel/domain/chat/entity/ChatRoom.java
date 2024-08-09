@@ -23,8 +23,8 @@ public class ChatRoom {
     @Column(name = "room_id", nullable = false)
     private Long roomId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "plan_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "plan_id")
     private Plan plan;
 
     @Column(name = "room_name", nullable = false)
@@ -37,6 +37,9 @@ public class ChatRoom {
     private Set<ChatRoomUser> chatRoomUsers = new HashSet<>();
 
     public void addUser(User user) {
+        if (this.chatRoomUsers == null) {
+            this.chatRoomUsers = new HashSet<>();
+        }
         ChatRoomUser chatRoomUser = new ChatRoomUser(this, user);
         this.chatRoomUsers.add(chatRoomUser);
     }

@@ -37,7 +37,7 @@ public class SecurityConfig {
             "/index.html", // 프론트 구현 완료시 삭제
             "/api/location/**",
             "/api/invite/**",
-            "/api/chat",
+            "/api/chat/**",
             "/api/notification/**",
     };
 
