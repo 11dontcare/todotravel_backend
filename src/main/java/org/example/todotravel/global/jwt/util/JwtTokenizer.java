@@ -148,7 +148,7 @@ public class JwtTokenizer {
     }
 
     /**
-     * refreshTOken 유효성 검증
+     * refreshToken 유효성 검증
      *
      * @param refreshToken 토큰 값
      * @return 유효성 결과
