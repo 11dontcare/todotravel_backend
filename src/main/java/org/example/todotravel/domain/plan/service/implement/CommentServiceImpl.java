@@ -10,6 +10,8 @@ import org.example.todotravel.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
@@ -34,6 +36,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public Comment updateComment(Long commentId, CommentRequestDto commentRequestDto) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
         comment = comment.toBuilder()
@@ -44,8 +47,15 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public void removeComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
         commentRepository.delete(comment);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Comment> getCommentsByPlan(Plan plan) {
+        return commentRepository.findAllByPlan(plan);
     }
 }

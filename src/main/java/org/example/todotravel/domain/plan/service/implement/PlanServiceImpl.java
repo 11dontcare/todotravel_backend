@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.notification.dto.request.AlarmRequestDto;
 import org.example.todotravel.domain.notification.service.implement.AlarmServiceImpl;
 import org.example.todotravel.domain.plan.dto.request.PlanRequestDto;
+import org.example.todotravel.domain.plan.dto.response.CommentResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanResponseDto;
+import org.example.todotravel.domain.plan.entity.Comment;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
+import org.example.todotravel.domain.plan.entity.Schedule;
 import org.example.todotravel.domain.plan.repository.PlanRepository;
 import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.user.entity.User;
@@ -18,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +31,7 @@ public class PlanServiceImpl implements PlanService {
     private final BookmarkServiceImpl bookmarkService;
     private final LikeServiceImpl likeService;
     private final AlarmServiceImpl alarmService; //알림 자동 생성
+    private final CommentServiceImpl commentService;
 
     @Override
     @Transactional
@@ -109,7 +114,13 @@ public class PlanServiceImpl implements PlanService {
     public PlanResponseDto getPlanDetails(Long planId) {
         Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("플랜을 찾을 수 없습니다."));
         PlanResponseDto planResponseDto = PlanResponseDto.fromEntity(plan);
+        List<Comment> comments = commentService.getCommentsByPlan(plan);
+        List<CommentResponseDto> commentList = new ArrayList<>();
+        for (Comment comment : comments){
+            commentList.add(CommentResponseDto.fromEntity(comment));
+        }
         return planResponseDto.toBuilder()
+                .commentList(commentList)
                 .bookmarkNumber(bookmarkService.countBookmark(plan))
                 .likeNumber(likeService.countLike(plan))
                 .build();
@@ -120,7 +131,8 @@ public class PlanServiceImpl implements PlanService {
     public Plan copyPlan(Long planId) {
         Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("플랜을 찾을 수 없습니다."));
         //현재 로그인 중인 사용자 user
-        User user = new User();
+//        User user = new User();
+        User user = userRepository.findById(1L).orElseThrow();
         Plan newPlan = Plan.builder()
                 .title(plan.getTitle())
                 .location(plan.getLocation())
@@ -131,8 +143,20 @@ public class PlanServiceImpl implements PlanService {
                 .status(false)
                 .totalBudget(plan.getTotalBudget())
                 .planUser(user)
-                .schedules(plan.getSchedules())
                 .build();
+        List<Schedule> newSchedules = new ArrayList<>();
+        for (Schedule schedule : plan.getSchedules()){
+            newSchedules.add(Schedule.builder()
+                    .status(false)
+                    .travelDayCount(schedule.getTravelDayCount())
+                    .description(schedule.getDescription())
+                    .travelTime(schedule.getTravelTime())
+                    .plan(newPlan)
+                    .location(schedule.getLocation())
+                    .build()
+            );
+        }
+        newPlan.setSchedules(newSchedules);
         //planUsers에 플랜 생성자 추가
         PlanUser planUser = PlanUser.builder()
                 .status(PlanUser.StatusType.ACCEPTED)

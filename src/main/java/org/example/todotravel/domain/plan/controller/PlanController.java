@@ -12,6 +12,7 @@ import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
 import org.example.todotravel.domain.plan.service.implement.PlanServiceImpl;
 import org.example.todotravel.domain.plan.service.implement.PlanUserServiceImpl;
+import org.example.todotravel.domain.plan.service.implement.ScheduleServiceImpl;
 import org.example.todotravel.domain.user.dto.response.UserListResponseDto;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
@@ -29,6 +30,7 @@ public class PlanController {
     private final UserServiceImpl userService;
     private final PlanUserServiceImpl planUserService;
     private final ChatRoomServiceImpl chatRoomService;
+    private final ScheduleServiceImpl scheduleService;
 
     //플랜 생성
     @PostMapping
@@ -99,6 +101,9 @@ public class PlanController {
     @GetMapping("/specific/{plan_id}")
     public ApiResponse<PlanResponseDto> viewPlan(@PathVariable("plan_id") Long planId) {
         PlanResponseDto planDetails = planService.getPlanDetails(planId);
+        planDetails = planDetails.toBuilder()
+                .scheduleList(scheduleService.getSchedulesByPlan(planId))
+                .build();
         return new ApiResponse<>(true, "플랜 조회 성공", planDetails);
     }
 
