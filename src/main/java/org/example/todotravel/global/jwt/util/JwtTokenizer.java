@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.user.entity.RefreshToken;
@@ -173,5 +174,34 @@ public class JwtTokenizer {
             .setExpiration(new Date(System.currentTimeMillis() + 5 * 60 * 1000)) // 5분 유효
             .signWith(getSigningKey(accessSecret))
             .compact();
+    }
+
+    public void deleteRefreshTokenCookie(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    cookie.setValue("");
+                    cookie.setPath("/");
+                    cookie.setMaxAge(0);
+                    response.addCookie(cookie);
+                    break;
+                }
+            }
+        }
+    }
+
+    public void deleteRefreshTokenFromDB(HttpServletRequest request) {
+        String accessToken = request.getHeader("Authorization");
+        if (accessToken != null && accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+            try {
+                Claims claims = parseAccessToken(accessToken);
+                Long userId = Long.valueOf((Integer) claims.get("userId"));
+                refreshTokenService.deleteRefreshToken(userId);
+            } catch (Exception e) {
+                log.error("Failed to delete refresh token", e);
+            }
+        }
     }
 }

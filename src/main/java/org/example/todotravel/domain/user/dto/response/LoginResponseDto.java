@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.todotravel.domain.user.entity.User;
 
 @Getter
 @Builder
@@ -14,4 +15,13 @@ public class LoginResponseDto {
     private String nickname;
     private String role;
     private String accessToken;
+
+    public static LoginResponseDto of(User user, String accessToken) {
+        return LoginResponseDto.builder()
+            .userId(user.getUserId())
+            .nickname(user.getNickname())
+            .role(user.getRole().name())
+            .accessToken(accessToken)
+            .build();
+    }
 }
