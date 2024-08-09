@@ -20,11 +20,11 @@ public class LikeController {
 
     //좋아요
     @PostMapping("/{plan_id}/like/{user_id}")
-    public ApiResponse<Like> likePlan(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId){
+    public ApiResponse<Long> likePlan(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId){
         Plan plan = planService.getPlan(planId);
         User user = userService.getUserByUserId(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
         Like like = likeService.createLike(plan, user);
-        return new ApiResponse<>(true, "좋아요 성공", like);
+        return new ApiResponse<>(true, "좋아요 성공", like.getLikeId());
     }
 
     //좋아요 취소

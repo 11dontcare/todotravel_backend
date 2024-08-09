@@ -43,7 +43,7 @@ public class PlanController {
 
     //플랜 수정 창
     @GetMapping("/{plan_id}")
-    public ApiResponse<PlanResponseDto> updatePlan(@PathVariable("plan_id") Long planId) {
+    public ApiResponse<PlanResponseDto> getUpdatePlan(@PathVariable("plan_id") Long planId){
         PlanResponseDto plan = planService.getPlanForModify(planId);
         //수정 창에 수정하려는 plan 정보
         return new ApiResponse<>(true, "수정할 플랜 조회 성공", plan);
