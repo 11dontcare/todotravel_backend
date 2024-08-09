@@ -3,11 +3,13 @@ package org.example.todotravel.domain.plan.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.chat.entity.ChatRoom;
 import org.example.todotravel.domain.chat.service.impl.ChatRoomServiceImpl;
+import org.example.todotravel.domain.plan.dto.response.PlanUserResponseDto;
 import org.example.todotravel.domain.plan.entity.PlanUser;
 import org.example.todotravel.domain.plan.service.implement.PlanUserServiceImpl;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -19,14 +21,14 @@ public class PlanUserController {
 
     // 플랜 초대 거절
     @PutMapping("/invite/{plan_participant_id}/reject")
-    public ApiResponse<PlanUser> rejectInvite(@PathVariable("plan_participant_id") Long planParticipantId) {
+    public ApiResponse<Long> rejectInvite(@PathVariable("plan_participant_id") Long planParticipantId) {
         PlanUser planUser = planUserService.rejected(planParticipantId);
-        return new ApiResponse<>(true, "플랜 초대 거절 성공", planUser);
+        return new ApiResponse<>(true, "플랜 초대 거절 성공", planUser.getPlanParticipantId());
     }
 
     // 플랜 초대 수락
     @PutMapping("/invite/{plan_participant_id}/accept")
-    public ApiResponse<PlanUser> acceptInvite(@PathVariable("plan_participant_id") Long planParticipantId) {
+    public ApiResponse<Long> acceptInvite(@PathVariable("plan_participant_id") Long planParticipantId) {
         // 플랜 초대 수락 처리
         PlanUser planUser = planUserService.accepted(planParticipantId);
 
@@ -34,14 +36,18 @@ public class PlanUserController {
         ChatRoom chatRoom = chatRoomService.getChatRoomByPlanId(planUser.getPlan().getPlanId());
         chatRoomService.addUserToChatRoom(chatRoom.getRoomId(), planUser.getUser().getUserId());
 
-        return new ApiResponse<>(true, "플랜 초대 수락 성공", planUser);
+        return new ApiResponse<>(true, "플랜 초대 수락 성공", planUser.getPlanParticipantId());
     }
 
     // 플랜 참여자 조회
     @GetMapping("/plan/{plan_id}/participant")
-    public ApiResponse<List<PlanUser>> participant(@PathVariable("plan_id") Long planId) {
+    public ApiResponse<List<PlanUserResponseDto>> participant(@PathVariable("plan_id") Long planId) {
         List<PlanUser> planUsers = planUserService.getAllPlanUser(planId);
-        return new ApiResponse<>(true, "플랜 참여자 조회 성공", planUsers);
+        List<PlanUserResponseDto> planUserList = new ArrayList<>();
+        planUsers.forEach(planUser -> {
+            planUserList.add(PlanUserResponseDto.fromEntity(planUser));
+        });
+        return new ApiResponse<>(true, "플랜 참여자 조회 성공", planUserList);
     }
 
     // 플랜 나가기, 초대 취소
