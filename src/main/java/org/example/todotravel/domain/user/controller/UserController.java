@@ -37,30 +37,15 @@ public class UserController {
     public ApiResponse<?> updateOAuth2UserAdditionalInfo(@RequestBody OAuth2AdditionalInfoRequestDto dto,
                                                          HttpServletResponse response) {
         try {
-            User updateUser = userService.updateOAuth2UserAdditionalInfo(dto);
+            User updatedUser = userService.updateOAuth2UserAdditionalInfo(dto);
 
             // accessToken, refreshToken 생성
-            String accessToken = jwtTokenizer.issueTokenAndSetCookies(response, updateUser);
+            String accessToken = jwtTokenizer.issueTokenAndSetCookies(response, updatedUser);
 
-            LoginResponseDto loginResponseDto = LoginResponseDto.of(updateUser, accessToken);
+            LoginResponseDto loginResponseDto = LoginResponseDto.of(updatedUser, accessToken);
             return new ApiResponse<>(true, "추가 정보 업데이트 성공", loginResponseDto);
         } catch (Exception e) {
             return new ApiResponse<>(false, "추가 정보 업데이트 실패");
-        }
-    }
-
-    // OAuth2 첫 가입시
-    @GetMapping("/oauth2/signup")
-    public ApiResponse<?> getOAuth2UserInfo(@RequestParam("token") String userInfoJwt) {
-        try {
-            Claims claims = jwtTokenizer.parseAccessToken(userInfoJwt);
-            String email = claims.getSubject();
-
-            OAuth2SignUpResponseDto oAuth2SignUpResponseDto = userService.getUserIdByEmail(email);
-
-            return new ApiResponse<>(true, "OAuth2 가입 성공", oAuth2SignUpResponseDto);
-        } catch (Exception e) {
-            return new ApiResponse<>(false, "OAuth2 가입 성공");
         }
     }
 

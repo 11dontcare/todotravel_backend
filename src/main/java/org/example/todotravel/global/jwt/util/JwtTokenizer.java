@@ -165,13 +165,13 @@ public class JwtTokenizer {
 
     public String createTempJwtForOAuth2User(CustomOAuth2User oAuth2User) {
         Claims claims = Jwts.claims().setSubject(oAuth2User.getEmail());
-        log.info("oAuth2User.getName:: {}", oAuth2User.getName());
         claims.put("name", oAuth2User.getName());
+        claims.put("role", oAuth2User.getRole());
 
         return Jwts.builder()
             .setClaims(claims)
             .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + 5 * 60 * 1000)) // 5분 유효
+            .setExpiration(new Date(System.currentTimeMillis() + 10 * 60 * 1000)) // 10분 유효
             .signWith(getSigningKey(accessSecret))
             .compact();
     }

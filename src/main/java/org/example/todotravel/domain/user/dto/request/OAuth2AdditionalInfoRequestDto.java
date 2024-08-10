@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OAuth2AdditionalInfoRequestDto {
-    private Long userId;
+    private String token;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
