@@ -1,7 +1,10 @@
 package org.example.todotravel.domain.user.service;
 
+import org.example.todotravel.domain.user.dto.request.OAuth2AdditionalInfoRequestDto;
+import org.example.todotravel.domain.user.dto.request.OAuth2UserLoginRequestDto;
 import org.example.todotravel.domain.user.dto.request.UserRegisterRequestDto;
 import org.example.todotravel.domain.user.dto.request.UsernameRequestDto;
+import org.example.todotravel.domain.user.dto.response.OAuth2SignUpResponseDto;
 import org.example.todotravel.domain.user.entity.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,8 @@ public interface UserService {
 
     User registerNewUser(UserRegisterRequestDto dto, PasswordEncoder passwordEncoder);
 
+    User loginOAuth2User(OAuth2UserLoginRequestDto dto);
+
     void checkDuplicateUsername(String username);
 
     void checkDuplicateEmail(String email);
@@ -26,6 +31,14 @@ public interface UserService {
     String getUsername(UsernameRequestDto dto);
 
     void setTempPassword(String email, String tempPassword, PasswordEncoder passwordEncoder);
+
+    OAuth2SignUpResponseDto getUserIdByEmail(String email);
+
+    User updateOAuth2UserAdditionalInfo(OAuth2AdditionalInfoRequestDto dto);
+
+    User getUserByEmail(String email);
+
+    User getUserById(Long userId);
 
     //플랜에 사용자 초대 시 모든 사용자 목록을 return - 김민정
     List<User> getAllUsers();

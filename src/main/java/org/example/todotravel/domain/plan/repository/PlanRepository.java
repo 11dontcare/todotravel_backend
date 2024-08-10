@@ -12,4 +12,5 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     void deleteByPlanId(Long planId);
     Optional<Plan> findByPlanId(Long planId);
     List<Plan> findAllByIsPublicTrue();
+    List<Plan> findAllByIsPublicTrueAndTitleContains(String keyword);
 }

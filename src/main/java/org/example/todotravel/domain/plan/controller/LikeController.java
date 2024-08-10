@@ -2,7 +2,11 @@ package org.example.todotravel.domain.plan.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.plan.entity.Like;
+import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.service.implement.LikeServiceImpl;
+import org.example.todotravel.domain.plan.service.implement.PlanServiceImpl;
+import org.example.todotravel.domain.user.entity.User;
+import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,18 +15,24 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/plan")
 public class LikeController {
     private final LikeServiceImpl likeService;
+    private final PlanServiceImpl planService;
+    private final UserServiceImpl userService;
 
     //좋아요
     @PostMapping("/{plan_id}/like/{user_id}")
-    public ApiResponse<Like> likePlan(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId){
-        Like like = likeService.createLike(planId, userId);
-        return new ApiResponse<>(true, "좋아요 성공", like);
+    public ApiResponse<Long> likePlan(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId){
+        Plan plan = planService.getPlan(planId);
+        User user = userService.getUserByUserId(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        Like like = likeService.createLike(plan, user);
+        return new ApiResponse<>(true, "좋아요 성공", like.getLikeId());
     }
 
     //좋아요 취소
     @DeleteMapping("/{plan_id}/like/{user_id}")
     public ApiResponse<Like> likeCancel(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId){
-        likeService.removeLike(planId, userId);
+        Plan plan = planService.getPlan(planId);
+        User user = userService.getUserByUserId(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        likeService.removeLike(plan, user);
         return new ApiResponse<>(true, "좋아요 취소 성공");
     }
 }

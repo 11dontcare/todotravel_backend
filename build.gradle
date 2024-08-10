@@ -59,10 +59,11 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     // 준영님 Hibernate 오류 전용 의존성
-//    implementation 'org.hibernate.orm:hibernate-core:6.2.6.Final'
+    implementation 'org.hibernate.orm:hibernate-core:6.2.6.Final'
 
     // Test Dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core:5.8.0' // Mockito Core
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

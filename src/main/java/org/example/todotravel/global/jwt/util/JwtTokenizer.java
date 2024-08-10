@@ -4,14 +4,14 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.user.entity.RefreshToken;
 import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.impl.RefreshTokenServiceImpl;
-import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
-import org.example.todotravel.global.exception.UserNotFoundException;
+import org.example.todotravel.global.oauth2.CustomOAuth2User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +26,6 @@ import java.util.Date;
 @Component
 public class JwtTokenizer {
     private final RefreshTokenServiceImpl refreshTokenService;
-    private final UserServiceImpl userService;
     private final byte[] accessSecret;
     private final byte[] refreshSecret;
 
@@ -35,20 +34,22 @@ public class JwtTokenizer {
 
     public JwtTokenizer(@Value("${jwt.secretKey}") String accessSecret,
                         @Value("${jwt.refreshKey}") String refreshSecret,
-                        RefreshTokenServiceImpl refreshTokenService,
-                        UserServiceImpl userService) {
+                        RefreshTokenServiceImpl refreshTokenService) {
         this.accessSecret = accessSecret.getBytes(StandardCharsets.UTF_8);
         this.refreshSecret = refreshSecret.getBytes(StandardCharsets.UTF_8);
         this.refreshTokenService = refreshTokenService;
-        this.userService = userService;
     }
 
-    public String createAccessToken(Long userId, String username, String email, Role role) {
-        return createToken(userId, username, email, role, ACCESS_TOKEN_EXPIRATION_COUNT, accessSecret);
+    public String createAccessToken(User user) {
+        return createToken(
+            user.getUserId(), user.getUsername(), user.getEmail(), user.getRole(), ACCESS_TOKEN_EXPIRATION_COUNT, accessSecret
+        );
     }
 
-    public String createRefreshToken(Long userId, String username, String email, Role role) {
-        return createToken(userId, username, email, role, REFRESH_TOKEN_EXPIRATION_COUNT, refreshSecret);
+    public String createRefreshToken(User user) {
+        return createToken(
+            user.getUserId(), user.getUsername(), user.getEmail(), user.getRole(), REFRESH_TOKEN_EXPIRATION_COUNT, refreshSecret
+        );
     }
 
     /**
@@ -110,11 +111,12 @@ public class JwtTokenizer {
      *
      * @param response 응답 객체
      * @param user     사용자
+     * @return 클라이언트에게 넘겨줄 AccessToken
      */
-    public void issueTokenAndSetCookies(HttpServletResponse response, User user) {
+    public String issueTokenAndSetCookies(HttpServletResponse response, User user) {
         // 토큰 생성
-        String accessToken = createAccessToken(user.getUserId(), user.getEmail(), user.getUsername(), user.getRole());
-        String refreshToken = createRefreshToken(user.getUserId(), user.getEmail(), user.getUsername(), user.getRole());
+        String accessToken = createAccessToken(user);
+        String refreshToken = createRefreshToken(user);
 
         // 리프레쉬 토큰을 DB에 저장
         RefreshToken refreshTokenEntity = refreshTokenService.getRefreshTokenByUserId(user.getUserId())
@@ -126,43 +128,80 @@ public class JwtTokenizer {
         refreshTokenEntity.setValue(refreshToken);
         refreshTokenService.saveRefreshToken(refreshTokenEntity);
 
-        addTokenCookie(response, "accessToken", accessToken, ACCESS_TOKEN_EXPIRATION_COUNT);
-        addTokenCookie(response, "refreshToken", refreshToken, REFRESH_TOKEN_EXPIRATION_COUNT);
+        addTokenCookie(response, refreshToken, REFRESH_TOKEN_EXPIRATION_COUNT);
+
+        return accessToken;
     }
 
     /**
-     * RefreshToken으로 AccessToken 재발급
-     *
-     * @param response     응답 객체
-     * @param refreshToken refresh token
-     */
-    public void renewAccessToken(HttpServletResponse response, String refreshToken) {
-        // 토큰으로부터 정보 얻기
-        Claims claims = parseRefreshToken(refreshToken);
-        Long userId = Long.valueOf((Integer) claims.get("userId"));
-        User user = userService.getUserByUserId(userId)
-            .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
-
-        // accessToken 생성
-        String email = claims.getSubject();
-        String accessToken = createAccessToken(userId, email, user.getUsername(), user.getRole());
-
-        addTokenCookie(response, "accessToken", accessToken, ACCESS_TOKEN_EXPIRATION_COUNT);
-    }
-
-    /**
-     * 쿠키 생성 메서드
+     * refreshToken 쿠키 생성 메서드
      *
      * @param response       응답 객체
-     * @param tokenName      토큰 이름
      * @param tokenValue     토큰 값
      * @param expirationTime 토큰 만료 시간
      */
-    private void addTokenCookie(HttpServletResponse response, String tokenName, String tokenValue, Long expirationTime) {
-        Cookie tokenCookie = new Cookie(tokenName, tokenValue);
+    private void addTokenCookie(HttpServletResponse response, String tokenValue, Long expirationTime) {
+        Cookie tokenCookie = new Cookie("refreshToken", tokenValue);
         tokenCookie.setPath("/");
         tokenCookie.setHttpOnly(true);
         tokenCookie.setMaxAge(Math.toIntExact(expirationTime / 1000)); // milliseconds to seconds
         response.addCookie(tokenCookie);
+    }
+
+    /**
+     * refreshToken 유효성 검증
+     *
+     * @param refreshToken 토큰 값
+     * @return 유효성 결과
+     */
+    public boolean validateRefreshToken(String refreshToken) {
+        try {
+            Jwts.parserBuilder().setSigningKey(getSigningKey(refreshSecret)).build().parseClaimsJws(refreshToken);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String createTempJwtForOAuth2User(CustomOAuth2User oAuth2User) {
+        Claims claims = Jwts.claims().setSubject(oAuth2User.getEmail());
+        log.info("oAuth2User.getName:: {}", oAuth2User.getName());
+        claims.put("name", oAuth2User.getName());
+
+        return Jwts.builder()
+            .setClaims(claims)
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + 5 * 60 * 1000)) // 5분 유효
+            .signWith(getSigningKey(accessSecret))
+            .compact();
+    }
+
+    public void deleteRefreshTokenCookie(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    cookie.setValue("");
+                    cookie.setPath("/");
+                    cookie.setMaxAge(0);
+                    response.addCookie(cookie);
+                    break;
+                }
+            }
+        }
+    }
+
+    public void deleteRefreshTokenFromDB(HttpServletRequest request) {
+        String accessToken = request.getHeader("Authorization");
+        if (accessToken != null && accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+            try {
+                Claims claims = parseAccessToken(accessToken);
+                Long userId = Long.valueOf((Integer) claims.get("userId"));
+                refreshTokenService.deleteRefreshToken(userId);
+            } catch (Exception e) {
+                log.error("Failed to delete refresh token", e);
+            }
+        }
     }
 }
