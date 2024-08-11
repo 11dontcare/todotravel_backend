@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
@@ -96,7 +97,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         // 사용자가 있지만 다른 소셜 타입으로 가입된 경우 예외 발생
         if (user.getSocialType() != socialType) {
-            throw new RuntimeException("이미 다른 소셜 계정으로 가입된 이메일입니다: " + email);
+            throw new OAuth2AuthenticationException(new OAuth2Error("duplicate_social_account",
+                email + "::이미 " + user.getSocialType() + " 계정으로 가입된 이메일입니다.", null));
         }
 
         return user;
