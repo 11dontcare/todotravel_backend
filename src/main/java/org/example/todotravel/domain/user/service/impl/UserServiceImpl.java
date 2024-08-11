@@ -1,5 +1,6 @@
 package org.example.todotravel.domain.user.service.impl;
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.user.dto.request.OAuth2AdditionalInfoRequestDto;
 import org.example.todotravel.domain.user.dto.request.OAuth2UserLoginRequestDto;
@@ -12,6 +13,7 @@ import org.example.todotravel.domain.user.repository.UserRepository;
 import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.exception.DuplicateUserException;
 import org.example.todotravel.global.exception.UserNotFoundException;
+import org.example.todotravel.global.jwt.util.JwtTokenizer;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final JwtTokenizer jwtTokenizer;
 
     @Override
     @Transactional(readOnly = true)
@@ -73,8 +76,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User updateOAuth2UserAdditionalInfo(OAuth2AdditionalInfoRequestDto dto) {
-        User user = getUserByUserId(dto.getUserId())
-            .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+        Claims claims = jwtTokenizer.parseAccessToken(dto.getToken());
+        String email = claims.getSubject();
+        User user = getUserByEmail(email);
 
         user.setGender(dto.getGender());
         user.setBirthDate(dto.getBirthDate());
