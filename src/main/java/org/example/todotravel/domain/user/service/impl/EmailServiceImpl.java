@@ -42,7 +42,7 @@ public class EmailServiceImpl implements EmailService {
 
             return authNum;
         } catch (MessagingException e) {
-            throw new RuntimeException("메일 전송 실패", e);
+            throw new RuntimeException("메일 전송에 실패했습니다.", e);
         }
     }
 
