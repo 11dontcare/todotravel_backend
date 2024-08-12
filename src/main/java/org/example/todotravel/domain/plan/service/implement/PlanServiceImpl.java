@@ -35,13 +35,13 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     @Transactional
-    public Plan createPlan(PlanRequestDto planRequestDto) {
+    public Plan createPlan(PlanRequestDto planRequestDto, User user) {
         //플랜 생성 시 일정과 메모가 빈 플랜이 db에 생성
 
         Plan plan = planRequestDto.toEntity();
         //현재 로그인 중인 사용자 user
 //        User user = new User();
-        User user = userRepository.findById(1L).orElseThrow();//테스트용
+//        User user = userRepository.findById(1L).orElseThrow();//테스트용
         plan.setPlanUser(user);
         //planUsers에 플랜 생성자 추가
         PlanUser planUser = PlanUser.builder()
@@ -102,8 +102,9 @@ public class PlanServiceImpl implements PlanService {
                             .description(plan.getDescription())
                             .startDate(plan.getStartDate())
                             .endDate(plan.getEndDate())
-//                            .bookmarkNumber(bookmarkService.countBookmark(plan))
-//                            .likeNumber(likeService.countLike(plan))
+                            .bookmarkNumber(bookmarkService.countBookmark(plan))
+                            .likeNumber(likeService.countLike(plan))
+                            .planUserNickname(plan.getPlanUser().getNickname())
                     .build());
         }
         return planList;

@@ -4,6 +4,7 @@ import lombok.*;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.user.entity.User;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
@@ -15,8 +16,8 @@ import java.time.LocalDateTime;
 public class PlanRequestDto {
     private String title;
     private String location;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Boolean isPublic;
     private Boolean status;
     private Long totalBudget;

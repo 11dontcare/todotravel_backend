@@ -192,7 +192,14 @@ public class UserServiceImpl implements UserService {
 
     //플랜에 사용자 초대 시 모든 사용자 목록을 return - 김민정
     @Override
+    @Transactional(readOnly = true)
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
     }
 }

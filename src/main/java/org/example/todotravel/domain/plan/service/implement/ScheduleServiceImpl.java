@@ -78,9 +78,16 @@ public class ScheduleServiceImpl implements ScheduleService {
     //여행 일정 등록(수정)하기 - vehicle
     @Override
     @Transactional
-    public Schedule updateVehicle(Long scheduleId, String vehicle) {
+    public Schedule updateVehicle(Long scheduleId, Schedule.VehicleType vehicle) {
         Schedule schedule = findByScheduleId(scheduleId);
-        schedule.setVehicle(Schedule.VehicleType.valueOf(vehicle));
+        // Enum 값을 검증하는 방법
+        Schedule.VehicleType vehicleType;
+        try {
+            vehicleType = vehicle;
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("유효하지 않은 값입니다. : " + vehicle);
+        }
+        schedule.setVehicle(vehicleType);
         return scheduleRepository.save(schedule);
     }
 
