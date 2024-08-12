@@ -33,7 +33,7 @@ public class UserController {
     }
 
     // OAuth2 첫 가입시 추가 정보 입력 후 로그인 처리
-    @PostMapping("/oauth2/additional-info")
+    @PutMapping("/oauth2/additional-info")
     public ApiResponse<?> updateOAuth2UserAdditionalInfo(@RequestBody OAuth2AdditionalInfoRequestDto dto,
                                                          HttpServletResponse response) {
         try {
@@ -68,21 +68,21 @@ public class UserController {
     }
 
     // 사용자 아이디 중복 검사
-    @PostMapping("/check-username")
+    @GetMapping("/check-username")
     public ApiResponse<?> checkUsername(@RequestParam String username) {
         userService.checkDuplicateUsername(username);
         return new ApiResponse<>(true, "아이디 사용 가능", username);
     }
 
     // 사용자 이메일 중복 검사
-    @PostMapping("/check-email")
+    @GetMapping("/check-email")
     public ApiResponse<?> checkEmail(@RequestParam String email) {
         userService.checkDuplicateEmail(email);
         return new ApiResponse<>(true, "이메일 사용 가능", email);
     }
 
     // 사용자 닉네임 중복 검사
-    @PostMapping("/check-nickname")
+    @GetMapping("/check-nickname")
     public ApiResponse<?> checkNickname(@RequestParam String nickname) {
         userService.checkDuplicateUsername(nickname);
         return new ApiResponse<>(true, "닉네임 사용 가능", nickname);
@@ -108,7 +108,7 @@ public class UserController {
     }
 
     // 비밀번호 재설정
-    @PostMapping("/password-reset")
+    @PutMapping("/password-reset")
     public ApiResponse<?> resetPassword(@RequestBody PasswordResetRequestDto dto) {
         try {
             userService.renewPassword(dto, passwordEncoder);
