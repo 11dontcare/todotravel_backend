@@ -15,6 +15,7 @@ public class PlanUserResponseDto {
     private PlanUser.StatusType status;
     private Long userId;
     private Long planId;
+    private String nickname;
 
     public static PlanUserResponseDto fromEntity(PlanUser planUser){
         return PlanUserResponseDto.builder()
@@ -22,6 +23,7 @@ public class PlanUserResponseDto {
                 .status(planUser.getStatus())
                 .userId(planUser.getUser().getUserId())
                 .planId(planUser.getPlan().getPlanId())
+                .nickname(planUser.getUser().getNickname())
                 .build();
     }
 }
