@@ -19,7 +19,7 @@ public interface ScheduleService {
     ScheduleResponseDto getSchedule(Long scheduleId);
 
     Schedule updateStatus(Long scheduleId);
-    Schedule updateVehicle(Long scheduleId, String vehicle);
+    Schedule updateVehicle(Long scheduleId, Schedule.VehicleType vehicle);
     Schedule deleteVehicle(Long scheduleId);
     Schedule updatePrice(Long scheduleId, Long price);
     Schedule deletePrice(Long scheduleId);

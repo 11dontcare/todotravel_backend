@@ -29,7 +29,7 @@ public class ScheduleController {
     public ApiResponse<Void> deleteSchedule(@PathVariable("plan_id") Long planId,
                                       @PathVariable("schedule_id") Long scheduleId) {
         scheduleService.destroySchedule(scheduleId);
-        return new ApiResponse<>(true, "일정 삭제 성공");
+        return new ApiResponse<>(true, "일정이 삭제되었습니다.");
     }
 
     //여행 일정 불러오기
@@ -49,17 +49,18 @@ public class ScheduleController {
 
     //여행 일정 vehicle 관리 - 수정(등록)
     @PutMapping("/{schedule_id}/vehicle")
-    public ApiResponse<String> updateScheduleVehicle(@PathVariable("schedule_id") Long scheduleId,
-                                                   @RequestBody String vehicle) {
+    public ApiResponse<Schedule.VehicleType> updateScheduleVehicle(
+            @PathVariable("schedule_id") Long scheduleId,
+            @RequestBody Schedule.VehicleType vehicle) {
         scheduleService.updateVehicle(scheduleId, vehicle);
-        return new ApiResponse<>(true, "이동수단 저장 완료", vehicle);
+        return new ApiResponse<>(true, "이동수단이 추가되었습니다.", vehicle);
     }
 
     //여행 일정 vehicle 관리 - 삭제
     @DeleteMapping("/{schedule_id}/vehicle")
     public ApiResponse<Void> deleteScheduleVehicle(@PathVariable("schedule_id") Long scheduleId) {
         scheduleService.deleteVehicle(scheduleId);
-        return new ApiResponse<>(true, "이동수단 삭제 완료");
+        return new ApiResponse<>(true, "이동수단이 삭제되었습니다.");
     }
 
     //여행 일정 price 관리 - 수정(등록)
@@ -68,13 +69,13 @@ public class ScheduleController {
                                                    @RequestBody Long price) {
         System.out.println("Received price: " + price);
         scheduleService.updatePrice(scheduleId, price);
-        return new ApiResponse<>(true, "예산 저장 완료", price);
+        return new ApiResponse<>(true, "예산이 추가되었습니다.", price);
     }
 
     //여행 일정 price 관리 - 삭제
     @DeleteMapping("/{schedule_id}/price")
     public ApiResponse<Void> deleteSchedulePrice(@PathVariable("schedule_id") Long scheduleId) {
         scheduleService.deletePrice(scheduleId);
-        return new ApiResponse<>(true, "예산 삭제 완료");
+        return new ApiResponse<>(true, "예산이 삭제되었습니다.");
     }
 }
