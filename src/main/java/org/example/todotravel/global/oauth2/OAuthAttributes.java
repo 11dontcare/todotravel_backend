@@ -40,7 +40,10 @@ public class OAuthAttributes {
         if (socialType == SocialType.NAVER) {
             return ofNaver(userNameAttributeName, attributes);
         }
+        if (socialType == SocialType.KAKAO) {
             return ofKakao(userNameAttributeName, attributes);
+        }
+        return ofGoogle(userNameAttributeName, attributes);
 
     }
 
