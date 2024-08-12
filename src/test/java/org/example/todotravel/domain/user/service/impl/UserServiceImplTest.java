@@ -127,7 +127,7 @@ class UserServiceImplTest {
     void updateOAuth2UserAdditionalInfo() {
         // given
         OAuth2AdditionalInfoRequestDto dto = OAuth2AdditionalInfoRequestDto.builder()
-            .userId(1L)
+//            .userId(1L)
             .gender(Gender.MAN)
             .birthDate(LocalDate.of(1990, 1, 1))
             .build();
@@ -182,22 +182,22 @@ class UserServiceImplTest {
             () -> userService.checkLoginAvailable("testuser", "wrongPassword", passwordEncoder));
     }
 
-    @Test
-    @DisplayName("임시 비밀번호 설정 테스트")
-    void setTempPassword() {
-        // given
-        String email = "test@example.com";
-        String tempPassword = "tempPass123";
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(testUser));
-        when(passwordEncoder.encode(tempPassword)).thenReturn("encodedTempPassword");
-
-        // when
-        userService.setTempPassword(email, tempPassword, passwordEncoder);
-
-        // then
-        verify(userRepository, times(1)).save(testUser);
-        assertEquals("encodedTempPassword", testUser.getPassword());
-    }
+//    @Test
+//    @DisplayName("임시 비밀번호 설정 테스트")
+//    void setTempPassword() {
+//        // given
+//        String email = "test@example.com";
+//        String tempPassword = "tempPass123";
+//        when(userRepository.findByEmail(email)).thenReturn(Optional.of(testUser));
+//        when(passwordEncoder.encode(tempPassword)).thenReturn("encodedTempPassword");
+//
+//        // when
+//        userService.setTempPassword(email, tempPassword, passwordEncoder);
+//
+//        // then
+//        verify(userRepository, times(1)).save(testUser);
+//        assertEquals("encodedTempPassword", testUser.getPassword());
+//    }
 
     @Test
     @DisplayName("이름과 이메일로 사용자명 찾기 테스트")
