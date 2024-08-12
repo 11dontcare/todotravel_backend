@@ -33,12 +33,13 @@ public class SecurityConfig {
 
     // 모든 유저 허용 URL
     String[] allAllowPage = new String[]{
-        "/api/plan/**", // 우선 "/api/plan/**" 전부 허용해두었습니다.
-        "/index.html", // 프론트 구현 완료시 삭제
-        "/api/location/**",
-        "/api/invite/**",
-        "/api/chat/**",
-        "/api/notification/**",
+            "/api/plan/**", // 우선 "/api/plan/**" 전부 허용해두었습니다.
+            "/index.html", // 프론트 구현 완료시 삭제
+            "/api/location/**",
+            "/api/invite/**",
+            "/api/chat/**",
+            "/api/notification/**",
+            "/ws/**",
     };
 
     // 비로그인 유저 허용 URL
@@ -74,15 +75,6 @@ public class SecurityConfig {
 
             /* rest api 설정 */
             .csrf(csrf -> csrf.disable()) // JWT 사용으로 csrf 비활성화 -> 쿠키 자체 설정
-            .cors(cors -> cors.configurationSource(request -> {
-                CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));            // 허용된 출처(Origin)
-                configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));     // 메서드 허용
-                configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));    // 헤더 허용
-                configuration.setAllowCredentials(true);    // 인증 정보(쿠키 등)를 포함할 수 있도록
-                configuration.setMaxAge(3600L);             // CORS 프리플라이트 요청의 캐시 시간을 1시간으로 설정
-                return configuration;
-            }))
             .httpBasic(auth -> auth.disable()) // 기본 인증 로그인 비활성화
             .formLogin(auth -> auth.disable()) // 기본 login form 비활성화
             .logout(auth -> auth.disable()) // 기본 logout 비활성화
@@ -103,6 +95,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
