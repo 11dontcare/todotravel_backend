@@ -10,4 +10,5 @@ public interface BookmarkService {
     Bookmark createBookmark(Plan plan, User user);
     void removeBookmark(Plan plan, User user);
     Long countBookmark(Plan plan);
+    Boolean isPlanBookmarkedByUser(User user, Plan plan);
 }

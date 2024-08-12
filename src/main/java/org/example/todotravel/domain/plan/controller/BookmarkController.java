@@ -35,4 +35,12 @@ public class BookmarkController {
         bookmarkService.removeBookmark(plan, user);
         return new ApiResponse<>(true, "북마크 취소 성공");
     }
+
+    @GetMapping("/{plan_id}/isBookmarked/{user_id}")
+    public ApiResponse<Boolean> isPlanBookmarked(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId) {
+        Plan plan = planService.getPlan(planId);
+        User user = userService.getUserByUserId(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        Boolean isBookmarked = bookmarkService.isPlanBookmarkedByUser(user, plan);
+        return new ApiResponse<>(true, "북마크 여부 조회 성공", isBookmarked);
+    }
 }
