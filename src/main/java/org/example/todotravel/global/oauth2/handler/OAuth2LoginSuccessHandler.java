@@ -33,19 +33,15 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         try {
             CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
-            Optional<User> user = userRepository.findByEmail(oAuth2User.getEmail());
+            String userInfoJwt = jwtTokenizer.createTempJwtForOAuth2User(oAuth2User);
+            String frontendUrl = "http://localhost:3000"; // 프론트엔드 URL
 
-            if (oAuth2User.getRole() == Role.ROLE_GUEST) {
-                String userInfoJwt = jwtTokenizer.createTempJwtForOAuth2User(oAuth2User);
-                String redirectUrl = String.format("/api/auth/oauth2/signup?token=%s", userInfoJwt);
-                getRedirectStrategy().sendRedirect(request, response, redirectUrl);
-            } else {
-                String userInfoJwt = jwtTokenizer.createTempJwtForOAuth2User(oAuth2User);
-                String redirectUrl = String.format("/api/auth/oauth2/login?token=%s", userInfoJwt);
-                getRedirectStrategy().sendRedirect(request, response, redirectUrl);
-            }
+            String role = oAuth2User.getRole().name();
+            String redirectUrl = frontendUrl + "/oauth2/redirect?token=" + userInfoJwt + "&role=" + role;
+            getRedirectStrategy().sendRedirect(request, response, redirectUrl);
         } catch (Exception e) {
-            throw e;
+            log.error("OAuth2 로그인 성공 처리 중 오류 발생", e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error");
         }
     }
 }
