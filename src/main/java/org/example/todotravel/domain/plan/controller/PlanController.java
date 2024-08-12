@@ -1,7 +1,9 @@
 package org.example.todotravel.domain.plan.controller;
 
+import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.chat.dto.request.ChatRoomCreateRequestDto;
 import org.example.todotravel.domain.chat.service.impl.ChatRoomServiceImpl;
 import org.example.todotravel.domain.plan.dto.request.PlanRequestDto;
@@ -17,6 +19,9 @@ import org.example.todotravel.domain.user.dto.response.UserListResponseDto;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
 import org.example.todotravel.global.controller.ApiResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -25,6 +30,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/plan")
+@Slf4j
 public class PlanController {
     private final PlanServiceImpl planService;
     private final UserServiceImpl userService;
@@ -35,7 +41,11 @@ public class PlanController {
     //플랜 생성
     @PostMapping
     public ApiResponse<Long> createPlan(@Valid @RequestBody PlanRequestDto planRequestDto) {
-        Plan plan = planService.createPlan(planRequestDto);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails)authentication.getPrincipal();
+        log.info(":::::username :: " + userDetails.getUsername());
+        User user = userService.getUserByUsername(userDetails.getUsername());
+        Plan plan = planService.createPlan(planRequestDto, user);
 
         // 채팅방 자동 생성
         chatRoomService.createChatRoom(plan);
@@ -47,6 +57,9 @@ public class PlanController {
     @GetMapping("/{plan_id}")
     public ApiResponse<PlanResponseDto> getUpdatePlan(@PathVariable("plan_id") Long planId){
         PlanResponseDto plan = planService.getPlanForModify(planId);
+//        plan = plan.toBuilder()
+//                .scheduleList(scheduleService.getSchedulesByPlan(planId))
+//                .build();
         //수정 창에 수정하려는 plan 정보
         return new ApiResponse<>(true, "수정할 플랜 조회 성공", plan);
     }

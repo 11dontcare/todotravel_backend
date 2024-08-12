@@ -42,4 +42,7 @@ public interface UserService {
 
     //플랜에 사용자 초대 시 모든 사용자 목록을 return - 김민정
     List<User> getAllUsers();
+
+    //로그인 중인 사용자 정보
+    User getUserByUsername(String username);
 }
