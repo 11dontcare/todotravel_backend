@@ -33,7 +33,7 @@ public class EmailController {
         EmailResponseDto emailResponseDto = new EmailResponseDto();
         emailResponseDto.setCode(code);
 
-        return new ApiResponse<>(true, "이메일 인증 코드 발송 성공", emailResponseDto);
+        return new ApiResponse<>(true, "인증번호가 발송되었습니다. 이메일을 확인해주세요.", emailResponseDto);
     }
 
     // 이메일 인증 - 이름, 이메일에 해당하는 유저 찾은 후 이메일 전송

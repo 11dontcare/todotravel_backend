@@ -29,11 +29,11 @@ public class UserController {
     @PostMapping("/signup")
     public ApiResponse<?> registerUser(@Valid @RequestBody UserRegisterRequestDto dto) {
         userService.registerNewUser(dto, passwordEncoder);
-        return new ApiResponse<>(true, "회원가입 성공");
+        return new ApiResponse<>(true, "회원가입을 완료했습니다.");
     }
 
     // OAuth2 첫 가입시 추가 정보 입력 후 로그인 처리
-    @PostMapping("/oauth2/additional-info")
+    @PutMapping("/oauth2/additional-info")
     public ApiResponse<?> updateOAuth2UserAdditionalInfo(@RequestBody OAuth2AdditionalInfoRequestDto dto,
                                                          HttpServletResponse response) {
         try {
@@ -43,9 +43,9 @@ public class UserController {
             String accessToken = jwtTokenizer.issueTokenAndSetCookies(response, updatedUser);
 
             LoginResponseDto loginResponseDto = LoginResponseDto.of(updatedUser, accessToken);
-            return new ApiResponse<>(true, "추가 정보 업데이트 성공", loginResponseDto);
+            return new ApiResponse<>(true, "추가 정보 업데이트에 성공했습니다.", loginResponseDto);
         } catch (Exception e) {
-            return new ApiResponse<>(false, "추가 정보 업데이트 실패");
+            return new ApiResponse<>(false, "추가 정보 업데이트에 실패했습니다.");
         }
     }
 
@@ -61,28 +61,28 @@ public class UserController {
             String accessToken = jwtTokenizer.issueTokenAndSetCookies(response, user);
 
             LoginResponseDto loginResponseDto = LoginResponseDto.of(user, accessToken);
-            return new ApiResponse<>(true, "OAuth2 로그인 성공", loginResponseDto);
+            return new ApiResponse<>(true, "OAuth2 로그인을 성공했습니다.", loginResponseDto);
         } catch (Exception e) {
-            return new ApiResponse<>(false, "OAuth2 로그인 실패: " + e.getMessage(), null);
+            return new ApiResponse<>(false, "OAuth2 로그인을 실패했습니다. : " + e.getMessage(), null);
         }
     }
 
     // 사용자 아이디 중복 검사
-    @PostMapping("/check-username")
+    @GetMapping("/check-username")
     public ApiResponse<?> checkUsername(@RequestParam String username) {
         userService.checkDuplicateUsername(username);
         return new ApiResponse<>(true, "아이디 사용 가능", username);
     }
 
     // 사용자 이메일 중복 검사
-    @PostMapping("/check-email")
+    @GetMapping("/check-email")
     public ApiResponse<?> checkEmail(@RequestParam String email) {
         userService.checkDuplicateEmail(email);
         return new ApiResponse<>(true, "이메일 사용 가능", email);
     }
 
     // 사용자 닉네임 중복 검사
-    @PostMapping("/check-nickname")
+    @GetMapping("/check-nickname")
     public ApiResponse<?> checkNickname(@RequestParam String nickname) {
         userService.checkDuplicateUsername(nickname);
         return new ApiResponse<>(true, "닉네임 사용 가능", nickname);
@@ -97,24 +97,24 @@ public class UserController {
         String accessToken = jwtTokenizer.issueTokenAndSetCookies(response, loginUser);
 
         LoginResponseDto loginResponseDto = LoginResponseDto.of(loginUser, accessToken);
-        return new ApiResponse<>(true, "로그인 성공", loginResponseDto);
+        return new ApiResponse<>(true, "로그인을 성공했습니다.", loginResponseDto);
     }
 
     // 아이디 찾기 인증확인
     @PostMapping("/find-username")
     public ApiResponse<?> findUsername(@Valid @RequestBody UsernameRequestDto dto) {
         UsernameResponseDto usernameResponseDto = userService.getUsername(dto);
-        return new ApiResponse<>(true, "아이디 찾기 성공", usernameResponseDto);
+        return new ApiResponse<>(true, "아이디 찾기를 성공했습니다.", usernameResponseDto);
     }
 
     // 비밀번호 재설정
-    @PostMapping("/password-reset")
+    @PutMapping("/password-reset")
     public ApiResponse<?> resetPassword(@RequestBody PasswordResetRequestDto dto) {
         try {
             userService.renewPassword(dto, passwordEncoder);
-            return new ApiResponse<>(true, "비밀번호 재설정 완료");
+            return new ApiResponse<>(true, "비밀번호 재설정을 완료했습니다.");
         } catch (Exception e) {
-            return new ApiResponse<>(false, "비밀번호 재설정 실패");
+            return new ApiResponse<>(false, "비밀번호 재설정을 실패했습니다.");
         }
     }
 
@@ -125,6 +125,6 @@ public class UserController {
         jwtTokenizer.deleteRefreshTokenFromDB(request);
 
         // 클라이언트에게 AccessToken 삭제 지시 (프론트엔드에서 처리)
-        return new ApiResponse<>(true, "로그아웃 성공");
+        return new ApiResponse<>(true, "로그아웃을 성공했습니다.");
     }
 }
