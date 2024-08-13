@@ -26,7 +26,7 @@ public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
             OAuth2AuthenticationException oauth2Exception = (OAuth2AuthenticationException) exception;
             String errorCode = oauth2Exception.getError().getErrorCode();
             if (errorCode.equals("duplicate_social_account")) {
-                errorMessage = URLEncoder.encode("이미 다른 소셜 계정으로 가입된 이메일입니다.", StandardCharsets.UTF_8);
+                errorMessage = URLEncoder.encode("해당 이메일로 가입된 계정이 존재합니다.", StandardCharsets.UTF_8);
             } else {
                 errorMessage = URLEncoder.encode(oauth2Exception.getError().getDescription(), StandardCharsets.UTF_8);
             }
