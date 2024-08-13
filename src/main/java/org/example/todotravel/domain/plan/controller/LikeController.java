@@ -35,4 +35,12 @@ public class LikeController {
         likeService.removeLike(plan, user);
         return new ApiResponse<>(true, "좋아요 취소 성공");
     }
+
+    @GetMapping("/{plan_id}/isLiked/{user_id}")
+    public ApiResponse<Boolean> isPlanLiked(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId) {
+        Plan plan = planService.getPlan(planId);
+        User user = userService.getUserByUserId(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        Boolean isLiked = likeService.isPlanLikedByUser(user, plan);
+        return new ApiResponse<>(true, "좋아요 여부 조회 성공", isLiked);
+    }
 }
