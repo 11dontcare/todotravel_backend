@@ -2,9 +2,6 @@ package org.example.todotravel.global.oauth2.handler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.todotravel.domain.user.entity.Role;
-import org.example.todotravel.domain.user.entity.User;
-import org.example.todotravel.domain.user.repository.UserRepository;
 import org.example.todotravel.global.jwt.util.JwtTokenizer;
 import org.example.todotravel.global.oauth2.CustomOAuth2User;
 import org.springframework.security.core.Authentication;
@@ -15,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -23,7 +19,6 @@ import java.util.Optional;
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtTokenizer jwtTokenizer;
-    private final UserRepository userRepository;
 
     // oAuth2 로그인 권한 핸들러
     @Override

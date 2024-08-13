@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.user.entity.RefreshToken;
 import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.domain.user.entity.User;
-import org.example.todotravel.domain.user.service.impl.RefreshTokenServiceImpl;
+import org.example.todotravel.domain.user.service.RefreshTokenService;
 import org.example.todotravel.global.oauth2.CustomOAuth2User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -25,7 +25,7 @@ import java.util.Date;
 @Slf4j
 @Component
 public class JwtTokenizer {
-    private final RefreshTokenServiceImpl refreshTokenService;
+    private final RefreshTokenService refreshTokenService;
     private final byte[] accessSecret;
     private final byte[] refreshSecret;
 
@@ -34,7 +34,7 @@ public class JwtTokenizer {
 
     public JwtTokenizer(@Value("${jwt.secretKey}") String accessSecret,
                         @Value("${jwt.refreshKey}") String refreshSecret,
-                        RefreshTokenServiceImpl refreshTokenService) {
+                        RefreshTokenService refreshTokenService) {
         this.accessSecret = accessSecret.getBytes(StandardCharsets.UTF_8);
         this.refreshSecret = refreshSecret.getBytes(StandardCharsets.UTF_8);
         this.refreshTokenService = refreshTokenService;

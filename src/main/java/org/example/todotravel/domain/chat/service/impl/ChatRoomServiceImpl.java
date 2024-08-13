@@ -2,7 +2,6 @@ package org.example.todotravel.domain.chat.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.example.todotravel.domain.chat.dto.request.ChatRoomCreateRequestDto;
 import org.example.todotravel.domain.chat.dto.request.ChatRoomNameRequestDto;
 import org.example.todotravel.domain.chat.dto.request.OneToOneChatRoomRequestDto;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomNameResponseDto;
@@ -10,12 +9,11 @@ import org.example.todotravel.domain.chat.dto.response.ChatRoomResponseDto;
 import org.example.todotravel.domain.chat.entity.ChatRoom;
 import org.example.todotravel.domain.chat.entity.ChatRoomUser;
 import org.example.todotravel.domain.chat.repository.ChatRoomRepository;
+import org.example.todotravel.domain.chat.service.ChatRoomUserService;
 import org.example.todotravel.domain.plan.entity.Plan;
-import org.example.todotravel.domain.plan.service.implement.PlanServiceImpl;
-import org.example.todotravel.domain.plan.service.implement.PlanUserServiceImpl;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.chat.service.ChatRoomService;
-import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
+import org.example.todotravel.domain.user.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,10 +24,8 @@ import java.time.LocalDateTime;
 public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
 
-    private final ChatRoomUserServiceImpl chatRoomUserService;
-    private final PlanUserServiceImpl planUserService;
-    private final PlanServiceImpl planService;
-    private final UserServiceImpl userService;
+    private final ChatRoomUserService chatRoomUserService;
+    private final UserService userService;
 
     // 플랜 생성 시 채팅방 생성
     @Override

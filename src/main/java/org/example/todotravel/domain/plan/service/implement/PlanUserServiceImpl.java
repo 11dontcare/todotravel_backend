@@ -2,13 +2,14 @@ package org.example.todotravel.domain.plan.service.implement;
 
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.notification.dto.request.AlarmRequestDto;
-import org.example.todotravel.domain.notification.service.implement.AlarmServiceImpl;
+import org.example.todotravel.domain.notification.service.AlarmService;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
 import org.example.todotravel.domain.plan.repository.PlanUserRepository;
+import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.plan.service.PlanUserService;
 import org.example.todotravel.domain.user.entity.User;
-import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
+import org.example.todotravel.domain.user.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,9 +19,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PlanUserServiceImpl implements PlanUserService {
     private final PlanUserRepository planUserRepository;
-    private final PlanServiceImpl planService;
-    private final UserServiceImpl userService;
-    private final AlarmServiceImpl alarmService; //알림 자동 생성
+    private final PlanService planService;
+    private final UserService userService;
+    private final AlarmService alarmService; //알림 자동 생성
 
     //플랜 초대
     @Override

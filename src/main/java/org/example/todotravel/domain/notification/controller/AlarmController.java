@@ -3,10 +3,8 @@ package org.example.todotravel.domain.notification.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.notification.dto.response.AlarmResponseDto;
 import org.example.todotravel.domain.notification.entity.Alarm;
-import org.example.todotravel.domain.notification.service.implement.AlarmServiceImpl;
-import org.example.todotravel.domain.plan.dto.response.ScheduleResponseDto;
+import org.example.todotravel.domain.notification.service.AlarmService;
 import org.example.todotravel.global.controller.ApiResponse;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +14,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RequestMapping("/api/notification")
 public class AlarmController {
-    final private AlarmServiceImpl alarmService;
+    final private AlarmService alarmService;
 
     //자동으로 알림 만들기
 

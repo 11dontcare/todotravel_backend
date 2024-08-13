@@ -2,6 +2,8 @@ package org.example.todotravel.domain.user.service.impl;
 
 import jakarta.mail.internet.MimeMessage;
 import org.example.todotravel.domain.user.entity.EmailMessage;
+import org.example.todotravel.domain.user.service.EmailService;
+import org.example.todotravel.domain.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,13 +30,13 @@ class EmailServiceImplTest {
     private JavaMailSender javaMailSender;
 
     @Mock
-    private UserServiceImpl userService;
+    private UserService userService;
 
     @Mock
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private EmailServiceImpl emailService;
+    private EmailService emailService;
 
     private EmailMessage emailMessage;
 

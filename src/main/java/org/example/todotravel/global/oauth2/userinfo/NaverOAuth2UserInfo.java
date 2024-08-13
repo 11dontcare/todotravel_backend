@@ -1,7 +1,6 @@
 package org.example.todotravel.global.oauth2.userinfo;
 
 import java.util.Map;
-import org.example.todotravel.domain.user.entity.Gender;
 
 public class NaverOAuth2UserInfo extends OAuth2UserInfo {
 
@@ -30,7 +29,7 @@ public class NaverOAuth2UserInfo extends OAuth2UserInfo {
         return (String) response.get("nickname");
     }
 
-@Override
+    @Override
     public String getName() {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 

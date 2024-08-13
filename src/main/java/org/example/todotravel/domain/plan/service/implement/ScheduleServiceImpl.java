@@ -1,14 +1,14 @@
 package org.example.todotravel.domain.plan.service.implement;
 
 import lombok.RequiredArgsConstructor;
-import org.example.todotravel.domain.notification.dto.request.AlarmRequestDto;
-import org.example.todotravel.domain.notification.service.implement.AlarmServiceImpl;
 import org.example.todotravel.domain.plan.dto.request.ScheduleCreateRequestDto;
 import org.example.todotravel.domain.plan.dto.response.ScheduleResponseDto;
 import org.example.todotravel.domain.plan.entity.Location;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.Schedule;
 import org.example.todotravel.domain.plan.repository.ScheduleRepository;
+import org.example.todotravel.domain.plan.service.LocationService;
+import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.plan.service.ScheduleService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +20,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
-    private final LocationServiceImpl locationService;
-    private final PlanServiceImpl planService;
+    private final LocationService locationService;
+    private final PlanService planService;
 
     //여행 일정 찾기
     @Override

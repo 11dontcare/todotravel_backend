@@ -1,7 +1,6 @@
 package org.example.todotravel.global.oauth2.userinfo;
 
 import java.util.Map;
-import org.example.todotravel.domain.user.entity.Gender;
 
 public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
 
@@ -47,6 +46,7 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
 
         return (String) profile.get("nickname");
     }
+
     @Override
     public String getEmail() {
         Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
@@ -57,5 +57,4 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
 
         return (String) account.get("email");
     }
-
 }

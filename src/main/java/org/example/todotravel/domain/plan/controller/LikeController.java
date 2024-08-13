@@ -3,10 +3,10 @@ package org.example.todotravel.domain.plan.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.plan.entity.Like;
 import org.example.todotravel.domain.plan.entity.Plan;
-import org.example.todotravel.domain.plan.service.implement.LikeServiceImpl;
-import org.example.todotravel.domain.plan.service.implement.PlanServiceImpl;
+import org.example.todotravel.domain.plan.service.LikeService;
+import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.user.entity.User;
-import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
+import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/plan")
 public class LikeController {
-    private final LikeServiceImpl likeService;
-    private final PlanServiceImpl planService;
-    private final UserServiceImpl userService;
+    private final LikeService likeService;
+    private final PlanService planService;
+    private final UserService userService;
 
     //좋아요
     @PostMapping("/{plan_id}/like/{user_id}")

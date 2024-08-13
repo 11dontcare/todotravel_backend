@@ -2,7 +2,7 @@ package org.example.todotravel.domain.plan.service.implement;
 
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.notification.dto.request.AlarmRequestDto;
-import org.example.todotravel.domain.notification.service.implement.AlarmServiceImpl;
+import org.example.todotravel.domain.notification.service.AlarmService;
 import org.example.todotravel.domain.plan.entity.Like;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.repository.LikeRepository;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LikeServiceImpl implements LikeService {
     private final LikeRepository likeRepository;
-    private final AlarmServiceImpl alarmService; //알림 자동 생성
+    private final AlarmService alarmService; //알림 자동 생성
 
     @Override
     @Transactional

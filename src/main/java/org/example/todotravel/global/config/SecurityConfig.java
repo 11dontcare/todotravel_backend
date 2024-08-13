@@ -89,7 +89,7 @@ public class SecurityConfig {
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenizer), UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(exception -> exception
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-            )
+            ) // 인증되지 않은 사용자가 보안처리된 리소스에 접근 시 처리 (혹은 토큰에러 발생 시)
 
             /* oauth 관련 설정 */
             .oauth2Login(oauth2 -> oauth2

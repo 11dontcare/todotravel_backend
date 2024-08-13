@@ -3,6 +3,7 @@ package org.example.todotravel.domain.user.service.impl;
 import org.example.todotravel.domain.user.entity.RefreshToken;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.repository.RefreshTokenRepository;
+import org.example.todotravel.domain.user.service.RefreshTokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ class RefreshTokenServiceImplTest {
     private RefreshTokenRepository refreshTokenRepository;
 
     @InjectMocks
-    private RefreshTokenServiceImpl refreshTokenService;
+    private RefreshTokenService refreshTokenService;
 
     private RefreshToken refreshToken;
     private User user;

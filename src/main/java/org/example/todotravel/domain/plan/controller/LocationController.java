@@ -3,7 +3,7 @@ package org.example.todotravel.domain.plan.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.plan.dto.request.LocationRequestDto;
 import org.example.todotravel.domain.plan.entity.Location;
-import org.example.todotravel.domain.plan.service.implement.LocationServiceImpl;
+import org.example.todotravel.domain.plan.service.LocationService;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
@@ -12,7 +12,7 @@ import jakarta.validation.Valid;
 @RequiredArgsConstructor
 @RequestMapping("/api/location")
 public class LocationController {
-    private final LocationServiceImpl locationService;
+    private final LocationService locationService;
 
     //여행 장소 저장하기
     @PostMapping

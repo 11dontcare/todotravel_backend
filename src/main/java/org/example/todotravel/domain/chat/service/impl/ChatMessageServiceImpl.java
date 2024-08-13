@@ -1,8 +1,7 @@
 package org.example.todotravel.domain.chat.service.impl;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.chat.dto.request.ChatMessageRequestDto;
 import org.example.todotravel.domain.chat.dto.response.ChatMessageResponseDto;
@@ -20,11 +19,10 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class ChatMessageServiceImpl implements ChatMessageService {
+    private final ChatMessageRepository chatMessageRepository;
+    private final ChatRoomUserRepository chatRoomUserRepository;
 
-private final ChatMessageRepository chatMessageRepository;
-private final ChatRoomUserRepository chatRoomUserRepository;
-
-//     이전 채팅 내용 조회
+    //     이전 채팅 내용 조회
     @Transactional
     public Flux<ChatMessageResponseDto> findChatMessages(Long roomId) {
         Flux<ChatMessage> chatMessages = chatMessageRepository.findAllByRoomId(roomId);
