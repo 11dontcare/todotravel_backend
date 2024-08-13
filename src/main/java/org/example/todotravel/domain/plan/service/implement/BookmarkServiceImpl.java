@@ -44,4 +44,10 @@ public class BookmarkServiceImpl implements BookmarkService {
     public Long countBookmark(Plan plan) {
         return bookmarkRepository.countByPlan(plan);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Boolean isPlanBookmarkedByUser(User user, Plan plan) {
+        return bookmarkRepository.findByBookmarkUserAndPlan(user, plan).isPresent();
+    }
 }

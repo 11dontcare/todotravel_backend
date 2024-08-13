@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.chat.dto.request.ChatRoomCreateRequestDto;
+import org.example.todotravel.domain.chat.entity.ChatRoom;
 import org.example.todotravel.domain.chat.service.impl.ChatRoomServiceImpl;
 import org.example.todotravel.domain.plan.dto.request.PlanRequestDto;
 import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
@@ -74,6 +75,9 @@ public class PlanController {
     //플랜 삭제
     @DeleteMapping("/{plan_id}")
     public ApiResponse<Plan> deletePlan(@PathVariable("plan_id") Long planId) {
+        // 플랜 삭제 시 채팅방도 삭제
+        ChatRoom chatRoom = chatRoomService.getChatRoomByPlanId(planId);
+        chatRoomService.deleteChatRoom(chatRoom.getRoomId());
         planService.deletePlan(planId);
         return new ApiResponse<>(true, "플랜 삭제 성공");
     }
