@@ -3,10 +3,10 @@ package org.example.todotravel.domain.plan.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.plan.entity.Bookmark;
 import org.example.todotravel.domain.plan.entity.Plan;
-import org.example.todotravel.domain.plan.service.implement.BookmarkServiceImpl;
-import org.example.todotravel.domain.plan.service.implement.PlanServiceImpl;
+import org.example.todotravel.domain.plan.service.BookmarkService;
+import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.user.entity.User;
-import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
+import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/plan")
 public class BookmarkController {
-    private final BookmarkServiceImpl bookmarkService;
-    private final UserServiceImpl userService;
-    private final PlanServiceImpl planService;
+    private final BookmarkService bookmarkService;
+    private final UserService userService;
+    private final PlanService planService;
 
     //북마크
     @PostMapping("/{plan_id}/bookmark/{user_id}")

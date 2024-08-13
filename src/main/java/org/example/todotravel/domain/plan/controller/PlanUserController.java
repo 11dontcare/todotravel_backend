@@ -2,10 +2,10 @@ package org.example.todotravel.domain.plan.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.chat.entity.ChatRoom;
-import org.example.todotravel.domain.chat.service.impl.ChatRoomServiceImpl;
+import org.example.todotravel.domain.chat.service.ChatRoomService;
 import org.example.todotravel.domain.plan.dto.response.PlanUserResponseDto;
 import org.example.todotravel.domain.plan.entity.PlanUser;
-import org.example.todotravel.domain.plan.service.implement.PlanUserServiceImpl;
+import org.example.todotravel.domain.plan.service.PlanUserService;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,8 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class PlanUserController {
-    private final PlanUserServiceImpl planUserService;
-    private final ChatRoomServiceImpl chatRoomService;
+    private final PlanUserService planUserService;
+    private final ChatRoomService chatRoomService;
 
     // 플랜 초대 거절
     @PutMapping("/invite/{plan_participant_id}/reject")

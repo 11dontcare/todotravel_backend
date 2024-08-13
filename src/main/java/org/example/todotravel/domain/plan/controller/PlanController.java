@@ -1,24 +1,22 @@
 package org.example.todotravel.domain.plan.controller;
 
-import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.todotravel.domain.chat.dto.request.ChatRoomCreateRequestDto;
 import org.example.todotravel.domain.chat.entity.ChatRoom;
-import org.example.todotravel.domain.chat.service.impl.ChatRoomServiceImpl;
+import org.example.todotravel.domain.chat.service.ChatRoomService;
 import org.example.todotravel.domain.plan.dto.request.PlanRequestDto;
 import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanUserResponseDto;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
-import org.example.todotravel.domain.plan.service.implement.PlanServiceImpl;
-import org.example.todotravel.domain.plan.service.implement.PlanUserServiceImpl;
-import org.example.todotravel.domain.plan.service.implement.ScheduleServiceImpl;
+import org.example.todotravel.domain.plan.service.PlanService;
+import org.example.todotravel.domain.plan.service.PlanUserService;
+import org.example.todotravel.domain.plan.service.ScheduleService;
 import org.example.todotravel.domain.user.dto.response.UserListResponseDto;
 import org.example.todotravel.domain.user.entity.User;
-import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
+import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,11 +31,11 @@ import java.util.List;
 @RequestMapping("/api/plan")
 @Slf4j
 public class PlanController {
-    private final PlanServiceImpl planService;
-    private final UserServiceImpl userService;
-    private final PlanUserServiceImpl planUserService;
-    private final ChatRoomServiceImpl chatRoomService;
-    private final ScheduleServiceImpl scheduleService;
+    private final PlanService planService;
+    private final UserService userService;
+    private final PlanUserService planUserService;
+    private final ChatRoomService chatRoomService;
+    private final ScheduleService scheduleService;
 
     //플랜 생성
     @PostMapping
@@ -54,17 +52,16 @@ public class PlanController {
         return new ApiResponse<>(true, "플랜 생성 성공", plan.getPlanId());
     }
 
-    //플랜 수정 창
+    //수정됨
+    //플랜Id에 있는 schedules 조회
     @GetMapping("/{plan_id}")
-    public ApiResponse<PlanResponseDto> getUpdatePlan(@PathVariable("plan_id") Long planId){
-        PlanResponseDto plan = planService.getPlanForModify(planId);
-//        plan = plan.toBuilder()
-//                .scheduleList(scheduleService.getSchedulesByPlan(planId))
-//                .build();
-        //수정 창에 수정하려는 plan 정보
-        return new ApiResponse<>(true, "수정할 플랜 조회 성공", plan);
+    public ApiResponse<PlanResponseDto> getPlan(@PathVariable("plan_id") Long planId) {
+        PlanResponseDto planDetails = planService.getPlanDetails(planId);
+        planDetails = planDetails.toBuilder()
+                .scheduleList(scheduleService.getSchedulesByPlan(planId))
+                .build();
+        return new ApiResponse<>(true, "플랜 조회 성공", planDetails);
     }
-
     //플랜 수정
     @PutMapping("/{plan_id}")
     public ApiResponse<Long> updatePlan(@PathVariable("plan_id") Long planId, @Valid @RequestBody PlanRequestDto dto) {
@@ -82,7 +79,8 @@ public class PlanController {
         return new ApiResponse<>(true, "플랜 삭제 성공");
     }
 
-    //플랜 사용자 초대(초대할 사용자 조회)
+    //수정됨
+    //플랜에 사용자 초대하기 위해서 사용자 리스트 조회(현재 전체 사용자 조회, 추후 팔로잉 조회로 변경 예정)
     @GetMapping("/{plan_id}/invite")
     public ApiResponse<List<UserListResponseDto>> invite(@PathVariable("plan_id") Long planId) {
         List<User> users = userService.getAllUsers();
@@ -99,6 +97,7 @@ public class PlanController {
         return new ApiResponse<>(true, "사용자 목록 조회 성공", userList);
     }
 
+    //수정됨
     //플랜 사용자 초대
     @PostMapping("/{plan_id}/invite/{user_id}")
     public ApiResponse<PlanUserResponseDto> inviteUser(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId) {
@@ -107,26 +106,26 @@ public class PlanController {
         return new ApiResponse<>(true, "사용자 초대 성공", planUserResponseDto);
     }
 
-    //플랜 조회
-    @GetMapping("/get")
-    public ApiResponse<List<PlanListResponseDto>> viewPlanList() {
+    //수정됨
+    //전체 플랜 조회 - 공개로 설정
+    @GetMapping("/public")
+    public ApiResponse<List<PlanListResponseDto>> viewPublicPlans() {
         List<PlanListResponseDto> planList = planService.getPublicPlans();
         return new ApiResponse<>(true, "플랜 목록 조회 성공", planList);
     }
 
-    //플랜 상세 조회
-    @GetMapping("/specific/{plan_id}")
-    public ApiResponse<PlanResponseDto> viewPlan(@PathVariable("plan_id") Long planId) {
-        PlanResponseDto planDetails = planService.getPlanDetails(planId);
-        planDetails = planDetails.toBuilder()
-                .scheduleList(scheduleService.getSchedulesByPlan(planId))
-                .build();
-        return new ApiResponse<>(true, "플랜 조회 성공", planDetails);
+    //수정됨
+    //플랜 가져오기
+    @GetMapping("/public/{plan_id}")
+    public ApiResponse<PlanResponseDto> getPublicPlan(@PathVariable("plan_id") Long planId){
+        PlanResponseDto plan = planService.getPlanForModify(planId);
+        return new ApiResponse<>(true, "수정할 플랜 조회 성공", plan);
     }
 
-    //플랜 불러오기
+    //수정됨
+    //플랜 copy해서 만들기
     @PostMapping("/{plan_id}/load")
-    public ApiResponse<Long> loadPlan(@PathVariable("plan_id") Long planId) {
+    public ApiResponse<Long> getLoadPlan(@PathVariable("plan_id") Long planId) {
         Plan plan = planService.copyPlan(planId);
         return new ApiResponse<>(true, "플랜 불러오기 성공", plan.getPlanId());
     }

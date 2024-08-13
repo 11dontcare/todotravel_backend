@@ -28,8 +28,8 @@ public class TokenController {
 
             String newAccessToken = jwtTokenizer.createAccessToken(user);
 
-            return new ApiResponse<>(true, "토큰 갱신 성공", Collections.singletonMap("accessToken", newAccessToken));
+            return new ApiResponse<>(true, "토큰 갱신에 성공했습니다.", Collections.singletonMap("accessToken", newAccessToken));
         }
-        return new ApiResponse<>(false, "토큰 갱신 실패", null);
+        return new ApiResponse<>(false, "토큰 갱신에 실패했습니다.", null);
     }
 }

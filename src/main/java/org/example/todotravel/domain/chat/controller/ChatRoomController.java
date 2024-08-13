@@ -14,8 +14,8 @@ import org.example.todotravel.domain.chat.service.ChatMessageService;
 import org.example.todotravel.domain.chat.service.ChatRoomService;
 import org.example.todotravel.domain.chat.service.ChatRoomUserService;
 import org.example.todotravel.domain.plan.entity.Plan;
-import org.example.todotravel.domain.plan.service.implement.PlanServiceImpl;
-import org.example.todotravel.domain.plan.service.implement.PlanUserServiceImpl;
+import org.example.todotravel.domain.plan.service.PlanService;
+import org.example.todotravel.domain.plan.service.PlanUserService;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,9 +30,9 @@ import reactor.core.publisher.Mono;
 public class ChatRoomController {
     private final ChatRoomService chatRoomService;
     private final ChatRoomUserService chatRoomUserService;
-    private final PlanUserServiceImpl planUserService;
     private final ChatMessageService chatMessageService;
-    private final PlanServiceImpl planService;
+    private final PlanUserService planUserService;
+    private final PlanService planService;
 
 
     // 1:1 채팅방 생성

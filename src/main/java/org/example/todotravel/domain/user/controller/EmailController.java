@@ -7,8 +7,8 @@ import org.example.todotravel.domain.user.dto.request.UsernameRequestDto;
 import org.example.todotravel.domain.user.dto.response.EmailResponseDto;
 import org.example.todotravel.domain.user.dto.response.PasswordSearchResponseDto;
 import org.example.todotravel.domain.user.entity.EmailMessage;
-import org.example.todotravel.domain.user.service.impl.EmailServiceImpl;
-import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
+import org.example.todotravel.domain.user.service.EmailService;
+import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/send-mail")
 public class EmailController {
-    private final UserServiceImpl userService;
-    private final EmailServiceImpl emailService;
+    private final UserService userService;
+    private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
 
     // 이메일 인증 - 요청 시 body로 인증번호 반환
@@ -33,7 +33,7 @@ public class EmailController {
         EmailResponseDto emailResponseDto = new EmailResponseDto();
         emailResponseDto.setCode(code);
 
-        return new ApiResponse<>(true, "이메일 인증 코드 발송 성공", emailResponseDto);
+        return new ApiResponse<>(true, "인증번호가 발송되었습니다. 이메일을 확인해주세요.", emailResponseDto);
     }
 
     // 이메일 인증 - 이름, 이메일에 해당하는 유저 찾은 후 이메일 전송

@@ -2,7 +2,7 @@ package org.example.todotravel.domain.plan.service.implement;
 
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.notification.dto.request.AlarmRequestDto;
-import org.example.todotravel.domain.notification.service.implement.AlarmServiceImpl;
+import org.example.todotravel.domain.notification.service.AlarmService;
 import org.example.todotravel.domain.plan.dto.request.CommentRequestDto;
 import org.example.todotravel.domain.plan.entity.Comment;
 import org.example.todotravel.domain.plan.entity.Plan;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
-    private final AlarmServiceImpl alarmService; //알림 자동 생성
+    private final AlarmService alarmService; //알림 자동 생성
 
     @Override
     @Transactional

@@ -6,7 +6,7 @@ import org.example.todotravel.domain.notification.entity.Alarm;
 import org.example.todotravel.domain.notification.repository.AlarmRepository;
 import org.example.todotravel.domain.notification.service.AlarmService;
 import org.example.todotravel.domain.user.entity.User;
-import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
+import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AlarmServiceImpl implements AlarmService {
     private final AlarmRepository alarmRepository;
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     //모든 알림 찾기 - userId
     @Override
