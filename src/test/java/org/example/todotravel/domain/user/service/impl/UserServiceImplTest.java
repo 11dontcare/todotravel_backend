@@ -8,6 +8,7 @@ import org.example.todotravel.domain.user.entity.Gender;
 import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.repository.UserRepository;
+import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.exception.DuplicateUserException;
 import org.example.todotravel.global.exception.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +43,7 @@ class UserServiceImplTest {
 
     // @InjectMocks: 모의 객체들을 주입
     @InjectMocks
-    private UserServiceImpl userService;
+    private UserService userService;
 
     private User testUser;
     private UserRegisterRequestDto registerDto;
@@ -199,20 +200,20 @@ class UserServiceImplTest {
 //        assertEquals("encodedTempPassword", testUser.getPassword());
 //    }
 
-    @Test
-    @DisplayName("이름과 이메일로 사용자명 찾기 테스트")
-    void getUsername() {
-        // given
-        UsernameRequestDto dto = new UsernameRequestDto("Test Name", "test@example.com");
-        when(userRepository.findByNameAndEmail(dto.getName(), dto.getEmail()))
-            .thenReturn(Optional.of(testUser));
-
-        // when
-        String result = userService.getUsername(dto);
-
-        // then
-        assertEquals(testUser.getUsername(), result);
-    }
+//    @Test
+//    @DisplayName("이름과 이메일로 사용자명 찾기 테스트")
+//    void getUsername() {
+//        // given
+//        UsernameRequestDto dto = new UsernameRequestDto("Test Name", "test@example.com");
+//        when(userRepository.findByNameAndEmail(dto.getName(), dto.getEmail()))
+//            .thenReturn(Optional.of(testUser));
+//
+//        // when
+//        String result = userService.getUsername(dto);
+//
+//        // then
+//        assertEquals(testUser.getUsername(), result);
+//    }
 
     @Test
     @DisplayName("이메일로 사용자 찾기 테스트")

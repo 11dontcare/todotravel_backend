@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
-import org.example.todotravel.domain.user.entity.Gender;
 import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.domain.user.entity.SocialType;
 import org.example.todotravel.domain.user.entity.User;

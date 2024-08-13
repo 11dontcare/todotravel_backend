@@ -5,6 +5,7 @@ import jakarta.servlet.http.Cookie;
 import org.example.todotravel.domain.user.entity.RefreshToken;
 import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.domain.user.entity.User;
+import org.example.todotravel.domain.user.service.RefreshTokenService;
 import org.example.todotravel.domain.user.service.impl.RefreshTokenServiceImpl;
 import org.example.todotravel.global.oauth2.CustomOAuth2User;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +28,7 @@ class JwtTokenizerTest {
     private JwtTokenizer jwtTokenizer;
 
     @Mock
-    private RefreshTokenServiceImpl refreshTokenService;
+    private RefreshTokenService refreshTokenService;
 
     @BeforeEach
     void setUp() {

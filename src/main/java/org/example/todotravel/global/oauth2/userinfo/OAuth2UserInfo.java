@@ -1,7 +1,6 @@
 package org.example.todotravel.global.oauth2.userinfo;
 
 import java.util.Map;
-import org.example.todotravel.domain.user.entity.Gender;
 
 public abstract class OAuth2UserInfo {
 

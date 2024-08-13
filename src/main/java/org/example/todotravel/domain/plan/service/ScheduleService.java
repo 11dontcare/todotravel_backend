@@ -2,13 +2,11 @@ package org.example.todotravel.domain.plan.service;
 
 import org.example.todotravel.domain.plan.dto.request.ScheduleCreateRequestDto;
 import org.example.todotravel.domain.plan.dto.response.ScheduleResponseDto;
-import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.Schedule;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface ScheduleService {
     //repository 접근
     Schedule findByScheduleId(Long scheduleId);

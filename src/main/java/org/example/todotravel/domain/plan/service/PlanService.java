@@ -5,11 +5,9 @@ import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanResponseDto;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.user.entity.User;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface PlanService {
     Plan createPlan(PlanRequestDto planRequestDto, User user);
     void deletePlan(Long planId);

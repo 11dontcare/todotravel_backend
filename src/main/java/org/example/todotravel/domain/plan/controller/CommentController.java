@@ -6,10 +6,10 @@ import org.example.todotravel.domain.plan.dto.request.CommentRequestDto;
 import org.example.todotravel.domain.plan.dto.response.CommentResponseDto;
 import org.example.todotravel.domain.plan.entity.Comment;
 import org.example.todotravel.domain.plan.entity.Plan;
-import org.example.todotravel.domain.plan.service.implement.CommentServiceImpl;
-import org.example.todotravel.domain.plan.service.implement.PlanServiceImpl;
+import org.example.todotravel.domain.plan.service.CommentService;
+import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.user.entity.User;
-import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
+import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/plan")
 public class CommentController {
-    private final CommentServiceImpl commentService;
-    private final PlanServiceImpl planService;
-    private final UserServiceImpl userService;
+    private final CommentService commentService;
+    private final PlanService planService;
+    private final UserService userService;
 
     //댓글 생성
     @PostMapping("{plan_id}/comment/{user_id}")

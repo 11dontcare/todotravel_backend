@@ -3,6 +3,7 @@ package org.example.todotravel.domain.chat.service.impl;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomResponseDto;
 import org.example.todotravel.domain.chat.entity.ChatRoom;
 import org.example.todotravel.domain.chat.repository.ChatRoomRepository;
+import org.example.todotravel.domain.chat.service.ChatRoomService;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.repository.PlanRepository;
 import org.example.todotravel.domain.user.entity.User;
@@ -31,7 +32,7 @@ class ChatRoomServiceImplTest {
     private UserRepository userRepository;
 
     @InjectMocks
-    private ChatRoomServiceImpl chatService;
+    private ChatRoomService chatService;
 
     @BeforeEach
     void setUp() {

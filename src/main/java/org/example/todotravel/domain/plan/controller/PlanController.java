@@ -1,24 +1,22 @@
 package org.example.todotravel.domain.plan.controller;
 
-import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.todotravel.domain.chat.dto.request.ChatRoomCreateRequestDto;
 import org.example.todotravel.domain.chat.entity.ChatRoom;
-import org.example.todotravel.domain.chat.service.impl.ChatRoomServiceImpl;
+import org.example.todotravel.domain.chat.service.ChatRoomService;
 import org.example.todotravel.domain.plan.dto.request.PlanRequestDto;
 import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanUserResponseDto;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
-import org.example.todotravel.domain.plan.service.implement.PlanServiceImpl;
-import org.example.todotravel.domain.plan.service.implement.PlanUserServiceImpl;
-import org.example.todotravel.domain.plan.service.implement.ScheduleServiceImpl;
+import org.example.todotravel.domain.plan.service.PlanService;
+import org.example.todotravel.domain.plan.service.PlanUserService;
+import org.example.todotravel.domain.plan.service.ScheduleService;
 import org.example.todotravel.domain.user.dto.response.UserListResponseDto;
 import org.example.todotravel.domain.user.entity.User;
-import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
+import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,11 +31,11 @@ import java.util.List;
 @RequestMapping("/api/plan")
 @Slf4j
 public class PlanController {
-    private final PlanServiceImpl planService;
-    private final UserServiceImpl userService;
-    private final PlanUserServiceImpl planUserService;
-    private final ChatRoomServiceImpl chatRoomService;
-    private final ScheduleServiceImpl scheduleService;
+    private final PlanService planService;
+    private final UserService userService;
+    private final PlanUserService planUserService;
+    private final ChatRoomService chatRoomService;
+    private final ScheduleService scheduleService;
 
     //플랜 생성
     @PostMapping

@@ -2,6 +2,7 @@ package org.example.todotravel.domain.plan.service.implement;
 
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.notification.dto.request.AlarmRequestDto;
+import org.example.todotravel.domain.notification.service.AlarmService;
 import org.example.todotravel.domain.notification.service.implement.AlarmServiceImpl;
 import org.example.todotravel.domain.plan.dto.request.PlanRequestDto;
 import org.example.todotravel.domain.plan.dto.response.CommentResponseDto;
@@ -12,6 +13,9 @@ import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
 import org.example.todotravel.domain.plan.entity.Schedule;
 import org.example.todotravel.domain.plan.repository.PlanRepository;
+import org.example.todotravel.domain.plan.service.BookmarkService;
+import org.example.todotravel.domain.plan.service.CommentService;
+import org.example.todotravel.domain.plan.service.LikeService;
 import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.repository.UserRepository;
@@ -21,17 +25,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class PlanServiceImpl implements PlanService {
     private final PlanRepository planRepository;
     private final UserRepository userRepository;//테스트용
-    private final BookmarkServiceImpl bookmarkService;
-    private final LikeServiceImpl likeService;
-    private final AlarmServiceImpl alarmService; //알림 자동 생성
-    private final CommentServiceImpl commentService;
+    private final BookmarkService bookmarkService;
+    private final LikeService likeService;
+    private final AlarmService alarmService; //알림 자동 생성
+    private final CommentService commentService;
 
     @Override
     @Transactional

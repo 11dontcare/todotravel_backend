@@ -1,8 +1,6 @@
 package org.example.todotravel.global.oauth2.userinfo;
 
-
 import java.util.Map;
-import org.example.todotravel.domain.user.entity.Gender;
 
 public class GoogleOAuth2UserInfo extends OAuth2UserInfo {
 
@@ -24,6 +22,7 @@ public class GoogleOAuth2UserInfo extends OAuth2UserInfo {
     public String getName() {
         return (String) attributes.get("name");
     }
+
     @Override
     public String getEmail() {
         return (String) attributes.get("email");
