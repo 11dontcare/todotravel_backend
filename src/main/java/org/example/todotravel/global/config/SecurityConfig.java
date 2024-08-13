@@ -8,11 +8,13 @@ import org.example.todotravel.global.oauth2.handler.OAuth2LoginSuccessHandler;
 import org.example.todotravel.global.oauth2.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
@@ -39,6 +41,8 @@ public class SecurityConfig {
             "/api/invite/**",
             "/api/chat/**",
             "/api/notification/**",
+            "/api/token/refresh",
+            "/api/auth/logout",
             "/ws/**",
     };
 
@@ -83,6 +87,9 @@ public class SecurityConfig {
 
             /* jwt 관련 설정 */
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenizer), UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+            )
 
             /* oauth 관련 설정 */
             .oauth2Login(oauth2 -> oauth2
