@@ -2,11 +2,10 @@ package org.example.todotravel.domain.user.service.impl;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import org.example.todotravel.domain.user.dto.request.OAuth2AdditionalInfoRequestDto;
-import org.example.todotravel.domain.user.dto.request.OAuth2UserLoginRequestDto;
-import org.example.todotravel.domain.user.dto.request.UserRegisterRequestDto;
-import org.example.todotravel.domain.user.dto.request.UsernameRequestDto;
+import org.example.todotravel.domain.user.dto.request.*;
 import org.example.todotravel.domain.user.dto.response.OAuth2SignUpResponseDto;
+import org.example.todotravel.domain.user.dto.response.PasswordSearchResponseDto;
+import org.example.todotravel.domain.user.dto.response.UsernameResponseDto;
 import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.repository.UserRepository;
@@ -128,26 +127,39 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    // 임시 비밀번호 재설정
+    // 비밀번호 재설정
     @Override
     @Transactional
-    public void setTempPassword(String email, String tempPassword, PasswordEncoder passwordEncoder) {
-        User user = userRepository.findByEmail(email)
+    public void renewPassword(PasswordResetRequestDto dto, PasswordEncoder passwordEncoder) {
+        User user = userRepository.findById(dto.getUserId())
             .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
 
-        user.setPassword(passwordEncoder.encode(tempPassword));
-
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
+    }
+
+    // 이름, 생년월일, 이메일로 사용자 찾기
+    @Override
+    @Transactional(readOnly = true)
+    public PasswordSearchResponseDto findUserByNameAndBirthAndEmail(PasswordSearchRequestDto dto){
+        User user = userRepository.findByNameAndBirthDateAndEmail(dto.getName(), dto.getBirthDate(), dto.getEmail())
+            .orElseThrow(() -> new UserNotFoundException("입력하신 정보와 일치하는 회원이 없어 인증번호를 발송할 수 없습니다."));
+
+        return new PasswordSearchResponseDto(user.getUserId());
     }
 
     // 이름, 이메일로 아이디 찾기
     @Override
     @Transactional(readOnly = true)
-    public String getUsername(UsernameRequestDto dto) {
+    public UsernameResponseDto getUsername(UsernameRequestDto dto) {
         User user = userRepository.findByNameAndEmail(dto.getName(), dto.getEmail())
-            .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+            .orElseThrow(() -> new UserNotFoundException("입력하신 정보와 일치하는 회원이 없어 인증번호를 발송할 수 없습니다."));
 
-        return user.getUsername();
+        return UsernameResponseDto.builder()
+            .username(user.getUsername())
+            .name(user.getName())
+            .createdDate(user.getCreatedDate())
+            .build();
     }
 
     // 이메일로 사용자 찾기
@@ -180,7 +192,14 @@ public class UserServiceImpl implements UserService {
 
     //플랜에 사용자 초대 시 모든 사용자 목록을 return - 김민정
     @Override
+    @Transactional(readOnly = true)
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
     }
 }

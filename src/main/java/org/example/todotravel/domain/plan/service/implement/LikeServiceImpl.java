@@ -44,4 +44,10 @@ public class LikeServiceImpl implements LikeService {
     public Long countLike(Plan plan) {
         return likeRepository.countByPlan(plan);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Boolean isPlanLikedByUser(User user, Plan plan) {
+        return likeRepository.findByLikeUserAndPlan(user, plan).isPresent();
+    }
 }

@@ -31,11 +31,6 @@ public class EmailServiceImpl implements EmailService {
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
-        // 메일 전송 타입이 임시 비밀번호 설정일 경우
-        if(type.equals("password")) {
-            userService.setTempPassword(emailMessage.getTo(), authNum, passwordEncoder);
-        }
-
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
             mimeMessageHelper.setTo(emailMessage.getTo()); // 메일 수신자
@@ -51,25 +46,14 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    // 인증번호 및 임시 비밀번호 생성 메서드
+    // 인증번호 생성 메서드
     @Override
     public String createCode() {
         Random random = new Random();
         StringBuffer key = new StringBuffer();
 
-        for (int i = 0; i < 8; i++) {
-            int index = random.nextInt(4);
-
-            switch (index) {
-                case 0:
-                    key.append((char) (random.nextInt(26) + 97));
-                    break;
-                case 1:
-                    key.append((char) (random.nextInt(26) + 65));
-                    break;
-                default:
-                    key.append(random.nextInt(9));
-            }
+        for (int i = 0; i < 6; i++) {
+            key.append(random.nextInt(10));
         }
 
         return key.toString();

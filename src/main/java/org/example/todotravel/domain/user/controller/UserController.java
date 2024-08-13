@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.user.dto.request.*;
 import org.example.todotravel.domain.user.dto.response.LoginResponseDto;
-import org.example.todotravel.domain.user.dto.response.OAuth2SignUpResponseDto;
+import org.example.todotravel.domain.user.dto.response.UsernameResponseDto;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.impl.UserServiceImpl;
 import org.example.todotravel.global.controller.ApiResponse;
@@ -100,11 +100,22 @@ public class UserController {
         return new ApiResponse<>(true, "로그인 성공", loginResponseDto);
     }
 
-    // 아이디 찾기
+    // 아이디 찾기 인증확인
     @PostMapping("/find-username")
     public ApiResponse<?> findUsername(@Valid @RequestBody UsernameRequestDto dto) {
-        String username = userService.getUsername(dto);
-        return new ApiResponse<>(true, "아이디 찾기 성공", username);
+        UsernameResponseDto usernameResponseDto = userService.getUsername(dto);
+        return new ApiResponse<>(true, "아이디 찾기 성공", usernameResponseDto);
+    }
+
+    // 비밀번호 재설정
+    @PostMapping("/password-reset")
+    public ApiResponse<?> resetPassword(@RequestBody PasswordResetRequestDto dto) {
+        try {
+            userService.renewPassword(dto, passwordEncoder);
+            return new ApiResponse<>(true, "비밀번호 재설정 완료");
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "비밀번호 재설정 실패");
+        }
     }
 
     // 로그아웃
@@ -114,6 +125,6 @@ public class UserController {
         jwtTokenizer.deleteRefreshTokenFromDB(request);
 
         // 클라이언트에게 AccessToken 삭제 지시 (프론트엔드에서 처리)
-        return new ApiResponse<>(true, "로그아웃 성공", null);
+        return new ApiResponse<>(true, "로그아웃 성공");
     }
 }

@@ -75,7 +75,6 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     @Transactional
     public void deleteAlarm(Long alarmId) {
-
         alarmRepository.deleteById(alarmId);
     }
 

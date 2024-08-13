@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.todotravel.domain.plan.entity.Plan;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @NoArgsConstructor
@@ -22,9 +22,9 @@ public class PlanResponseDto {
 
     private String description;
 
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     private Boolean isPublic;
 
@@ -34,7 +34,9 @@ public class PlanResponseDto {
 
     private Long totalBudget;
 
-    private Long PlanUserId;
+    private Long planUserId;
+
+    private String planUserNickname;
 
     private Long bookmarkNumber;
 
@@ -56,7 +58,8 @@ public class PlanResponseDto {
                 .status(plan.getStatus())
                 .participantsCount(plan.getParticipantsCount())
                 .totalBudget(plan.getTotalBudget())
-                .PlanUserId(plan.getPlanUser().getUserId())
+                .planUserId(plan.getPlanUser().getUserId())
+                .planUserNickname(plan.getPlanUser().getNickname())
                 .build();
     }
 }

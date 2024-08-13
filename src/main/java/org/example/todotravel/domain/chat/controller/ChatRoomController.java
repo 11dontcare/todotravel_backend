@@ -2,22 +2,27 @@ package org.example.todotravel.domain.chat.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.todotravel.domain.chat.dto.request.ChatRoomCreateRequestDto;
 import org.example.todotravel.domain.chat.dto.request.ChatRoomNameRequestDto;
 import org.example.todotravel.domain.chat.dto.request.FirstUserCheckRequestDto;
 import org.example.todotravel.domain.chat.dto.request.OneToOneChatRoomRequestDto;
+import org.example.todotravel.domain.chat.dto.response.ChatMessageResponseDto;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomListResponseDto;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomNameResponseDto;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomResponseDto;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomUserResponseDto;
+import org.example.todotravel.domain.chat.service.ChatMessageService;
 import org.example.todotravel.domain.chat.service.ChatRoomService;
 import org.example.todotravel.domain.chat.service.ChatRoomUserService;
 import org.example.todotravel.domain.plan.entity.Plan;
+import org.example.todotravel.domain.plan.service.implement.PlanServiceImpl;
 import org.example.todotravel.domain.plan.service.implement.PlanUserServiceImpl;
 import org.example.todotravel.global.controller.ApiResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/chat/rooms")
@@ -26,6 +31,9 @@ public class ChatRoomController {
     private final ChatRoomService chatRoomService;
     private final ChatRoomUserService chatRoomUserService;
     private final PlanUserServiceImpl planUserService;
+    private final ChatMessageService chatMessageService;
+    private final PlanServiceImpl planService;
+
 
     // 1:1 채팅방 생성
     @PostMapping("/one-to-one")
@@ -81,7 +89,20 @@ public class ChatRoomController {
     // 채팅방 삭제
     @DeleteMapping("/{roomId}")
     public ApiResponse<?> deleteChatRoom(@PathVariable("roomId") Long roomId) {
+        // 채팅방 삭제 시 플랜도 삭제 - 1:1인 경우는 플랜이 없음
+        Plan plan = chatRoomService.getPlanByRoomId(roomId);
+        //외래키 제약조건으로 인해 채팅방 먼저 삭제
         chatRoomService.deleteChatRoom(roomId);
+        if (plan != null) {
+            planService.deletePlan(plan.getPlanId());
+        }
         return new ApiResponse<>(true, "채팅방 삭제 성공");
+    }
+
+    // 이전 채팅 내용 조회
+    @GetMapping("/find/comment-list/{roomId}")
+    public Mono<ResponseEntity<List<ChatMessageResponseDto>>> find(@PathVariable("roomId") Long messageId) {
+        Flux<ChatMessageResponseDto> response = chatMessageService.findChatMessages(messageId);
+        return response.collectList().map(ResponseEntity::ok);
     }
 }

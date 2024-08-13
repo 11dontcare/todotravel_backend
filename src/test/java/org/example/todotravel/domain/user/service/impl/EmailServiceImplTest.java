@@ -67,22 +67,22 @@ class EmailServiceImplTest {
         verify(javaMailSender, times(1)).send(any(MimeMessage.class));
     }
 
-    @Test
-    @DisplayName("이메일 전송 테스트 - 비밀번호 타입")
-    void sendMail_PasswordType() {
-        // given
-        when(javaMailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
-        when(templateEngine.process(anyString(), any())).thenReturn("test content");
-
-        // when
-        String result = emailService.sendMail(emailMessage, "password", passwordEncoder);
-
-        // then
-        assertNotNull(result);
-        assertEquals(8, result.length());
-        verify(javaMailSender, times(1)).send(any(MimeMessage.class));
-        verify(userService, times(1)).setTempPassword(eq("test@example.com"), anyString(), eq(passwordEncoder));
-    }
+//    @Test
+//    @DisplayName("이메일 전송 테스트 - 비밀번호 타입")
+//    void sendMail_PasswordType() {
+//        // given
+//        when(javaMailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
+//        when(templateEngine.process(anyString(), any())).thenReturn("test content");
+//
+//        // when
+//        String result = emailService.sendMail(emailMessage, "password", passwordEncoder);
+//
+//        // then
+//        assertNotNull(result);
+//        assertEquals(8, result.length());
+//        verify(javaMailSender, times(1)).send(any(MimeMessage.class));
+//        verify(userService, times(1)).setTempPassword(eq("test@example.com"), anyString(), eq(passwordEncoder));
+//    }
 
     @Test
     @DisplayName("인증 코드 생성 테스트")
