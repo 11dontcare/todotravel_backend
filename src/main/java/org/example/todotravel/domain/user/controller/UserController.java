@@ -69,21 +69,21 @@ public class UserController {
 
     // 사용자 아이디 중복 검사
     @GetMapping("/check-username")
-    public ApiResponse<?> checkUsername(@RequestParam String username) {
+    public ApiResponse<?> checkUsername(@RequestParam("username") String username) {
         userService.checkDuplicateUsername(username);
         return new ApiResponse<>(true, "아이디 사용 가능", username);
     }
 
     // 사용자 이메일 중복 검사
     @GetMapping("/check-email")
-    public ApiResponse<?> checkEmail(@RequestParam String email) {
+    public ApiResponse<?> checkEmail(@RequestParam("email") String email) {
         userService.checkDuplicateEmail(email);
         return new ApiResponse<>(true, "이메일 사용 가능", email);
     }
 
     // 사용자 닉네임 중복 검사
     @GetMapping("/check-nickname")
-    public ApiResponse<?> checkNickname(@RequestParam String nickname) {
+    public ApiResponse<?> checkNickname(@RequestParam("nickname") String nickname) {
         userService.checkDuplicateUsername(nickname);
         return new ApiResponse<>(true, "닉네임 사용 가능", nickname);
     }
