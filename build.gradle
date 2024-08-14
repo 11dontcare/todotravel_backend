@@ -77,3 +77,8 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+//한글 깨짐 문제로 추가
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
