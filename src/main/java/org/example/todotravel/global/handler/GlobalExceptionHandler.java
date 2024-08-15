@@ -42,29 +42,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
-    // CustomJwtException 예외를 처리하는 핸들러
-    @ExceptionHandler(CustomJwtException.class)
-    public ResponseEntity<ErrorDetails> handleCustomJwtException(CustomJwtException ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getJwtExceptionCode().getMessage(), request.getDescription(false));
-        HttpStatus status;
-        switch (ex.getJwtExceptionCode()) {
-            case EXPIRED_TOKEN:
-                status = HttpStatus.UNAUTHORIZED;
-                errorDetails.setCode("TOKEN_EXPIRED");
-                break;
-            case UNSUPPORTED_TOKEN:
-            case INVALID_TOKEN:
-            case NOT_FOUND_TOKEN:
-                status = HttpStatus.UNAUTHORIZED;
-                errorDetails.setCode("INVALID_TOKEN");
-                break;
-            default:
-                status = HttpStatus.INTERNAL_SERVER_ERROR;
-                errorDetails.setCode("JWT_ERROR");
-        }
-        return new ResponseEntity<>(errorDetails, status);
-    }
-
     // DuplicateUserException 예외를 처리하는 핸들러
     @ExceptionHandler(DuplicateUserException.class)
     public ResponseEntity<ErrorDetails> handleDuplicateUserException(Exception ex, WebRequest request) {
