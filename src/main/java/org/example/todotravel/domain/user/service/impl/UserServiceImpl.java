@@ -121,7 +121,7 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new UserNotFoundException("존재하지 않는 아이디입니다."));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new UserNotFoundException("비밀번호가 일치하지 않습니다.");
+            throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
 
         return user;
