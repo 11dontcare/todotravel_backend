@@ -1,6 +1,7 @@
 package org.example.todotravel.global.config;
 
 import lombok.RequiredArgsConstructor;
+import org.example.todotravel.global.exception.CustomAuthenticationEntryPoint;
 import org.example.todotravel.global.jwt.filter.JwtAuthenticationFilter;
 import org.example.todotravel.global.jwt.util.JwtTokenizer;
 import org.example.todotravel.global.oauth2.handler.OAuth2LoginFailureHandler;
@@ -8,17 +9,12 @@ import org.example.todotravel.global.oauth2.handler.OAuth2LoginSuccessHandler;
 import org.example.todotravel.global.oauth2.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-
-import java.util.Arrays;
 
 /**
  * Spring Security 설정 클래스
@@ -32,6 +28,7 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     // 모든 유저 허용 URL
     String[] allAllowPage = new String[]{
@@ -41,6 +38,7 @@ public class SecurityConfig {
             "/api/invite/**",
             "/api/chat/**",
             "/api/notification/**",
+            "/api/mypage/**",
             "/api/token/refresh",
             "/api/auth/logout",
             "/ws/**",
@@ -88,8 +86,8 @@ public class SecurityConfig {
             /* jwt 관련 설정 */
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenizer), UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(exception -> exception
-                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-            ) // 인증되지 않은 사용자가 보안처리된 리소스에 접근 시 처리 (혹은 토큰에러 발생 시)
+                .authenticationEntryPoint(customAuthenticationEntryPoint)
+            )
 
             /* oauth 관련 설정 */
             .oauth2Login(oauth2 -> oauth2

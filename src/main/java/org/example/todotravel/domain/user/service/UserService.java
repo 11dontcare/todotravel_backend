@@ -1,9 +1,7 @@
 package org.example.todotravel.domain.user.service;
 
 import org.example.todotravel.domain.user.dto.request.*;
-import org.example.todotravel.domain.user.dto.response.OAuth2SignUpResponseDto;
-import org.example.todotravel.domain.user.dto.response.PasswordSearchResponseDto;
-import org.example.todotravel.domain.user.dto.response.UsernameResponseDto;
+import org.example.todotravel.domain.user.dto.response.*;
 import org.example.todotravel.domain.user.entity.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -29,6 +27,8 @@ public interface UserService {
 
     void renewPassword(PasswordResetRequestDto dto, PasswordEncoder passwordEncoder);
 
+    void updatePassword(PasswordUpdateRequestDto dto, PasswordEncoder passwordEncoder);
+
     PasswordSearchResponseDto findUserByNameAndBirthAndEmail(PasswordSearchRequestDto dto);
 
     OAuth2SignUpResponseDto getUserIdByEmail(String email);
@@ -38,6 +38,8 @@ public interface UserService {
     User getUserByEmail(String email);
 
     User getUserById(Long userId);
+
+    void updateNickname(NicknameRequestDto dto);
 
     //플랜에 사용자 초대 시 모든 사용자 목록을 return - 김민정
     List<User> getAllUsers();

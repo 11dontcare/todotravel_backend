@@ -18,10 +18,15 @@ public class Follow {
     private Long followId;
 
     @ManyToOne
+    @JoinColumn(name = "follower_id", nullable = false)
+    private User followerUser;
+
+    @ManyToOne
     @JoinColumn(name = "following_id", nullable = false)
     private User followingUser;
 
-    @ManyToOne
-    @JoinColumn(name = "follower_id", nullable = false)
-    private User followerUser;
+    public Follow(User followerUser, User followingUser) {
+        this.followerUser = followerUser;
+        this.followingUser = followingUser;
+    }
 }

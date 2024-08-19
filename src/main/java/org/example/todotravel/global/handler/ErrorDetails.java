@@ -10,7 +10,6 @@ public class ErrorDetails {
     private LocalDateTime timestamp;
     private String message;
     private String details;
-    private String code;
 
     // 생성자
     public ErrorDetails(LocalDateTime timestamp, String message, String details) {
