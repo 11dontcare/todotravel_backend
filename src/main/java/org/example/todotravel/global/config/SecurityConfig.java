@@ -38,6 +38,7 @@ public class SecurityConfig {
             "/api/invite/**",
             "/api/chat/**",
             "/api/notification/**",
+            "/api/mypage/**",
             "/api/token/refresh",
             "/api/auth/logout",
             "/ws/**",
