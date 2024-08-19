@@ -90,12 +90,11 @@ public class PlanUserServiceImpl implements PlanUserService {
     @Transactional(readOnly = true)
     public UserProfileResponseDto getUserProfile(String subject, User user) {
         Long userId = user.getUserId();
-        List<PlanListResponseDto> planList;
+        List<PlanListResponseDto> planList = getAllPlansByUser(userId);
+        int planCount = planList.size();
 
-        if (subject.equals("other")) {
-            planList = getAllPlansByUser(userId);
-        } else {
-            planList = getRecentPlansByUser(userId);
+        if (subject.equals("my")) {
+            planList = planList.size() > 3 ? planList.subList(0, 3) : planList;
         }
 
         return UserProfileResponseDto.builder()
@@ -105,7 +104,7 @@ public class PlanUserServiceImpl implements PlanUserService {
             .age(Period.between(user.getBirthDate(), LocalDate.now()).getYears())
             .followerCount(user.getFollowers().size())
             .followingCount(user.getFollowings().size())
-            .planCount(user.getPlans().size())
+            .planCount(planCount)
             .planList(planList)
             .build();
     }
