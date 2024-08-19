@@ -15,6 +15,9 @@ import org.example.todotravel.domain.user.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,16 +36,16 @@ public class PlanUserServiceImpl implements PlanUserService {
         Plan plan = planService.getPlan(planId);
         User user = userService.getUserByUserId(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
         PlanUser planUser = PlanUser.builder()
-                .status(PlanUser.StatusType.PENDING)
-                .user(user)
-                .plan(plan)
-                .build();
+            .status(PlanUser.StatusType.PENDING)
+            .user(user)
+            .plan(plan)
+            .build();
 
         PlanUser newPlanUser = planUserRepository.save(planUser);
 
 
         AlarmRequestDto requestDto = new AlarmRequestDto(plan.getPlanUser().getUserId(),
-                "[" + plan.getTitle() + "] 플랜에 " + user.getNickname()+ "님이 초대 되었습니다.");
+            "[" + plan.getTitle() + "] 플랜에 " + user.getNickname() + "님이 초대 되었습니다.");
         alarmService.createAlarm(requestDto);
 
         return newPlanUser;
@@ -85,8 +88,8 @@ public class PlanUserServiceImpl implements PlanUserService {
     // 사용자 프로필 조회
     @Override
     @Transactional(readOnly = true)
-    public UserProfileResponseDto getUserProfile(String subject, Long userId) {
-        User user = userService.getUserById(userId);
+    public UserProfileResponseDto getUserProfile(String subject, User user) {
+        Long userId = user.getUserId();
         List<PlanListResponseDto> planList;
 
         if (subject.equals("other")) {
@@ -98,6 +101,8 @@ public class PlanUserServiceImpl implements PlanUserService {
         return UserProfileResponseDto.builder()
             .userId(userId)
             .nickname(user.getNickname())
+            .gender(user.getGender())
+            .age(Period.between(user.getBirthDate(), LocalDate.now()).getYears())
             .followerCount(user.getFollowers().size())
             .followingCount(user.getFollowings().size())
             .planCount(user.getPlans().size())
@@ -119,7 +124,9 @@ public class PlanUserServiceImpl implements PlanUserService {
     @Override
     @Transactional(readOnly = true)
     public List<PlanListResponseDto> getRecentPlansByUser(Long userId) {
-        List<Plan> plans = planUserRepository.findRecentPlansByUserId(userId);
+        List<Plan> plans = planUserRepository.findAllPlansByUserId(userId, PlanUser.StatusType.ACCEPTED);
+        plans = plans.size() > 3 ? plans.subList(0, 3) : plans;
+
         return plans.stream()
             .map(planService::convertToPlanListResponseDto)
             .collect(Collectors.toList());

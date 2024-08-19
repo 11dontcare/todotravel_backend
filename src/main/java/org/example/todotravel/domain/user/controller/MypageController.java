@@ -13,6 +13,7 @@ import org.example.todotravel.domain.user.dto.response.FollowResponseDto;
 import org.example.todotravel.domain.user.dto.response.MyProfileResponseDto;
 import org.example.todotravel.domain.user.dto.response.UserDetailResponseDto;
 import org.example.todotravel.domain.user.dto.response.UserProfileResponseDto;
+import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.FollowService;
 import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.controller.ApiResponse;
@@ -37,18 +38,22 @@ public class MypageController {
     private final UserService userService;
 
     // 특정 사용자 프로필 보기 (본인, 타인에 대한 처리)
-    @GetMapping("/profile/{user_id}")
-    public ApiResponse<?> showProfile(@PathVariable("user_id") Long userId, Authentication authentication) {
+    @GetMapping("/profile/{nickname}")
+    public ApiResponse<?> showProfile(@PathVariable("nickname") String nickname, Authentication authentication) {
+        // 해당 사용자 찾기
+        User user = userService.getUserIdByNickname(nickname);
+
         // 본인인 경우
-        if (authenticationUtil.isAuthenticatedUser(authentication, userId)) {
-            UserProfileResponseDto baseProfile = planUserService.getUserProfile("my", userId);
-            List<PlanListResponseDto> recentBookmarks = planService.getRecentBookmarkedPlans(userId);
-            List<PlanListResponseDto> recentLikes = planService.getRecentLikedPlans(userId);
-            List<CommentSummaryResponseDto> recentComments = commentService.getRecentCommentedPlansByUser(userId);
+        if (authenticationUtil.isAuthenticatedUser(authentication, user)) {
+            UserProfileResponseDto baseProfile = planUserService.getUserProfile("my", user);
+            List<PlanListResponseDto> recentBookmarks = planService.getRecentBookmarkedPlans(user);
+            List<PlanListResponseDto> recentLikes = planService.getRecentLikedPlans(user);
+            List<CommentSummaryResponseDto> recentComments = commentService.getRecentCommentedPlansByUser(user);
+
             MyProfileResponseDto myProfileResponseDto = MyProfileResponseDto.from(baseProfile, recentBookmarks, recentLikes, recentComments);
             return new ApiResponse<>(true, "본인 마이페이지 조회에 성공했습니다.", myProfileResponseDto);
         } else { // 타인인 경우
-            UserProfileResponseDto userProfileResponseDto = planUserService.getUserProfile("other", userId);
+            UserProfileResponseDto userProfileResponseDto = planUserService.getUserProfile("other", user);
             return new ApiResponse<>(true, "타인 마이페이지 조회에 성공했습니다.", userProfileResponseDto);
         }
     }
@@ -56,35 +61,44 @@ public class MypageController {
     // 내 개인정보 조회
     @GetMapping("/personal-profile/{user_id}")
     public ApiResponse<?> getPersonalProfile(@PathVariable("user_id") Long userId, Authentication authentication) {
+        // 해당 사용자 찾기
+        User user = userService.getUserById(userId);
+
         // 본인 확인
-        if (!authenticationUtil.isAuthenticatedUser(authentication, userId)) {
+        if (!authenticationUtil.isAuthenticatedUser(authentication, user)) {
             throw new AccessDeniedException("접근 권한이 없습니다.");
         }
 
-        UserDetailResponseDto userDetailResponseDto = UserDetailResponseDto.from(userService.getUserById(userId));
+        UserDetailResponseDto userDetailResponseDto = UserDetailResponseDto.from(user);
         return new ApiResponse<>(true, "사용자 개인 정보 조회에 성공했습니다.", userDetailResponseDto);
     }
 
     // 닉네임 변경
     @PutMapping("/nickname")
     public ApiResponse<?> changeNickname(@RequestBody NicknameRequestDto dto, Authentication authentication) {
+        // 해당 사용자 찾기
+        User user = userService.getUserById(dto.getUserId());
+
         // 본인 확인
-        if (!authenticationUtil.isAuthenticatedUser(authentication, dto.getUserId())) {
+        if (!authenticationUtil.isAuthenticatedUser(authentication, user)) {
             throw new AccessDeniedException("접근 권한이 없습니다.");
         }
 
-        userService.updateNickname(dto);
+        userService.updateNickname(user, dto.getNewNickname());
         return new ApiResponse<>(true, "닉네임 변경을 완료했습니다.");
     }
 
     // 비밀번호 변경 - UserController 에도 있지만, 마이페이지에서 기존 비밀번호를 알아야 가능한 변경
     @PutMapping("/password")
     public ApiResponse<?> changePassword(@RequestBody PasswordUpdateRequestDto dto, Authentication authentication) {
+        // 해당 사용자 찾기
+        User user = userService.getUserById(dto.getUserId());
+
         // 본인 확인
-        if (!authenticationUtil.isAuthenticatedUser(authentication, dto.getUserId())) {
+        if (!authenticationUtil.isAuthenticatedUser(authentication, user)) {
             throw new AccessDeniedException("접근 권한이 없습니다.");
         }
-        userService.updatePassword(dto, passwordEncoder);
+        userService.updatePassword(user, dto, passwordEncoder);
         return new ApiResponse<>(true, "비밀번호 변경을 완료했습니다.");
     }
 
@@ -132,36 +146,45 @@ public class MypageController {
     // 북마크 플랜 전체 조회
     @GetMapping("/{user_id}/my-bookmark")
     public ApiResponse<?> getAllBookmarkedPlans(@PathVariable("user_id") Long userId, Authentication authentication) {
+        // 해당 사용자 찾기
+        User user = userService.getUserById(userId);
+
         // 본인 확인
-        if (!authenticationUtil.isAuthenticatedUser(authentication, userId)) {
+        if (!authenticationUtil.isAuthenticatedUser(authentication, user)) {
             throw new AccessDeniedException("접근 권한이 없습니다.");
         }
 
-        List<PlanListResponseDto> planList = planService.getAllBookmarkedPlans(userId);
+        List<PlanListResponseDto> planList = planService.getAllBookmarkedPlans(user);
         return new ApiResponse<>(true, "북마크한 여행 조회에 성공했습니다.", planList);
     }
 
     // 좋아요한 플랜 전체 조회
     @GetMapping("/{user_id}/my-like")
     public ApiResponse<?> getAllLikedPlans(@PathVariable("user_id") Long userId, Authentication authentication) {
+        // 해당 사용자 찾기
+        User user = userService.getUserById(userId);
+
         // 본인 확인
-        if (!authenticationUtil.isAuthenticatedUser(authentication, userId)) {
+        if (!authenticationUtil.isAuthenticatedUser(authentication, user)) {
             throw new AccessDeniedException("접근 권한이 없습니다.");
         }
 
-        List<PlanListResponseDto> planList = planService.getAllLikedPlans(userId);
+        List<PlanListResponseDto> planList = planService.getAllLikedPlans(user);
         return new ApiResponse<>(true, "좋아요한 여행 조회에 성공했습니다.", planList);
     }
 
     // 댓글 단 플랜 전체 조회
     @GetMapping("/{user_id}/my-comment")
     public ApiResponse<?> getAllCommentedPlans(@PathVariable("user_id") Long userId, Authentication authentication) {
+        // 해당 사용자 찾기
+        User user = userService.getUserById(userId);
+
         // 본인 확인
-        if (!authenticationUtil.isAuthenticatedUser(authentication, userId)) {
+        if (!authenticationUtil.isAuthenticatedUser(authentication, user)) {
             throw new AccessDeniedException("접근 권한이 없습니다.");
         }
 
-        List<CommentSummaryResponseDto> planList = commentService.getAllCommentedPlansByUser(userId);
+        List<CommentSummaryResponseDto> planList = commentService.getAllCommentedPlansByUser(user);
         return new ApiResponse<>(true, "댓글을 단 여행 조회에 성공했습니다.", planList);
     }
 }
