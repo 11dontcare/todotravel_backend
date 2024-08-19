@@ -19,4 +19,10 @@ public interface PlanService {
     Plan copyPlan(Long planId);
     List<PlanListResponseDto> getSpecificPlans(String keyword);
     PlanResponseDto getPlanForModify(Long planId);
+
+    List<PlanListResponseDto> getRecentBookmarkedPlans(Long userId);
+    List<PlanListResponseDto> getAllBookmarkedPlans(Long userId);
+    List<PlanListResponseDto> getRecentLikedPlans(Long userId);
+    List<PlanListResponseDto> getAllLikedPlans(Long userId);
+    PlanListResponseDto convertToPlanListResponseDto(Plan plan);
 }

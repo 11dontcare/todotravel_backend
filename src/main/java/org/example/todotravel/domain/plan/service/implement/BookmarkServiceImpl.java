@@ -3,6 +3,7 @@ package org.example.todotravel.domain.plan.service.implement;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.notification.dto.request.AlarmRequestDto;
 import org.example.todotravel.domain.notification.service.AlarmService;
+import org.example.todotravel.domain.plan.dto.response.PlanSummaryDto;
 import org.example.todotravel.domain.plan.entity.Bookmark;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.repository.BookmarkRepository;
@@ -10,6 +11,8 @@ import org.example.todotravel.domain.plan.service.BookmarkService;
 import org.example.todotravel.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +50,27 @@ public class BookmarkServiceImpl implements BookmarkService {
 
     @Override
     @Transactional(readOnly = true)
+    public Long countBookmarkByPlanId(Long planId) {
+        return bookmarkRepository.countByPlanPlanId(planId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Boolean isPlanBookmarkedByUser(User user, Plan plan) {
         return bookmarkRepository.findByBookmarkUserAndPlan(user, plan).isPresent();
+    }
+
+    // 특정 사용자가 북마크한 플랜 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<Plan> getAllBookmarkedPlansByUser(Long userId) {
+        return bookmarkRepository.findBookmarkedPlansByUserId(userId);
+    }
+
+    // 특정 사용자가 최근 북마크한 플랜 3개 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<PlanSummaryDto> getRecentBookmarkedPlansByUser(Long userId) {
+        return bookmarkRepository.findRecentCommentedPlansByUserId(userId);
     }
 }

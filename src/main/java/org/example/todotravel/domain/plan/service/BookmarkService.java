@@ -1,12 +1,18 @@
 package org.example.todotravel.domain.plan.service;
 
+import org.example.todotravel.domain.plan.dto.response.PlanSummaryDto;
 import org.example.todotravel.domain.plan.entity.Bookmark;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.user.entity.User;
+
+import java.util.List;
 
 public interface BookmarkService {
     Bookmark createBookmark(Plan plan, User user);
     void removeBookmark(Plan plan, User user);
     Long countBookmark(Plan plan);
+    Long countBookmarkByPlanId(Long planId);
     Boolean isPlanBookmarkedByUser(User user, Plan plan);
+    List<Plan> getAllBookmarkedPlansByUser(Long userId);
+    List<PlanSummaryDto> getRecentBookmarkedPlansByUser(Long userId);
 }

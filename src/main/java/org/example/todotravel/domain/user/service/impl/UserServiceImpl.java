@@ -2,10 +2,9 @@ package org.example.todotravel.domain.user.service.impl;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.example.todotravel.domain.plan.service.PlanUserService;
 import org.example.todotravel.domain.user.dto.request.*;
-import org.example.todotravel.domain.user.dto.response.OAuth2SignUpResponseDto;
-import org.example.todotravel.domain.user.dto.response.PasswordSearchResponseDto;
-import org.example.todotravel.domain.user.dto.response.UsernameResponseDto;
+import org.example.todotravel.domain.user.dto.response.*;
 import org.example.todotravel.domain.user.entity.Role;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.repository.UserRepository;
@@ -138,6 +137,19 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    // 비밀번호 재설정 - 기존 비밀번호 검사도 수행
+    @Override
+    @Transactional
+    public void updatePassword(PasswordUpdateRequestDto dto, PasswordEncoder passwordEncoder) {
+        User user = getUserById(dto.getUserId());
+        if (!passwordEncoder.matches(dto.getExistingPassword(), user.getPassword())) {
+            throw new BadCredentialsException("기존 비밀번호가 일치하지 않습니다.");
+        }
+
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
+    }
+
     // 이름, 생년월일, 이메일로 사용자 찾기
     @Override
     @Transactional(readOnly = true)
@@ -188,6 +200,19 @@ public class UserServiceImpl implements UserService {
         return OAuth2SignUpResponseDto.builder()
             .userId(user.getUserId())
             .build();
+    }
+
+    // 닉네임 업데이트
+    @Override
+    @Transactional
+    public void updateNickname(NicknameRequestDto dto) {
+        // 닉네임 중복 검사
+        checkDuplicateNickname(dto.getNewNickname());
+
+        // 중복되지 않는 닉네임이면 업데이트
+        User user = getUserById(dto.getUserId());
+        user.setNickname(dto.getNewNickname());
+        userRepository.save(user);
     }
 
     //플랜에 사용자 초대 시 모든 사용자 목록을 return - 김민정
