@@ -254,6 +254,7 @@ public class PlanServiceImpl implements PlanService {
             .endDate(plan.getEndDate())
             .bookmarkNumber(bookmarkService.countBookmark(plan))
             .likeNumber(likeService.countLike(plan))
+            .planUserNickname(plan.getPlanUser().getNickname())
             .build();
     }
 
@@ -267,6 +268,7 @@ public class PlanServiceImpl implements PlanService {
             .endDate(summaryDto.getEndDate())
             .bookmarkNumber(bookmarkService.countBookmarkByPlanId(summaryDto.getPlanId()))
             .likeNumber(likeService.countLikeByPlanId(summaryDto.getPlanId()))
+            .planUserNickname(summaryDto.getPlanUserNickname())
             .build();
     }
 }

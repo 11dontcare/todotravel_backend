@@ -23,9 +23,11 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     List<Plan> findBookmarkedPlansByUserId(@Param("userId") Long userId);
 
     @Query(nativeQuery = true, value = """
-        SELECT p.plan_id as planId, p.title, p.location, p.description, p.start_date as startDate, p.end_date as endDate
+        SELECT p.plan_id as planId, p.title, p.location, p.description, p.start_date as startDate,
+               p.end_date as endDate, u.nickname as planUserNickname
         FROM plans p
         JOIN bookmarks b ON p.plan_id = b.plan_id
+        JOIN users u ON p.user_id = u.user_id
         WHERE b.user_id = :userId
         ORDER BY b.bookmark_id DESC
         LIMIT 3
