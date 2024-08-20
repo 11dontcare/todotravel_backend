@@ -50,6 +50,7 @@ public class UserServiceImpl implements UserService {
             .email(dto.getEmail())
             .createdDate(LocalDateTime.now())
             .birthDate(dto.getBirthDate())
+            .info("현재 작성된 소개글이 없습니다.")
             .role(Role.ROLE_USER)
             .build();
 
@@ -126,6 +127,14 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    // 소개글 업데이트
+    @Override
+    @Transactional
+    public void updateUserInfo(User user, UserInfoRequestDto dto) {
+        user.setInfo(dto.getNewInfo());
+        userRepository.save(user);
+    }
+
     // 비밀번호 재설정
     @Override
     @Transactional
@@ -152,7 +161,7 @@ public class UserServiceImpl implements UserService {
     // 이름, 생년월일, 이메일로 사용자 찾기
     @Override
     @Transactional(readOnly = true)
-    public PasswordSearchResponseDto findUserByNameAndBirthAndEmail(PasswordSearchRequestDto dto){
+    public PasswordSearchResponseDto findUserByNameAndBirthAndEmail(PasswordSearchRequestDto dto) {
         User user = userRepository.findByNameAndBirthDateAndEmail(dto.getName(), dto.getBirthDate(), dto.getEmail())
             .orElseThrow(() -> new UserNotFoundException("입력하신 정보와 일치하는 회원이 없어 인증번호를 발송할 수 없습니다."));
 

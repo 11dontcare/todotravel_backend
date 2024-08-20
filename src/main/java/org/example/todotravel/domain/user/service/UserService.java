@@ -25,6 +25,8 @@ public interface UserService {
 
     UsernameResponseDto getUsername(UsernameRequestDto dto);
 
+    void updateUserInfo(User user, UserInfoRequestDto dto);
+
     void renewPassword(PasswordResetRequestDto dto, PasswordEncoder passwordEncoder);
 
     void updatePassword(User user, PasswordUpdateRequestDto dto, PasswordEncoder passwordEncoder);

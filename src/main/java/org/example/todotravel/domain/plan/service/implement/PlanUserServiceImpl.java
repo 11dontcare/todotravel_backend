@@ -102,6 +102,7 @@ public class PlanUserServiceImpl implements PlanUserService {
             .nickname(user.getNickname())
             .gender(user.getGender())
             .age(Period.between(user.getBirthDate(), LocalDate.now()).getYears())
+            .info(user.getInfo())
             .followerCount(user.getFollowers().size())
             .followingCount(user.getFollowings().size())
             .planCount(planCount)

@@ -27,6 +27,7 @@ public class MyProfileResponseDto extends UserProfileResponseDto {
             .nickname(userProfileResponseDto.getNickname())
             .gender(userProfileResponseDto.getGender())
             .age(userProfileResponseDto.getAge())
+            .info(userProfileResponseDto.getInfo())
             .followerCount(userProfileResponseDto.getFollowerCount())
             .followingCount(userProfileResponseDto.getFollowingCount())
             .planCount(userProfileResponseDto.getPlanCount())

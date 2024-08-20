@@ -19,6 +19,7 @@ public class UserProfileResponseDto {
     private String nickname;
     private Gender gender;
     private int age;
+    private String info;
     private int followerCount;
     private int followingCount;
     private int planCount;

@@ -1,5 +1,6 @@
 package org.example.todotravel.domain.user.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.plan.dto.response.CommentSummaryResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
@@ -9,6 +10,7 @@ import org.example.todotravel.domain.plan.service.PlanUserService;
 import org.example.todotravel.domain.user.dto.request.FollowRequestDto;
 import org.example.todotravel.domain.user.dto.request.NicknameRequestDto;
 import org.example.todotravel.domain.user.dto.request.PasswordUpdateRequestDto;
+import org.example.todotravel.domain.user.dto.request.UserInfoRequestDto;
 import org.example.todotravel.domain.user.dto.response.FollowResponseDto;
 import org.example.todotravel.domain.user.dto.response.MyProfileResponseDto;
 import org.example.todotravel.domain.user.dto.response.UserDetailResponseDto;
@@ -56,6 +58,21 @@ public class MypageController {
             UserProfileResponseDto userProfileResponseDto = planUserService.getUserProfile("other", user);
             return new ApiResponse<>(true, "타인 마이페이지 조회에 성공했습니다.", userProfileResponseDto);
         }
+    }
+
+    // 소개글 업데이트
+    @PutMapping("/update-info")
+    public ApiResponse<?> updateInfo(@Valid @RequestBody UserInfoRequestDto dto, Authentication authentication) {
+        // 해당 사용자 찾기
+        User user = userService.getUserById(dto.getUserId());
+
+        // 본인 확인
+        if (!authenticationUtil.isAuthenticatedUser(authentication, user)) {
+            throw new AccessDeniedException("접근 권한이 없습니다.");
+        }
+
+        userService.updateUserInfo(user, dto);
+        return new ApiResponse<>(true, "소개글 업데이트에 성공했습니다.");
     }
 
     // 내 개인정보 조회
