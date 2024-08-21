@@ -13,11 +13,10 @@ import org.springframework.stereotype.Component;
 public class AuthenticationUtil {
     private final UserService userService;
 
-    public boolean isAuthenticatedUser(Authentication authentication, Long userId) {
+    public boolean isAuthenticatedUser(Authentication authentication, User user) {
         if (authentication.getPrincipal() instanceof UserDetails) {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            User user = userService.getUserByEmail(userDetails.getEmail());
-            return user.getUserId().equals(userId);
+            return userDetails.getEmail().equals(user.getEmail());
         }
         return false;
     }

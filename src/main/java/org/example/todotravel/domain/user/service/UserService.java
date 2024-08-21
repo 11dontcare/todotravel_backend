@@ -25,9 +25,11 @@ public interface UserService {
 
     UsernameResponseDto getUsername(UsernameRequestDto dto);
 
+    void updateUserInfo(User user, UserInfoRequestDto dto);
+
     void renewPassword(PasswordResetRequestDto dto, PasswordEncoder passwordEncoder);
 
-    void updatePassword(PasswordUpdateRequestDto dto, PasswordEncoder passwordEncoder);
+    void updatePassword(User user, PasswordUpdateRequestDto dto, PasswordEncoder passwordEncoder);
 
     PasswordSearchResponseDto findUserByNameAndBirthAndEmail(PasswordSearchRequestDto dto);
 
@@ -37,9 +39,11 @@ public interface UserService {
 
     User getUserByEmail(String email);
 
+    User getUserIdByNickname(String nickname);
+
     User getUserById(Long userId);
 
-    void updateNickname(NicknameRequestDto dto);
+    void updateNickname(User user, String newNickname);
 
     //플랜에 사용자 초대 시 모든 사용자 목록을 return - 김민정
     List<User> getAllUsers();

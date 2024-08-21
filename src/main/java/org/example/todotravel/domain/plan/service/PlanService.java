@@ -20,9 +20,9 @@ public interface PlanService {
     List<PlanListResponseDto> getSpecificPlans(String keyword);
     PlanResponseDto getPlanForModify(Long planId);
 
-    List<PlanListResponseDto> getRecentBookmarkedPlans(Long userId);
-    List<PlanListResponseDto> getAllBookmarkedPlans(Long userId);
-    List<PlanListResponseDto> getRecentLikedPlans(Long userId);
-    List<PlanListResponseDto> getAllLikedPlans(Long userId);
+    List<PlanListResponseDto> getRecentBookmarkedPlans(User user);
+    List<PlanListResponseDto> getAllBookmarkedPlans(User user);
+    List<PlanListResponseDto> getRecentLikedPlans(User user);
+    List<PlanListResponseDto> getAllLikedPlans(User user);
     PlanListResponseDto convertToPlanListResponseDto(Plan plan);
 }

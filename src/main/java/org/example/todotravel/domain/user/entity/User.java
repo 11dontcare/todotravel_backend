@@ -68,6 +68,9 @@ public class User {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
+    @Column(name = "info", length = 160)
+    private String info;
+
     // 권한설정
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)

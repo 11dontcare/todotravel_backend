@@ -9,4 +9,5 @@ public interface PlanSummaryDto {
     String getDescription();
     LocalDate getStartDate();
     LocalDate getEndDate();
+    String getPlanUserNickname();
 }
