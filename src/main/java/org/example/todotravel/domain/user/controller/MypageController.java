@@ -2,6 +2,7 @@ package org.example.todotravel.domain.user.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.plan.dto.response.CommentSummaryResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.service.CommentService;
@@ -11,15 +12,14 @@ import org.example.todotravel.domain.user.dto.request.FollowRequestDto;
 import org.example.todotravel.domain.user.dto.request.NicknameRequestDto;
 import org.example.todotravel.domain.user.dto.request.PasswordUpdateRequestDto;
 import org.example.todotravel.domain.user.dto.request.UserInfoRequestDto;
-import org.example.todotravel.domain.user.dto.response.FollowResponseDto;
-import org.example.todotravel.domain.user.dto.response.MyProfileResponseDto;
-import org.example.todotravel.domain.user.dto.response.UserDetailResponseDto;
-import org.example.todotravel.domain.user.dto.response.UserProfileResponseDto;
+import org.example.todotravel.domain.user.dto.response.*;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.FollowService;
 import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.controller.ApiResponse;
+import org.example.todotravel.global.dto.PagedResponseDto;
 import org.example.todotravel.global.jwt.util.AuthenticationUtil;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/mypage")
@@ -140,18 +141,22 @@ public class MypageController {
         return new ApiResponse<>(true, "팔로우 취소에 성공했습니다.");
     }
 
-    // 팔로잉 조회
-    @GetMapping("/{user_id}/following")
-    public ApiResponse<?> getFollowing(@PathVariable("user_id") Long userId) {
-        List<FollowResponseDto> followingList = followService.getFollowing(userId);
-        return new ApiResponse<>(true, "팔로잉 사용자 조회에 성공했습니다.", followingList);
-    }
-
     // 팔로워 조회
     @GetMapping("/{user_id}/follower")
-    public ApiResponse<?> getFollower(@PathVariable("user_id") Long userId) {
-        List<FollowResponseDto> followerList = followService.getFollower(userId);
+    public ApiResponse<?> getFollower(@PathVariable("user_id") Long userId,
+                                      @RequestParam(defaultValue = "0") int page,
+                                      @RequestParam(defaultValue = "15") int size) {
+        PagedResponseDto<FollowResponseDto> followerList = followService.getFollower(userId, page, size);
         return new ApiResponse<>(true, "팔로워 사용자 조회에 성공했습니다.", followerList);
+    }
+
+    // 팔로잉 조회
+    @GetMapping("/{user_id}/following")
+    public ApiResponse<?> getFollowing(@PathVariable("user_id") Long userId,
+                                       @RequestParam(defaultValue = "0") int page,
+                                       @RequestParam(defaultValue = "15") int size) {
+        PagedResponseDto<FollowResponseDto> followingList = followService.getFollowing(userId, page, size);
+        return new ApiResponse<>(true, "팔로잉 사용자 조회에 성공했습니다.", followingList);
     }
 
     // 내 여행 전체 조회

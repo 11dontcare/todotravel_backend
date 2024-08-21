@@ -8,7 +8,11 @@ import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.repository.FollowRepository;
 import org.example.todotravel.domain.user.service.FollowService;
 import org.example.todotravel.domain.user.service.UserService;
+import org.example.todotravel.global.dto.PagedResponseDto;
 import org.example.todotravel.global.security.CustomUserDetails;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -27,7 +31,7 @@ public class FollowServiceImpl implements FollowService {
      * 팔로우 중인지 확인하는 메서드
      *
      * @param authentication 타인 페이지에 접근하는 사용자
-     * @param followingUser 마이페이지 주인
+     * @param followingUser  마이페이지 주인
      * @return boolean
      */
     @Override
@@ -66,25 +70,31 @@ public class FollowServiceImpl implements FollowService {
         followRepository.delete(follow);
     }
 
-    // 팔로잉 조회
-    @Override
-    @Transactional(readOnly = true)
-    public List<FollowResponseDto> getFollowing(Long userId) {
-        List<User> followings = followRepository.findFollowingsByUserId(userId);
-
-        return followings.stream()
-            .map(user -> new FollowResponseDto(user.getUserId(), user.getNickname()))
-            .collect(Collectors.toList());
-    }
-
     // 팔로워 조회
     @Override
     @Transactional(readOnly = true)
-    public List<FollowResponseDto> getFollower(Long userId) {
-        List<User> followers = followRepository.findFollowersByUserId(userId);
+    public PagedResponseDto<FollowResponseDto> getFollower(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> followers = followRepository.findFollowersByUserId(userId, pageable);
 
-        return followers.stream()
-            .map(user -> new FollowResponseDto(user.getUserId(), user.getNickname()))
-            .collect(Collectors.toList());
+        Page<FollowResponseDto> followerDtos = followers.map(
+            user -> new FollowResponseDto(user.getUserId(), user.getNickname())
+        );
+
+        return new PagedResponseDto<>(followerDtos);
+    }
+
+    // 팔로잉 조회
+    @Override
+    @Transactional(readOnly = true)
+    public PagedResponseDto<FollowResponseDto> getFollowing(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> followings = followRepository.findFollowingsByUserId(userId, pageable);
+
+        Page<FollowResponseDto> followingDtos = followings.map(
+            user -> new FollowResponseDto(user.getUserId(), user.getNickname())
+        );
+
+        return new PagedResponseDto<>(followingDtos);
     }
 }

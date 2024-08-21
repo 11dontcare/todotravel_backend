@@ -107,8 +107,8 @@ public class PlanUserServiceImpl implements PlanUserService {
             .age(Period.between(user.getBirthDate(), LocalDate.now()).getYears())
             .info(user.getInfo())
             .isFollowing(isFollowing)
-            .followerCount(user.getFollowers().size())
-            .followingCount(user.getFollowings().size())
+            .followerCount(user.getFollowings().size()) // 팔로워 수 : 나를 팔로잉 하는 수
+            .followingCount(user.getFollowers().size()) // 팔로잉 수 : 내가 팔로잉 하는 수
             .planCount(planCount)
             .planList(planList)
             .build();
