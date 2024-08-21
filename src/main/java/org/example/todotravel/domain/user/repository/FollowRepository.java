@@ -12,7 +12,18 @@ import java.util.Optional;
 
 @Repository
 public interface FollowRepository extends JpaRepository<Follow, Long> {
+    // 두 사용자의 이메일로 팔로잉 중인지 확인
+    @Query("""
+        SELECT CASE WHEN COUNT(f) > 0 THEN true ELSE false END
+        FROM Follow f
+        WHERE f.followerUser.email = :followerEmail
+        AND f.followingUser.email = :followingEmail
+        """)
+    boolean existsByFollowerEmailAndFollowingEmail(@Param("followerEmail") String followerEmail,
+                                                   @Param("followingEmail") String followingEmail);
+
     boolean existsByFollowerUserAndFollowingUser(User followerUser, User followingUser);
+
     Optional<Follow> findByFollowerUserAndFollowingUser(User followerUser, User followingUser);
 
     @Query("SELECT f.followingUser FROM Follow f WHERE f.followerUser.userId = :userId")

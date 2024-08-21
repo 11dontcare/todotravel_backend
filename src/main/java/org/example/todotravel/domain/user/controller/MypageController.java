@@ -47,7 +47,7 @@ public class MypageController {
 
         // 본인인 경우
         if (authenticationUtil.isAuthenticatedUser(authentication, user)) {
-            UserProfileResponseDto baseProfile = planUserService.getUserProfile("my", user);
+            UserProfileResponseDto baseProfile = planUserService.getUserProfile("my", user, false);
             List<PlanListResponseDto> recentBookmarks = planService.getRecentBookmarkedPlans(user);
             List<PlanListResponseDto> recentLikes = planService.getRecentLikedPlans(user);
             List<CommentSummaryResponseDto> recentComments = commentService.getRecentCommentedPlansByUser(user);
@@ -55,7 +55,8 @@ public class MypageController {
             MyProfileResponseDto myProfileResponseDto = MyProfileResponseDto.from(baseProfile, recentBookmarks, recentLikes, recentComments);
             return new ApiResponse<>(true, "본인 마이페이지 조회에 성공했습니다.", myProfileResponseDto);
         } else { // 타인인 경우
-            UserProfileResponseDto userProfileResponseDto = planUserService.getUserProfile("other", user);
+            boolean isFollowing = followService.checkFollowing(authentication, user); // 팔로우 중인지 확인
+            UserProfileResponseDto userProfileResponseDto = planUserService.getUserProfile("other", user, isFollowing);
             return new ApiResponse<>(true, "타인 마이페이지 조회에 성공했습니다.", userProfileResponseDto);
         }
     }

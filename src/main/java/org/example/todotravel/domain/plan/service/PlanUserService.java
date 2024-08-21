@@ -15,7 +15,7 @@ public interface PlanUserService {
     List<PlanUser> getAllPlanUser(Long planId);
     void removePlanUser(Long planId, Long userId);
 
-    UserProfileResponseDto getUserProfile(String subject, User user);
+    UserProfileResponseDto getUserProfile(String subject, User user, boolean isFollowing);
     List<PlanListResponseDto> getAllPlansByUser(Long userId);
     List<PlanListResponseDto> getRecentPlansByUser(Long userId);
 }

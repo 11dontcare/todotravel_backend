@@ -8,6 +8,9 @@ import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.repository.FollowRepository;
 import org.example.todotravel.domain.user.service.FollowService;
 import org.example.todotravel.domain.user.service.UserService;
+import org.example.todotravel.global.security.CustomUserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +22,23 @@ import java.util.stream.Collectors;
 public class FollowServiceImpl implements FollowService {
     private final FollowRepository followRepository;
     private final UserService userService;
+
+    /**
+     * 팔로우 중인지 확인하는 메서드
+     *
+     * @param authentication 타인 페이지에 접근하는 사용자
+     * @param followingUser 마이페이지 주인
+     * @return boolean
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public boolean checkFollowing(Authentication authentication, User followingUser) {
+        if (authentication.getPrincipal() instanceof UserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            return followRepository.existsByFollowerEmailAndFollowingEmail(userDetails.getEmail(), followingUser.getEmail());
+        }
+        return false;
+    }
 
     // 팔로우
     @Override
