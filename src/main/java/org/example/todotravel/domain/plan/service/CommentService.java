@@ -14,6 +14,6 @@ public interface CommentService {
     Comment updateComment(Long commentId, CommentRequestDto commentRequestDto);
     void removeComment(Long commentId);
     List<Comment> getCommentsByPlan(Plan plan);
-    List<CommentSummaryResponseDto> getAllCommentedPlansByUser(Long userId);
-    List<CommentSummaryResponseDto> getRecentCommentedPlansByUser(Long userId);
+    List<CommentSummaryResponseDto> getAllCommentedPlansByUser(User user);
+    List<CommentSummaryResponseDto> getRecentCommentedPlansByUser(User user);
 }

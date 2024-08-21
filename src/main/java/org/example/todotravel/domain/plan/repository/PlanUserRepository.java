@@ -23,14 +23,4 @@ public interface PlanUserRepository extends JpaRepository<PlanUser, Long> {
         ORDER BY pu.plan.planId DESC
         """)
     List<Plan> findAllPlansByUserId(@Param("userId") Long userId, @Param("status") PlanUser.StatusType status);
-
-    @Query(nativeQuery = true, value = """
-        SELECT p.* FROM plans p
-        JOIN plan_users pu ON p.plan_id = pu.plan_id
-        WHERE pu.user_id = :userId
-        AND pu.status = 'ACCEPTED'
-        ORDER BY p.plan_id DESC
-        LIMIT 3
-        """)
-    List<Plan> findRecentPlansByUserId(@Param("userId") Long userId);
 }

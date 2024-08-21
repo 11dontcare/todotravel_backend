@@ -72,14 +72,14 @@ public class CommentServiceImpl implements CommentService {
     // 특정 사용자가 댓글 단 플랜 조회
     @Override
     @Transactional(readOnly = true)
-    public List<CommentSummaryResponseDto> getAllCommentedPlansByUser(Long userId) {
-        return commentRepository.findDistinctPlansByUserIdOrderByLatestComment(userId);
+    public List<CommentSummaryResponseDto> getAllCommentedPlansByUser(User user) {
+        return commentRepository.findDistinctPlansByUserIdOrderByLatestComment(user.getUserId());
     }
 
     // 특정 사용자가 최근 댓글 단 플랜 4개 조회
     @Override
     @Transactional(readOnly = true)
-    public List<CommentSummaryResponseDto> getRecentCommentedPlansByUser(Long userId) {
-        return commentRepository.findTop4DistinctPlansByUserIdOrderByLatestComment(userId);
+    public List<CommentSummaryResponseDto> getRecentCommentedPlansByUser(User user) {
+        return commentRepository.findTop4DistinctPlansByUserIdOrderByLatestComment(user.getUserId());
     }
 }
