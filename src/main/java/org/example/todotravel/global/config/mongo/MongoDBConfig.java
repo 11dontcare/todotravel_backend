@@ -1,4 +1,4 @@
-package org.example.todotravel.global.config;
+package org.example.todotravel.global.config.mongo;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;

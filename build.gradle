@@ -34,6 +34,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'     // Thymeleaf for Mail Form
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
+    // S3 의존성
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+
     // 메일 Context에 Thymeleaf 적용을 위한 의존성
     implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 
