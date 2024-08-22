@@ -83,6 +83,10 @@ public class PlanServiceImpl implements PlanService {
     @Override
     @Transactional
     public void deletePlan(Long planId) {
+        Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("여행 플랜을 찾을 수 없습니다."));
+        commentService.removeAllByPlan(plan);
+        bookmarkService.removeAllByPlan(plan);
+        likeService.removeAllByPlan(plan);
         planRepository.deleteByPlanId(planId);
     }
 

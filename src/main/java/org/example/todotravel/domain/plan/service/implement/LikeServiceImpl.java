@@ -73,4 +73,10 @@ public class LikeServiceImpl implements LikeService {
     public List<PlanSummaryDto> getRecentLikedPlansByUser(Long userId) {
         return likeRepository.findRecentLikedPlansByUserId(userId);
     }
+
+    //플랜 삭제 시 플랜에 달린 좋아요 삭제
+    @Override
+    public void removeAllByPlan(Plan plan) {
+        likeRepository.deleteAllByPlan(plan);
+    }
 }
