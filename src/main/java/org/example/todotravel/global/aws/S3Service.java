@@ -1,5 +1,6 @@
 package org.example.todotravel.global.aws;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import java.io.IOException;
@@ -30,7 +31,11 @@ public class S3Service {
         return amazonS3.getUrl(bucketName, fileName).toString();
     }
 
-    public void deleteFile(String fileName) {
-        amazonS3.deleteObject(bucketName, fileName);
+    public void deleteFile(String fileName) throws IOException{
+        try{
+            amazonS3.deleteObject(bucketName, fileName);
+        } catch (SdkClientException e){
+            throw new IOException("이미지 삭제에 실패했습니다.", e);
+        }
     }
 }
