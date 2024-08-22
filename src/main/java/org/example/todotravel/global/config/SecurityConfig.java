@@ -41,6 +41,7 @@ public class SecurityConfig {
             "/api/mypage/**",
             "/api/token/refresh",
             "/api/auth/logout",
+            "/api/auth/profile-image/**",
             "/ws/**",
     };
 
