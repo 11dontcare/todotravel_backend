@@ -12,6 +12,9 @@ import org.example.todotravel.domain.plan.service.PlanUserService;
 import org.example.todotravel.domain.user.dto.response.UserProfileResponseDto;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.UserService;
+import org.example.todotravel.global.security.CustomUserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,13 +91,13 @@ public class PlanUserServiceImpl implements PlanUserService {
     // 사용자 프로필 조회
     @Override
     @Transactional(readOnly = true)
-    public UserProfileResponseDto getUserProfile(String subject, User user) {
+    public UserProfileResponseDto getUserProfile(String subject, User user, boolean isFollowing) {
         Long userId = user.getUserId();
         List<PlanListResponseDto> planList = getAllPlansByUser(userId);
         int planCount = planList.size();
 
         if (subject.equals("my")) {
-            planList = planList.size() > 3 ? planList.subList(0, 3) : planList;
+            planList = planCount > 3 ? planList.subList(0, 3) : planList;
         }
 
         return UserProfileResponseDto.builder()
@@ -103,8 +106,9 @@ public class PlanUserServiceImpl implements PlanUserService {
             .gender(user.getGender())
             .age(Period.between(user.getBirthDate(), LocalDate.now()).getYears())
             .info(user.getInfo())
-            .followerCount(user.getFollowers().size())
-            .followingCount(user.getFollowings().size())
+            .isFollowing(isFollowing)
+            .followerCount(user.getFollowings().size()) // 팔로워 수 : 나를 팔로잉 하는 수
+            .followingCount(user.getFollowers().size()) // 팔로잉 수 : 내가 팔로잉 하는 수
             .planCount(planCount)
             .planList(planList)
             .build();
