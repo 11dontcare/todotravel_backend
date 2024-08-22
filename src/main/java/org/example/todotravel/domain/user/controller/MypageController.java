@@ -1,6 +1,8 @@
 package org.example.todotravel.domain.user.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.plan.dto.response.CommentSummaryResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.service.CommentService;
@@ -9,14 +11,15 @@ import org.example.todotravel.domain.plan.service.PlanUserService;
 import org.example.todotravel.domain.user.dto.request.FollowRequestDto;
 import org.example.todotravel.domain.user.dto.request.NicknameRequestDto;
 import org.example.todotravel.domain.user.dto.request.PasswordUpdateRequestDto;
-import org.example.todotravel.domain.user.dto.response.FollowResponseDto;
-import org.example.todotravel.domain.user.dto.response.MyProfileResponseDto;
-import org.example.todotravel.domain.user.dto.response.UserDetailResponseDto;
-import org.example.todotravel.domain.user.dto.response.UserProfileResponseDto;
+import org.example.todotravel.domain.user.dto.request.UserInfoRequestDto;
+import org.example.todotravel.domain.user.dto.response.*;
+import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.FollowService;
 import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.controller.ApiResponse;
+import org.example.todotravel.global.dto.PagedResponseDto;
 import org.example.todotravel.global.jwt.util.AuthenticationUtil;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/mypage")
@@ -37,54 +41,83 @@ public class MypageController {
     private final UserService userService;
 
     // 특정 사용자 프로필 보기 (본인, 타인에 대한 처리)
-    @GetMapping("/profile/{user_id}")
-    public ApiResponse<?> showProfile(@PathVariable("user_id") Long userId, Authentication authentication) {
+    @GetMapping("/profile/{nickname}")
+    public ApiResponse<?> showProfile(@PathVariable("nickname") String nickname, Authentication authentication) {
+        // 해당 사용자 찾기
+        User user = userService.getUserIdByNickname(nickname);
+
         // 본인인 경우
-        if (authenticationUtil.isAuthenticatedUser(authentication, userId)) {
-            UserProfileResponseDto baseProfile = planUserService.getUserProfile("my", userId);
-            List<PlanListResponseDto> recentBookmarks = planService.getRecentBookmarkedPlans(userId);
-            List<PlanListResponseDto> recentLikes = planService.getRecentLikedPlans(userId);
-            List<CommentSummaryResponseDto> recentComments = commentService.getRecentCommentedPlansByUser(userId);
+        if (authenticationUtil.isAuthenticatedUser(authentication, user)) {
+            UserProfileResponseDto baseProfile = planUserService.getUserProfile("my", user, false);
+            List<PlanListResponseDto> recentBookmarks = planService.getRecentBookmarkedPlans(user);
+            List<PlanListResponseDto> recentLikes = planService.getRecentLikedPlans(user);
+            List<CommentSummaryResponseDto> recentComments = commentService.getRecentCommentedPlansByUser(user);
+
             MyProfileResponseDto myProfileResponseDto = MyProfileResponseDto.from(baseProfile, recentBookmarks, recentLikes, recentComments);
             return new ApiResponse<>(true, "본인 마이페이지 조회에 성공했습니다.", myProfileResponseDto);
         } else { // 타인인 경우
-            UserProfileResponseDto userProfileResponseDto = planUserService.getUserProfile("other", userId);
+            boolean isFollowing = followService.checkFollowing(authentication, user); // 팔로우 중인지 확인
+            UserProfileResponseDto userProfileResponseDto = planUserService.getUserProfile("other", user, isFollowing);
             return new ApiResponse<>(true, "타인 마이페이지 조회에 성공했습니다.", userProfileResponseDto);
         }
+    }
+
+    // 소개글 업데이트
+    @PutMapping("/update-info")
+    public ApiResponse<?> updateInfo(@Valid @RequestBody UserInfoRequestDto dto, Authentication authentication) {
+        // 해당 사용자 찾기
+        User user = userService.getUserById(dto.getUserId());
+
+        // 본인 확인
+        if (!authenticationUtil.isAuthenticatedUser(authentication, user)) {
+            throw new AccessDeniedException("접근 권한이 없습니다.");
+        }
+
+        userService.updateUserInfo(user, dto);
+        return new ApiResponse<>(true, "소개글 업데이트에 성공했습니다.");
     }
 
     // 내 개인정보 조회
     @GetMapping("/personal-profile/{user_id}")
     public ApiResponse<?> getPersonalProfile(@PathVariable("user_id") Long userId, Authentication authentication) {
+        // 해당 사용자 찾기
+        User user = userService.getUserById(userId);
+
         // 본인 확인
-        if (!authenticationUtil.isAuthenticatedUser(authentication, userId)) {
+        if (!authenticationUtil.isAuthenticatedUser(authentication, user)) {
             throw new AccessDeniedException("접근 권한이 없습니다.");
         }
 
-        UserDetailResponseDto userDetailResponseDto = UserDetailResponseDto.from(userService.getUserById(userId));
+        UserDetailResponseDto userDetailResponseDto = UserDetailResponseDto.from(user);
         return new ApiResponse<>(true, "사용자 개인 정보 조회에 성공했습니다.", userDetailResponseDto);
     }
 
     // 닉네임 변경
     @PutMapping("/nickname")
     public ApiResponse<?> changeNickname(@RequestBody NicknameRequestDto dto, Authentication authentication) {
+        // 해당 사용자 찾기
+        User user = userService.getUserById(dto.getUserId());
+
         // 본인 확인
-        if (!authenticationUtil.isAuthenticatedUser(authentication, dto.getUserId())) {
+        if (!authenticationUtil.isAuthenticatedUser(authentication, user)) {
             throw new AccessDeniedException("접근 권한이 없습니다.");
         }
 
-        userService.updateNickname(dto);
+        userService.updateNickname(user, dto.getNewNickname());
         return new ApiResponse<>(true, "닉네임 변경을 완료했습니다.");
     }
 
     // 비밀번호 변경 - UserController 에도 있지만, 마이페이지에서 기존 비밀번호를 알아야 가능한 변경
     @PutMapping("/password")
     public ApiResponse<?> changePassword(@RequestBody PasswordUpdateRequestDto dto, Authentication authentication) {
+        // 해당 사용자 찾기
+        User user = userService.getUserById(dto.getUserId());
+
         // 본인 확인
-        if (!authenticationUtil.isAuthenticatedUser(authentication, dto.getUserId())) {
+        if (!authenticationUtil.isAuthenticatedUser(authentication, user)) {
             throw new AccessDeniedException("접근 권한이 없습니다.");
         }
-        userService.updatePassword(dto, passwordEncoder);
+        userService.updatePassword(user, dto, passwordEncoder);
         return new ApiResponse<>(true, "비밀번호 변경을 완료했습니다.");
     }
 
@@ -108,18 +141,22 @@ public class MypageController {
         return new ApiResponse<>(true, "팔로우 취소에 성공했습니다.");
     }
 
-    // 팔로잉 조회
-    @GetMapping("/{user_id}/following")
-    public ApiResponse<?> getFollowing(@PathVariable("user_id") Long userId) {
-        List<FollowResponseDto> followingList = followService.getFollowing(userId);
-        return new ApiResponse<>(true, "팔로잉 사용자 조회에 성공했습니다.", followingList);
-    }
-
     // 팔로워 조회
     @GetMapping("/{user_id}/follower")
-    public ApiResponse<?> getFollower(@PathVariable("user_id") Long userId) {
-        List<FollowResponseDto> followerList = followService.getFollower(userId);
+    public ApiResponse<?> getFollower(@PathVariable("user_id") Long userId,
+                                      @RequestParam(defaultValue = "0") int page,
+                                      @RequestParam(defaultValue = "15") int size) {
+        PagedResponseDto<FollowResponseDto> followerList = followService.getFollower(userId, page, size);
         return new ApiResponse<>(true, "팔로워 사용자 조회에 성공했습니다.", followerList);
+    }
+
+    // 팔로잉 조회
+    @GetMapping("/{user_id}/following")
+    public ApiResponse<?> getFollowing(@PathVariable("user_id") Long userId,
+                                       @RequestParam(defaultValue = "0") int page,
+                                       @RequestParam(defaultValue = "15") int size) {
+        PagedResponseDto<FollowResponseDto> followingList = followService.getFollowing(userId, page, size);
+        return new ApiResponse<>(true, "팔로잉 사용자 조회에 성공했습니다.", followingList);
     }
 
     // 내 여행 전체 조회
@@ -132,36 +169,45 @@ public class MypageController {
     // 북마크 플랜 전체 조회
     @GetMapping("/{user_id}/my-bookmark")
     public ApiResponse<?> getAllBookmarkedPlans(@PathVariable("user_id") Long userId, Authentication authentication) {
+        // 해당 사용자 찾기
+        User user = userService.getUserById(userId);
+
         // 본인 확인
-        if (!authenticationUtil.isAuthenticatedUser(authentication, userId)) {
+        if (!authenticationUtil.isAuthenticatedUser(authentication, user)) {
             throw new AccessDeniedException("접근 권한이 없습니다.");
         }
 
-        List<PlanListResponseDto> planList = planService.getAllBookmarkedPlans(userId);
+        List<PlanListResponseDto> planList = planService.getAllBookmarkedPlans(user);
         return new ApiResponse<>(true, "북마크한 여행 조회에 성공했습니다.", planList);
     }
 
     // 좋아요한 플랜 전체 조회
     @GetMapping("/{user_id}/my-like")
     public ApiResponse<?> getAllLikedPlans(@PathVariable("user_id") Long userId, Authentication authentication) {
+        // 해당 사용자 찾기
+        User user = userService.getUserById(userId);
+
         // 본인 확인
-        if (!authenticationUtil.isAuthenticatedUser(authentication, userId)) {
+        if (!authenticationUtil.isAuthenticatedUser(authentication, user)) {
             throw new AccessDeniedException("접근 권한이 없습니다.");
         }
 
-        List<PlanListResponseDto> planList = planService.getAllLikedPlans(userId);
+        List<PlanListResponseDto> planList = planService.getAllLikedPlans(user);
         return new ApiResponse<>(true, "좋아요한 여행 조회에 성공했습니다.", planList);
     }
 
     // 댓글 단 플랜 전체 조회
     @GetMapping("/{user_id}/my-comment")
     public ApiResponse<?> getAllCommentedPlans(@PathVariable("user_id") Long userId, Authentication authentication) {
+        // 해당 사용자 찾기
+        User user = userService.getUserById(userId);
+
         // 본인 확인
-        if (!authenticationUtil.isAuthenticatedUser(authentication, userId)) {
+        if (!authenticationUtil.isAuthenticatedUser(authentication, user)) {
             throw new AccessDeniedException("접근 권한이 없습니다.");
         }
 
-        List<CommentSummaryResponseDto> planList = commentService.getAllCommentedPlansByUser(userId);
+        List<CommentSummaryResponseDto> planList = commentService.getAllCommentedPlansByUser(user);
         return new ApiResponse<>(true, "댓글을 단 여행 조회에 성공했습니다.", planList);
     }
 }

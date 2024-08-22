@@ -53,6 +53,7 @@ public class UserServiceImpl implements UserService {
             .email(dto.getEmail())
             .createdDate(LocalDateTime.now())
             .birthDate(dto.getBirthDate())
+            .info("현재 작성된 소개글이 없습니다.")
             .role(Role.ROLE_USER)
             .build();
 
@@ -129,6 +130,14 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    // 소개글 업데이트
+    @Override
+    @Transactional
+    public void updateUserInfo(User user, UserInfoRequestDto dto) {
+        user.setInfo(dto.getNewInfo());
+        userRepository.save(user);
+    }
+
     // 비밀번호 재설정
     @Override
     @Transactional
@@ -143,8 +152,7 @@ public class UserServiceImpl implements UserService {
     // 비밀번호 재설정 - 기존 비밀번호 검사도 수행
     @Override
     @Transactional
-    public void updatePassword(PasswordUpdateRequestDto dto, PasswordEncoder passwordEncoder) {
-        User user = getUserById(dto.getUserId());
+    public void updatePassword(User user, PasswordUpdateRequestDto dto, PasswordEncoder passwordEncoder) {
         if (!passwordEncoder.matches(dto.getExistingPassword(), user.getPassword())) {
             throw new BadCredentialsException("기존 비밀번호가 일치하지 않습니다.");
         }
@@ -156,7 +164,7 @@ public class UserServiceImpl implements UserService {
     // 이름, 생년월일, 이메일로 사용자 찾기
     @Override
     @Transactional(readOnly = true)
-    public PasswordSearchResponseDto findUserByNameAndBirthAndEmail(PasswordSearchRequestDto dto){
+    public PasswordSearchResponseDto findUserByNameAndBirthAndEmail(PasswordSearchRequestDto dto) {
         User user = userRepository.findByNameAndBirthDateAndEmail(dto.getName(), dto.getBirthDate(), dto.getEmail())
             .orElseThrow(() -> new UserNotFoundException("입력하신 정보와 일치하는 회원이 없어 인증번호를 발송할 수 없습니다."));
 
@@ -205,16 +213,24 @@ public class UserServiceImpl implements UserService {
             .build();
     }
 
+    // 닉네임으로 사용자 찾기
+    @Override
+    @Transactional(readOnly = true)
+    public User getUserIdByNickname(String nickname) {
+        User user = userRepository.findByNickname(nickname)
+            .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+        return user;
+    }
+
     // 닉네임 업데이트
     @Override
     @Transactional
-    public void updateNickname(NicknameRequestDto dto) {
+    public void updateNickname(User user, String newNickname) {
         // 닉네임 중복 검사
-        checkDuplicateNickname(dto.getNewNickname());
+        checkDuplicateNickname(newNickname);
 
         // 중복되지 않는 닉네임이면 업데이트
-        User user = getUserById(dto.getUserId());
-        user.setNickname(dto.getNewNickname());
+        user.setNickname(newNickname);
         userRepository.save(user);
     }
 

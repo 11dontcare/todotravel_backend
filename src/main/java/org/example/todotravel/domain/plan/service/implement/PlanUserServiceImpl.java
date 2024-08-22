@@ -12,9 +12,15 @@ import org.example.todotravel.domain.plan.service.PlanUserService;
 import org.example.todotravel.domain.user.dto.response.UserProfileResponseDto;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.UserService;
+import org.example.todotravel.global.security.CustomUserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,16 +39,16 @@ public class PlanUserServiceImpl implements PlanUserService {
         Plan plan = planService.getPlan(planId);
         User user = userService.getUserByUserId(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
         PlanUser planUser = PlanUser.builder()
-                .status(PlanUser.StatusType.PENDING)
-                .user(user)
-                .plan(plan)
-                .build();
+            .status(PlanUser.StatusType.PENDING)
+            .user(user)
+            .plan(plan)
+            .build();
 
         PlanUser newPlanUser = planUserRepository.save(planUser);
 
 
         AlarmRequestDto requestDto = new AlarmRequestDto(plan.getPlanUser().getUserId(),
-                "[" + plan.getTitle() + "] 플랜에 " + user.getNickname()+ "님이 초대 되었습니다.");
+            "[" + plan.getTitle() + "] 플랜에 " + user.getNickname() + "님이 초대 되었습니다.");
         alarmService.createAlarm(requestDto);
 
         return newPlanUser;
@@ -85,22 +91,25 @@ public class PlanUserServiceImpl implements PlanUserService {
     // 사용자 프로필 조회
     @Override
     @Transactional(readOnly = true)
-    public UserProfileResponseDto getUserProfile(String subject, Long userId) {
-        User user = userService.getUserById(userId);
-        List<PlanListResponseDto> planList;
+    public UserProfileResponseDto getUserProfile(String subject, User user, boolean isFollowing) {
+        Long userId = user.getUserId();
+        List<PlanListResponseDto> planList = getAllPlansByUser(userId);
+        int planCount = planList.size();
 
-        if (subject.equals("other")) {
-            planList = getAllPlansByUser(userId);
-        } else {
-            planList = getRecentPlansByUser(userId);
+        if (subject.equals("my")) {
+            planList = planCount > 3 ? planList.subList(0, 3) : planList;
         }
 
         return UserProfileResponseDto.builder()
             .userId(userId)
             .nickname(user.getNickname())
-            .followerCount(user.getFollowers().size())
-            .followingCount(user.getFollowings().size())
-            .planCount(user.getPlans().size())
+            .gender(user.getGender())
+            .age(Period.between(user.getBirthDate(), LocalDate.now()).getYears())
+            .info(user.getInfo())
+            .isFollowing(isFollowing)
+            .followerCount(user.getFollowings().size()) // 팔로워 수 : 나를 팔로잉 하는 수
+            .followingCount(user.getFollowers().size()) // 팔로잉 수 : 내가 팔로잉 하는 수
+            .planCount(planCount)
             .planList(planList)
             .build();
     }
@@ -119,7 +128,9 @@ public class PlanUserServiceImpl implements PlanUserService {
     @Override
     @Transactional(readOnly = true)
     public List<PlanListResponseDto> getRecentPlansByUser(Long userId) {
-        List<Plan> plans = planUserRepository.findRecentPlansByUserId(userId);
+        List<Plan> plans = planUserRepository.findAllPlansByUserId(userId, PlanUser.StatusType.ACCEPTED);
+        plans = plans.size() > 3 ? plans.subList(0, 3) : plans;
+
         return plans.stream()
             .map(planService::convertToPlanListResponseDto)
             .collect(Collectors.toList());

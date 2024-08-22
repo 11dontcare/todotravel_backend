@@ -24,9 +24,11 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     List<Plan> findLikedPlansByUserId(@Param("userId") Long userId);
 
     @Query(nativeQuery = true, value = """
-           SELECT p.plan_id as planId, p.title, p.location, p.description, p.start_date as startDate, p.end_date as endDate
+           SELECT p.plan_id as planId, p.title, p.location, p.description, p.start_date as startDate,
+                  p.end_date as endDate, u.nickname as planUserNickname
            FROM plans p
            JOIN likes l ON p.plan_id = l.plan_id
+           JOIN users u ON p.user_id = u.user_id
            WHERE l.user_id = :userId
            ORDER BY l.like_id DESC
            LIMIT 3
