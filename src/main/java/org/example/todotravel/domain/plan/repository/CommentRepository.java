@@ -17,6 +17,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("""
         SELECT NEW org.example.todotravel.domain.plan.dto.response.CommentSummaryResponseDto(
             c.plan.planId,
+            c.plan.title,
+            c.plan.location,
             (SELECT c2.content FROM Comment c2
              WHERE c2.plan = c.plan
              AND c2.commentId = (SELECT MAX(c3.commentId) FROM Comment c3 WHERE c3.plan = c.plan))
@@ -31,6 +33,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("""
         SELECT NEW org.example.todotravel.domain.plan.dto.response.CommentSummaryResponseDto(
             c.plan.planId,
+            c.plan.title,
+            c.plan.location,
             c.content
         )
         FROM Comment c
