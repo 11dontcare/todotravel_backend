@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
     Optional<User> getUserByUserId(Long userId);
@@ -46,4 +47,9 @@ public interface UserService {
 
     //로그인 중인 사용자 정보
     User getUserByUsername(String username);
+
+    // 사용자 이미지 프로필 업로드
+    void updateProfileImage(Long userId, MultipartFile file);
+
+    User getProfileImageUrl(Long userId);
 }
