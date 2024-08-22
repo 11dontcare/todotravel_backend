@@ -119,7 +119,10 @@ public class PlanController {
     //플랜 copy해서 만들기(불러오기 기능)
     @PostMapping("/{plan_id}/load")
     public ApiResponse<Long> getLoadPlan(@PathVariable("plan_id") Long planId) {
-        Plan plan = planService.copyPlan(planId);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails)authentication.getPrincipal();
+        User user = userService.getUserByUsername(userDetails.getUsername());
+        Plan plan = planService.copyPlan(planId, user);
         return new ApiResponse<>(true, "플랜 불러오기 성공", plan.getPlanId());
     }
 

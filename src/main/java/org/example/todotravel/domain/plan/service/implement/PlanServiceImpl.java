@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PlanServiceImpl implements PlanService {
     private final PlanRepository planRepository;
-    private final UserRepository userRepository;//테스트용
     private final BookmarkService bookmarkService;
     private final LikeService likeService;
     private final AlarmService alarmService; //알림 자동 생성
@@ -40,9 +39,6 @@ public class PlanServiceImpl implements PlanService {
         //플랜 생성 시 일정과 메모가 빈 플랜이 db에 생성
 
         Plan plan = planRequestDto.toEntity();
-        //현재 로그인 중인 사용자 user
-//        User user = new User();
-//        User user = userRepository.findById(1L).orElseThrow();//테스트용
         plan.setPlanUser(user);
         //planUsers에 플랜 생성자 추가
         PlanUser planUser = PlanUser.builder()
@@ -130,11 +126,8 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     @Transactional
-    public Plan copyPlan(Long planId) {
+    public Plan copyPlan(Long planId, User user) {
         Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("플랜을 찾을 수 없습니다."));
-        //현재 로그인 중인 사용자 user
-//        User user = new User();
-        User user = userRepository.findById(1L).orElseThrow();
         Plan newPlan = Plan.builder()
             .title(plan.getTitle())
             .location(plan.getLocation())
