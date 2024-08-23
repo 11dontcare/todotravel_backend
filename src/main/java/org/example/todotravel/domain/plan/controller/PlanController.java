@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.chat.entity.ChatRoom;
 import org.example.todotravel.domain.chat.service.ChatRoomService;
 import org.example.todotravel.domain.plan.dto.request.PlanRequestDto;
+import org.example.todotravel.domain.plan.dto.request.PlanThumbnailRequestDto;
 import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanUserResponseDto;
@@ -14,6 +15,7 @@ import org.example.todotravel.domain.plan.entity.PlanUser;
 import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.plan.service.PlanUserService;
 import org.example.todotravel.domain.plan.service.ScheduleService;
+import org.example.todotravel.domain.user.dto.request.UserProfileImageRequestDTO;
 import org.example.todotravel.domain.user.dto.response.UserListResponseDto;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.UserService;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -135,5 +138,22 @@ public class PlanController {
     public ApiResponse<List<PlanListResponseDto>> searchPlans(@PathVariable("keyword") String keyword) {
         List<PlanListResponseDto> planList = planService.getSpecificPlans(keyword);
         return new ApiResponse<>(true, "플랜 검색 성공", planList);
+    }
+
+    // 플랜 썸네일 이미지 등록
+    @PostMapping("/thumbnail/{plan_id}")
+    public ApiResponse<PlanThumbnailRequestDto> uploadThumbnailImage(@PathVariable("plan_id") Long planId, @RequestParam("file")
+                                                                     MultipartFile file) {
+        try {
+            planService.updateThumbnailImage(planId, file);
+
+            Plan plan = planService.getThumbnailImageUrl(planId);
+            String thumnailImageUrl = plan.getPlanThumbnailUrl();
+
+            PlanThumbnailRequestDto response = new PlanThumbnailRequestDto(planId, thumnailImageUrl);
+            return new ApiResponse<>(true, "썸네일 이미지가 성공적으로 업로드 되었습니다.", response);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "썸네일 이미지 등록에 실패했습니다.");
+        }
     }
 }
