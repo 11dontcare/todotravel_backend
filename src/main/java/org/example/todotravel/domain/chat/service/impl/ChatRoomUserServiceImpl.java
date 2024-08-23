@@ -70,4 +70,11 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
                 .build())
             .collect(Collectors.toList());
     }
+
+    // 채팅방에 존재하는 사용자인지 확인
+    @Override
+    @Transactional(readOnly = true)
+    public boolean checkUserInChatRoom(ChatRoom chatRoom, User user) {
+        return chatRoomUserRepository.existsByChatRoomAndUser(chatRoom, user);
+    }
 }

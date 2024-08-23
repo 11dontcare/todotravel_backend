@@ -86,6 +86,12 @@ public class ChatRoomServiceImpl implements ChatRoomService {
             .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다."));
         User user = userService.getUserById(userId);
 
+        // 사용자가 이미 채팅방에 존재하는지 확인
+        boolean userExists = chatRoomUserService.checkUserInChatRoom(chatRoom, user);
+        if (userExists) {
+            throw new RuntimeException("이미 채팅방에 존재하는 사용자입니다.");
+        }
+
         chatRoom.addUser(user);
         chatRoomRepository.save(chatRoom);
     }
