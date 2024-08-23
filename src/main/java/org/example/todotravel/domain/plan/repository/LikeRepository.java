@@ -34,4 +34,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
            LIMIT 3
            """)
     List<PlanSummaryDto> findRecentLikedPlansByUserId(@Param("userId") Long userId);
+
+    //플랜 삭제 시 플랜에 달린 좋아요 삭제
+    void deleteAllByPlan(Plan plan);
 }

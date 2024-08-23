@@ -73,4 +73,10 @@ public class BookmarkServiceImpl implements BookmarkService {
     public List<PlanSummaryDto> getRecentBookmarkedPlansByUser(Long userId) {
         return bookmarkRepository.findRecentCommentedPlansByUserId(userId);
     }
+
+    //플랜 삭제 시 플랜에 달린 북마크 삭제
+    @Override
+    public void removeAllByPlan(Plan plan) {
+        bookmarkRepository.deleteAllByPlan(plan);
+    }
 }

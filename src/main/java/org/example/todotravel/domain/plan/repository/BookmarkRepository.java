@@ -33,4 +33,7 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
         LIMIT 3
         """)
     List<PlanSummaryDto> findRecentCommentedPlansByUserId(@Param("userId") Long userId);
+
+    //플랜 삭제 시 플랜에 달린 북마크 삭제
+    void deleteAllByPlan(Plan plan);
 }

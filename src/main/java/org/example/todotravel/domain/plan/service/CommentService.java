@@ -16,4 +16,5 @@ public interface CommentService {
     List<Comment> getCommentsByPlan(Plan plan);
     List<CommentSummaryResponseDto> getAllCommentedPlansByUser(User user);
     List<CommentSummaryResponseDto> getRecentCommentedPlansByUser(User user);
+    void removeAllByPlan(Plan plan);
 }
