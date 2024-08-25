@@ -1,6 +1,7 @@
 package org.example.todotravel.domain.plan.service;
 
 import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
+import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
 import org.example.todotravel.domain.user.dto.response.MyProfileResponseDto;
 import org.example.todotravel.domain.user.dto.response.UserProfileResponseDto;
@@ -14,8 +15,11 @@ public interface PlanUserService {
     PlanUser accepted(Long planParticipantId);
     List<PlanUser> getAllPlanUser(Long planId);
     void removePlanUser(Long planId, Long userId);
+    void removePlanUserFromOwnPlan(Plan plan);
+    void removePlanUserFromPlan(Plan plan, User user);
 
     UserProfileResponseDto getUserProfile(String subject, User user, boolean isFollowing);
-    List<PlanListResponseDto> getAllPlansByUser(Long userId);
+    List<Plan> getAllPlansByUser(User user);
+    List<PlanListResponseDto> getAllPlansByUserAndStatus(Long userId);
     List<PlanListResponseDto> getRecentPlansByUser(Long userId);
 }

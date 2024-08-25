@@ -42,6 +42,20 @@ public class BookmarkServiceImpl implements BookmarkService {
         bookmarkRepository.deleteByPlanAndBookmarkUser(plan, user);
     }
 
+    // 회원 탈퇴 시 사용자가 생성한 플랜의 북마크 삭제
+    @Override
+    @Transactional
+    public void removeAllBookmarksByPlan(Plan plan) {
+        bookmarkRepository.deleteAllByPlan(plan);
+    }
+
+    // 회원 탈퇴 시 북마크 전체 삭제
+    @Override
+    @Transactional
+    public void removeAllBookmarkByUser(User user) {
+        bookmarkRepository.deleteAllByBookmarkUser(user);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public Long countBookmark(Plan plan) {

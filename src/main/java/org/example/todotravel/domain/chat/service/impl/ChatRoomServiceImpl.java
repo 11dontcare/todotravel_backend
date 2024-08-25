@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -102,6 +104,13 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public ChatRoom getChatRoomByPlanId(Long planId) {
         return chatRoomRepository.findByPlanPlanId(planId)
             .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다."));
+    }
+
+    // Plan으로 채팅방 찾기
+    @Override
+    @Transactional(readOnly = true)
+    public List<ChatRoom> getAllChatRoomByPlan(List<Plan> plans) {
+        return chatRoomRepository.findByPlanIn(plans);
     }
 
     // roomId로 plan 찾기

@@ -86,6 +86,13 @@ public class PlanServiceImpl implements PlanService {
         planRepository.deleteByPlanId(planId);
     }
 
+    // 회원 탈퇴 시 사용자가 생성한 모든 플랜 삭제
+    @Override
+    @Transactional
+    public void removeAllPlanByUser(User user) {
+        planRepository.deleteAllByPlanUser(user);
+    }
+
     @Override
     @Transactional
     public List<PlanListResponseDto> getPublicPlans() {
@@ -260,5 +267,12 @@ public class PlanServiceImpl implements PlanService {
             .likeNumber(likeService.countLikeByPlanId(summaryDto.getPlanId()))
             .planUserNickname(summaryDto.getPlanUserNickname())
             .build();
+    }
+
+    // 사용자가 생성한 플랜 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<Plan> getAllPlanByPlanUser(User user) {
+        return planRepository.findByPlanUser(user);
     }
 }

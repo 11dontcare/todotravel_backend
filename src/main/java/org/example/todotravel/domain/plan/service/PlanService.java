@@ -11,6 +11,7 @@ import java.util.List;
 public interface PlanService {
     Plan createPlan(PlanRequestDto planRequestDto, User user);
     void deletePlan(Long planId);
+    void removeAllPlanByUser(User user);
     Plan getPlan(Long planId);
     Plan updatePlan(Long planId, PlanRequestDto dto);
     List<PlanListResponseDto> getPublicPlans();
@@ -25,4 +26,6 @@ public interface PlanService {
     List<PlanListResponseDto> getRecentLikedPlans(User user);
     List<PlanListResponseDto> getAllLikedPlans(User user);
     PlanListResponseDto convertToPlanListResponseDto(Plan plan);
+
+    List<Plan> getAllPlanByPlanUser(User user);
 }

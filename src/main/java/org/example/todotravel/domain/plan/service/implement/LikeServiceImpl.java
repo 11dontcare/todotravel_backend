@@ -42,6 +42,20 @@ public class LikeServiceImpl implements LikeService {
         likeRepository.deleteByPlanAndLikeUser(plan, user);
     }
 
+    // 회원 탈퇴 시 사용자가 생성한 플랜의 좋아요 삭제
+    @Override
+    @Transactional
+    public void removeAllLikeByPlan(Plan plan) {
+        likeRepository.deleteAllByPlan(plan);
+    }
+
+    // 회원 탈퇴 시 좋아요 전체 삭제
+    @Override
+    @Transactional
+    public void removeAllLikeByUser(User user) {
+        likeRepository.deleteAllByLikeUser(user);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public Long countLike(Plan plan) {

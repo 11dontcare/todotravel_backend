@@ -19,4 +19,8 @@ public interface ChatRoomUserService {
     List<ChatRoomUserResponseDto> getUsersByRoomId(Long roomId);
 
     boolean checkUserInChatRoom(ChatRoom chatRoom, User user);
+
+    void removeAllUserFromChatRoom(ChatRoom chatRoom);
+
+    void removeUserFromChatRoom(ChatRoom chatRoom, User user);
 }
