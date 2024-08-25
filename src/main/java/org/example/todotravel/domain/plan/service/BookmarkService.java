@@ -17,4 +17,5 @@ public interface BookmarkService {
     Boolean isPlanBookmarkedByUser(User user, Plan plan);
     List<Plan> getAllBookmarkedPlansByUser(Long userId);
     List<PlanSummaryDto> getRecentBookmarkedPlansByUser(Long userId);
+    void removeAllByPlan(Plan plan);
 }

@@ -18,4 +18,5 @@ public interface LikeService {
     Boolean isPlanLikedByUser(User user, Plan plan);
     List<Plan> getAllLikedPlansByUser(Long userId);
     List<PlanSummaryDto> getRecentLikedPlansByUser(Long userId);
+    void removeAllByPlan(Plan plan);
 }
