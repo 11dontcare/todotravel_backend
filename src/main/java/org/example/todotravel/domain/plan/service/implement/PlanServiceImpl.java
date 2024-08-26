@@ -102,6 +102,13 @@ public class PlanServiceImpl implements PlanService {
         planRepository.deleteAllByPlanUser(user);
     }
 
+    // 회원 탈퇴 시 사용자가 생성한 해당 플랜에 대해서만 삭제
+    @Override
+    @Transactional
+    public void removeJustPlan(Plan plan) {
+        planRepository.deleteByPlanId(plan.getPlanId());
+    }
+
     @Override
     @Transactional
     public List<PlanListResponseDto> getPublicPlans() {

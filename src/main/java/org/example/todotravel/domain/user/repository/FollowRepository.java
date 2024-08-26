@@ -5,6 +5,7 @@ import org.example.todotravel.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -33,6 +34,11 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     @Query("SELECT DISTINCT f.followingUser FROM Follow f WHERE f.followerUser.userId = :userId")
     Page<User> findFollowingsByUserId(@Param("userId") Long userId, Pageable pageable);
 
-    void deleteAllByFollowerUser(User user);
-    void deleteAllByFollowingUser(User user);
+    @Modifying
+    @Query("DELETE FROM Follow f WHERE f.followerUser = :user")
+    void deleteAllByFollowerUser(@Param("user") User user);
+
+    @Modifying
+    @Query("DELETE FROM Follow f WHERE f.followingUser = :user")
+    void deleteAllByFollowingUser(@Param("user") User user);
 }

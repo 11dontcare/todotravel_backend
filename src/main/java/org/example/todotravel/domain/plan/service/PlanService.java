@@ -13,6 +13,7 @@ public interface PlanService {
     Plan createPlan(PlanRequestDto planRequestDto, User user);
     void deletePlan(Long planId);
     void removeAllPlanByUser(User user);
+    void removeJustPlan(Plan plan);
     Plan getPlan(Long planId);
     Plan updatePlan(Long planId, PlanRequestDto dto);
     List<PlanListResponseDto> getPublicPlans();

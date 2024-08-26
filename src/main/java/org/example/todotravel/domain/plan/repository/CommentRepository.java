@@ -57,6 +57,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
         """)
     List<CommentSummaryResponseDto> findTop4DistinctPlansByUserIdOrderByLatestComment(@Param("userId") Long userId);
 
-    //플랜 삭제 시 플랜에 달린 댓글 삭제
-    void deleteAllByPlan(Plan plan);
+    // 플랜 삭제 시 플랜에 달린 댓글 삭제
+    @Modifying
+    @Query("DELETE FROM Comment c WHERE c.plan = :plan")
+    void deleteAllByPlan(@Param("plan") Plan plan);
 }

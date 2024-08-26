@@ -140,8 +140,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     @Transactional
     public void deleteChatRoom(Long roomId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-            .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다."));
-        chatRoomRepository.delete(chatRoom);
+        chatRoomRepository.deleteByRoomId(roomId);
     }
 }
