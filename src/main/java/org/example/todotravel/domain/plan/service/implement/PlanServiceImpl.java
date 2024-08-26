@@ -284,6 +284,7 @@ public class PlanServiceImpl implements PlanService {
     @Transactional(readOnly = true)
     public List<Plan> getAllPlanByPlanUser(User user) {
         return planRepository.findByPlanUser(user);
+    }
 
     // 프로필 썸네일 등록
     public void updateThumbnailImage(Long planId, MultipartFile file) {
