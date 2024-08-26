@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface PlanService {
     Plan createPlan(PlanRequestDto planRequestDto, User user);
-    void deletePlan(Long planId);
+    void deletePlan(Plan plan);
     void removeAllPlanByUser(User user);
     void removeJustPlan(Plan plan);
     Plan getPlan(Long planId);
