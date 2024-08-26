@@ -66,4 +66,8 @@ public class Plan {
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Schedule> schedules;
 
+    // 플랜 썸네일
+    @Column(name = "plan_thumbnail_url")
+    private  String planThumbnailUrl;
+
 }
