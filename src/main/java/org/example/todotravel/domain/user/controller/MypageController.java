@@ -238,7 +238,7 @@ public class MypageController {
         List<CommentSummaryResponseDto> planList = commentService.getAllCommentedPlansByUser(user);
         return new ApiResponse<>(true, "댓글을 단 여행 조회에 성공했습니다.", planList);
     }
-    
+
     // 프로필 이미지
     @PostMapping("/profile-image/{userId}")
     public ApiResponse<UserProfileImageRequestDTO> uploadProfileImage(@PathVariable("userId") Long userId,

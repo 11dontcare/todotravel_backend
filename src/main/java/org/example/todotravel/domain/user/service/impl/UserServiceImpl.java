@@ -284,6 +284,18 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void removeUser(User user) {
+        String existingImageUrl = user.getProfileImageUrl();
+
+        if (existingImageUrl != null && !existingImageUrl.isEmpty()) {
+            String existingFileName = existingImageUrl.substring(existingImageUrl.lastIndexOf("/") + 1);
+            try {
+                s3Service.deleteFile(existingFileName);
+            } catch (IOException e) {
+                throw new RuntimeException("존재하는 프로필 이미지 삭제를 실패했습니다.", e);
+            }
+        }
+
+        // S3에서 프로필 이미지 삭제 후 사용자 삭제
         userRepository.deleteByUserId(user.getUserId());
     }
 }
