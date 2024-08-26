@@ -81,7 +81,7 @@ public class PlanController {
         return new ApiResponse<>(true, "플랜 삭제 성공");
     }
 
-    //플랜에 사용자 초대하기 위해서 사용자 리스트 조회(현재 전체 사용자 조회, 추후 팔로잉 조회로 변경 예정)
+    //플랜에 사용자 초대하기 위해서 사용자 리스트 조회(팔로워 조회로 변경)
     @GetMapping("/{plan_id}/invite")
     public ApiResponse<List<UserListResponseDto>> invite(@PathVariable("plan_id") Long planId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
