@@ -3,6 +3,8 @@ package org.example.todotravel.domain.user.dto.request;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +19,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class OAuth2AdditionalInfoRequestDto {
     private String token;
+
+    @Pattern(regexp = "^[\\S]+$", message = "닉네임에 공백을 포함할 수 없습니다.")
+    @NotBlank(message = "닉네임은 필수 입력 값입니다.")
+    private String nickname;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;

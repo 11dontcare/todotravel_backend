@@ -40,7 +40,7 @@ public class EmailController {
     @PostMapping("/find-username")
     public ApiResponse<?> sendMailToFindId(@RequestBody UsernameRequestDto dto) {
         // 입력 정보와 일치하는 회원이 있는지 검사 (여기서 반환은 x)
-        userService.getUsername(dto);
+        userService.getUsernameOrEmail(dto);
 
         EmailMessage emailMessage = setEmailMessage(dto.getEmail());
         String code = emailService.sendMail(emailMessage, "email", passwordEncoder);

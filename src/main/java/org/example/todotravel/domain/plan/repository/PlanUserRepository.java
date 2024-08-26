@@ -17,7 +17,9 @@ public interface PlanUserRepository extends JpaRepository<PlanUser, Long> {
 
     void deletePlanUserByPlanAndUser(Plan plan, User user);
 
-    void deleteAllByPlan(Plan plan);
+    @Modifying
+    @Query("DELETE FROM PlanUser pu WHERE pu.plan = :plan")
+    void deleteAllByPlan(@Param("plan") Plan plan);
 
     @Modifying
     @Query("DELETE FROM PlanUser pu WHERE pu.plan.planId = :planId AND pu.user.userId = :userId")

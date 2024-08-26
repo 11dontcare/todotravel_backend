@@ -92,9 +92,10 @@ public class ChatRoomController {
         // 채팅방 삭제 시 플랜도 삭제 - 1:1인 경우는 플랜이 없음
         Plan plan = chatRoomService.getPlanByRoomId(roomId);
         //외래키 제약조건으로 인해 채팅방 먼저 삭제
-        chatRoomService.deleteChatRoom(roomId);
+        chatRoomService.deleteChatRoomAndMessage(roomId);
         if (plan != null) {
-            planService.deletePlan(plan.getPlanId());
+            planUserService.removePlanUserFromOwnPlan(plan);
+            planService.deletePlan(plan);
         }
         return new ApiResponse<>(true, "채팅방 삭제 성공");
     }

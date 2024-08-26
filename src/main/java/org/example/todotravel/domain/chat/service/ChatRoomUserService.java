@@ -22,5 +22,5 @@ public interface ChatRoomUserService {
 
     void removeAllUserFromChatRoom(ChatRoom chatRoom);
 
-    void removeUserFromChatRoom(ChatRoom chatRoom, User user);
+    void removeUserFromAllChatRoom(User user);
 }

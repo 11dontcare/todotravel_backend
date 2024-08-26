@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -88,13 +89,13 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
     @Override
     @Transactional
     public void removeAllUserFromChatRoom(ChatRoom chatRoom) {
-        chatRoomUserRepository.deleteByChatRoom(chatRoom);
+        chatRoomUserRepository.deleteByChatRoom(chatRoom.getRoomId());
     }
 
     // 회원 탈퇴 시 채팅방에서 사용자 제거
     @Override
     @Transactional
-    public void removeUserFromChatRoom(ChatRoom chatRoom, User user) {
-        chatRoomUserRepository.deleteByChatRoomIdAndUserId(chatRoom.getRoomId(), user.getUserId());
+    public void removeUserFromAllChatRoom(User user) {
+        chatRoomUserRepository.deleteByChatRoomUser(user);
     }
 }
