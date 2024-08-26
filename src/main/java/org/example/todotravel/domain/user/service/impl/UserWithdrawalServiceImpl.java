@@ -16,9 +16,12 @@ import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.domain.user.service.UserWithdrawalService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -39,6 +42,9 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
     private final LikeService likeService;
     private final PlanService planService;
     private final UserService userService;
+
+    // 삭제된 채팅방 ID를 추적하기 위한 Set
+    private final Set<Long> deletedChatRoomIds = new HashSet<>();
 
     @Override
     @Transactional
@@ -66,9 +72,11 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
             // MySQL 데이터는 @Transactional 에 의해 자동 롤백
             // 채팅 메시지 복구를 비동기로 처리
             CompletableFuture.runAsync(() ->
-                restoreChatMessages(planService.getAllPlanByPlanUser(user)).block()
+                restoreChatMessages(deletedChatRoomIds).block()
             );
             throw new RuntimeException("회원 탈퇴 실패", e);
+        } finally {
+            deletedChatRoomIds.clear();
         }
     }
 
@@ -76,7 +84,10 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
     private Mono<Void> deleteChatMessages(List<Plan> userPlans) {
         return Mono.fromCallable(() -> chatRoomService.getAllChatRoomByPlan(userPlans))
             .flatMapIterable(rooms -> rooms)
-            .flatMap(chatRoom -> chatMessageService.deleteAllMessageForChatRoom(chatRoom.getRoomId()))
+            .flatMap(chatRoom -> {
+                deletedChatRoomIds.add(chatRoom.getRoomId()); // 삭제되는 채팅방 추적
+                return chatMessageService.deleteAllMessageForChatRoom(chatRoom.getRoomId());
+            })
             .then();
     }
 
@@ -118,8 +129,15 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
         ChatRoom chatRoom = chatRoomService.getChatRoomByPlanId(plan.getPlanId());
         if (chatRoom.getChatRoomUsers().size() == 1 || plan.getPlanUsers().size() == 1) {
             deleteEntirePlan(plan);
+
+            // 메시지 삭제를 비동기로 처리
+            CompletableFuture.runAsync(() ->
+                chatMessageService.deleteAllMessageForChatRoom(chatRoom.getRoomId()).block()
+            );
+
             chatRoomUserService.removeAllUserFromChatRoom(chatRoom);
             chatRoomService.deleteChatRoom(chatRoom.getRoomId());
+            deletedChatRoomIds.add(chatRoom.getRoomId()); // 삭제되는 채팅방 추적
         } else {
             updateUserInPlan(user, plan, chatRoom);
         }
@@ -157,10 +175,9 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
     }
 
     // 탈퇴 중 오류 발생 시 채팅 메시지 복구
-    private Mono<Void> restoreChatMessages(List<Plan> userPlans) {
-        return Mono.fromCallable(() -> chatRoomService.getAllChatRoomByPlan(userPlans))
-            .flatMapIterable(rooms -> rooms)
-            .flatMap(chatRoom -> chatMessageService.restoreMessagesForChatRoom(chatRoom.getRoomId()))
+    private Mono<Void> restoreChatMessages(Set<Long> roomIds) {
+        return Flux.fromIterable(roomIds)
+            .flatMap(chatMessageService::restoreMessagesForChatRoom)
             .then();
     }
 }
