@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.user.dto.request.*;
 import org.example.todotravel.domain.user.dto.response.LoginResponseDto;
+import org.example.todotravel.domain.user.dto.response.OAuth2EmailResponseDto;
 import org.example.todotravel.domain.user.dto.response.UsernameResponseDto;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.UserService;
@@ -106,8 +107,15 @@ public class UserController {
     // 아이디 찾기 인증확인
     @PostMapping("/find-username")
     public ApiResponse<?> findUsername(@Valid @RequestBody UsernameRequestDto dto) {
-        UsernameResponseDto usernameResponseDto = userService.getUsername(dto);
-        return new ApiResponse<>(true, "아이디 찾기를 성공했습니다.", usernameResponseDto);
+        Object response = userService.getUsernameOrEmail(dto);
+
+        if (response instanceof UsernameResponseDto) {
+            return new ApiResponse<>(true, "아이디 찾기를 성공했습니다.", response);
+        } else if (response instanceof OAuth2EmailResponseDto) {
+            return new ApiResponse<>(true, "소셜 로그인 사용자의 이메일 정보를 찾았습니다.", response);
+        } else {
+            return new ApiResponse<>(false, "알 수 없는 오류가 발생했습니다.", null);
+        }
     }
 
     // 비밀번호 재설정

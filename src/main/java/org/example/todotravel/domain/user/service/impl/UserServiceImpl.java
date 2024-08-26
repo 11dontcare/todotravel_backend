@@ -13,6 +13,7 @@ import org.example.todotravel.domain.user.repository.UserRepository;
 import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.aws.S3Service;
 import org.example.todotravel.global.exception.DuplicateUserException;
+import org.example.todotravel.global.exception.SocialUserPasswordResetException;
 import org.example.todotravel.global.exception.UserNotFoundException;
 import org.example.todotravel.global.jwt.util.JwtTokenizer;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -172,21 +173,35 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByNameAndBirthDateAndEmail(dto.getName(), dto.getBirthDate(), dto.getEmail())
             .orElseThrow(() -> new UserNotFoundException("입력하신 정보와 일치하는 회원이 없어 인증번호를 발송할 수 없습니다."));
 
+        // 소셜 로그인 사용자인 경우 예외 처리
+        if (user.getSocialType() != null) {
+            throw new SocialUserPasswordResetException("소셜 로그인 사용자는 비밀번호를 재설정할 수 없습니다.");
+        }
+
         return new PasswordSearchResponseDto(user.getUserId());
     }
 
     // 이름, 이메일로 아이디 찾기
     @Override
     @Transactional(readOnly = true)
-    public UsernameResponseDto getUsername(UsernameRequestDto dto) {
+    public Object getUsernameOrEmail(UsernameRequestDto dto) {
         User user = userRepository.findByNameAndEmail(dto.getName(), dto.getEmail())
             .orElseThrow(() -> new UserNotFoundException("입력하신 정보와 일치하는 회원이 없어 인증번호를 발송할 수 없습니다."));
 
-        return UsernameResponseDto.builder()
-            .username(user.getUsername())
-            .name(user.getName())
-            .createdDate(user.getCreatedDate())
-            .build();
+        if (user.getSocialType() != null) {
+            return OAuth2EmailResponseDto.builder()
+                .email(user.getEmail())
+                .name(user.getName())
+                .createdDate(user.getCreatedDate())
+                .socialType(user.getSocialType())
+                .build();
+        } else {
+            return UsernameResponseDto.builder()
+                .username(user.getUsername())
+                .name(user.getName())
+                .createdDate(user.getCreatedDate())
+                .build();
+        }
     }
 
     // 이메일로 사용자 찾기
