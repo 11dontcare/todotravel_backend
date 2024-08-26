@@ -20,8 +20,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("DELETE FROM Comment c WHERE c.commentUser = :user")
     void deleteAllByCommentUserWithQuery(@Param("user") User user);
 
-    void deleteAllByPlan(Plan plan);
-
     @Query("""
         SELECT NEW org.example.todotravel.domain.plan.dto.response.CommentSummaryResponseDto(
             c.plan.planId,
