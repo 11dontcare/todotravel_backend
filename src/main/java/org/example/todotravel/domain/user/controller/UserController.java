@@ -130,22 +130,4 @@ public class UserController {
         // 클라이언트에게 AccessToken 삭제 지시 (프론트엔드에서 처리)
         return new ApiResponse<>(true, "로그아웃을 성공했습니다.");
     }
-
-    // 프로필 이미지
-    @PostMapping("/profile-image/{userId}")
-    public ApiResponse<UserProfileImageRequestDTO> uploadProfileImage(@PathVariable("userId") Long userId,
-                                                                      @RequestParam("file") MultipartFile file) {
-        try {
-            userService.updateProfileImage(userId, file);
-
-            User user = userService.getProfileImageUrl(userId);
-            String profileImageUrl = user.getProfileImageUrl();
-
-            UserProfileImageRequestDTO response = new UserProfileImageRequestDTO(userId, profileImageUrl);
-            return new ApiResponse<>(true, "프로필 이미지가 성공적으로 업로드 되었습니다.", response);
-        } catch (Exception e) {
-            return new ApiResponse<>(false, "프로필 이미지 업로드 실패했습니다.");
-        }
-    }
-
 }
