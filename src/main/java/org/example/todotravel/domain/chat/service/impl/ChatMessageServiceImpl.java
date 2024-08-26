@@ -1,6 +1,7 @@
 package org.example.todotravel.domain.chat.service.impl;
 
 import java.util.Optional;
+import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,12 +9,16 @@ import org.example.todotravel.domain.chat.dto.request.ChatMessageRequestDto;
 import org.example.todotravel.domain.chat.dto.response.ChatMessageResponseDto;
 import org.example.todotravel.domain.chat.entity.ChatMessage;
 import org.example.todotravel.domain.chat.entity.ChatRoomUser;
+import org.example.todotravel.domain.chat.entity.DeletedMessage;
 import org.example.todotravel.domain.chat.repository.ChatMessageRepository;
 import org.example.todotravel.domain.chat.repository.ChatRoomUserRepository;
+import org.example.todotravel.domain.chat.repository.DeletedMessageRepository;
 import org.example.todotravel.domain.chat.service.ChatMessageService;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.repository.UserRepository;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionalOperator;
@@ -25,6 +30,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ChatMessageServiceImpl implements ChatMessageService {
 
+    private final DeletedMessageRepository deletedMessageRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomUserRepository chatRoomUserRepository;
     private final UserRepository userRepository;
@@ -64,24 +70,51 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     // 회원 탈퇴 시 사용자가 생성한 채팅방의 모든 메시지 삭제
     @Override
     public Mono<Void> deleteAllMessageForChatRoom(Long roomId) {
+        log.info("Starting to delete all messages for room ID: {}", roomId);
         return transactionalOperator.execute(tx ->
                 chatMessageRepository.findAllByRoomId(roomId)
-                    .collectList()
-                    .flatMap(messages -> {
-                        if (!messages.isEmpty()) {
-                            // 메시지가 있으면 삭제된 메시지 컬렉션에 저장 후 원본 삭제
-                            return reactiveMongoTemplate.insert(messages, "deleted_messages")
-                                .then(chatMessageRepository.deleteAllByRoomId(roomId));
-                        }
-                        log.info("No messages found for room ID: {}", roomId);
-                        return Mono.empty();
+                    .map(DeletedMessage::fromChatMessage)
+                    .flatMap(deletedMessage -> {
+                        log.debug("Saving deleted message for room ID: {} and user ID: {}", deletedMessage.getRoomId(), deletedMessage.getUserId());
+                        return deletedMessageRepository.save(deletedMessage);
                     })
-            ).then()
-            .doOnSuccess(v -> log.info("Deleted all messages for room ID: {}", roomId))
+                    .doOnComplete(() -> log.info("Finished saving deleted messages for room ID: {}", roomId))
+                    .then(Mono.defer(() -> {
+                        log.info("Starting to delete original messages for room ID: {}", roomId);
+                        return chatMessageRepository.deleteAllByRoomId(roomId);
+                    }))
+            )
+            .then()
+            .doOnSuccess(v -> log.info("Successfully deleted all messages for room ID: {}", roomId))
+            .doOnError(e -> log.error("Error deleting messages for room ID: {}", roomId, e))
             .onErrorResume(e -> {
-                log.error("Error deleting messages for room ID: {}", roomId, e);
+                log.error("Failed to delete messages for room ID: {}. Error: {}", roomId, e.getMessage());
                 return Mono.empty(); // 오류 발생 시에도 Mono.empty()를 반환하여 계속 진행
             });
+    }
+
+    // 회원 탈퇴 완료 후 deleted_messages 컬렉션에서 해당 채팅방의 메시지 제거
+    @Override
+    public Mono<Void> removeDeletedMessagesForRooms(Set<Long> roomIds) {
+        return Flux.fromIterable(roomIds)
+            .flatMap(roomId -> {
+                log.info("Removing deleted messages for room ID: {}", roomId);
+                return deletedMessageRepository.findAllByRoomId(roomId)
+                    .collectList()
+                    .flatMap(messages -> {
+                        log.info("Found {} messages to delete for room ID: {}", messages.size(), roomId);
+                        if (messages.isEmpty()) {
+                            return Mono.empty();
+                        }
+                        return deletedMessageRepository.deleteAllByRoomId(roomId)
+                            .then(Mono.fromRunnable(() ->
+                                log.info("Removed deleted messages for room ID: {}", roomId)
+                            ));
+                    });
+            })
+            .then()
+            .doOnSuccess(v -> log.info("Completed removing deleted messages for all rooms"))
+            .doOnError(e -> log.error("Error occurred while removing deleted messages", e));
     }
 
     // 회원 탈퇴 과정에서 오류 발생 시 삭제한 메시지를 복구하는 대한 보상 트랜잭션
@@ -89,8 +122,8 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     public Mono<Void> restoreMessagesForChatRoom(Long roomId) {
         return transactionalOperator.execute(tx ->
                 reactiveMongoTemplate.find(
-                        org.springframework.data.mongodb.core.query.Query.query(
-                            org.springframework.data.mongodb.core.query.Criteria.where("roomId").is(roomId)
+                        Query.query(
+                            Criteria.where("roomId").is(roomId)
                         ),
                         ChatMessage.class,
                         "deleted_messages"
@@ -101,8 +134,8 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                             // 삭제된 메시지가 있으면 원본 컬렉션에 복구 후 삭제된 메시지 컬렉션에서 제거
                             return chatMessageRepository.saveAll(deletedMessages)
                                 .then(reactiveMongoTemplate.remove(
-                                    org.springframework.data.mongodb.core.query.Query.query(
-                                        org.springframework.data.mongodb.core.query.Criteria.where("roomId").is(roomId)
+                                    Query.query(
+                                        Criteria.where("roomId").is(roomId)
                                     ),
                                     "deleted_messages"
                                 ));
