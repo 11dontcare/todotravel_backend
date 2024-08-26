@@ -66,7 +66,8 @@ public class PlanUserController {
         //플랜에 참여자가 없으면 플랜 삭제
         if(planUserService.getAllPlanUser(planId) == null){
             chatRoomService.deleteChatRoom(chatRoom.getRoomId());
-            planService.deletePlan(planId);
+            Plan plan = planService.getPlan(planId);
+            planService.deletePlan(plan);
         }
 
         return new ApiResponse<>(true, "플랜 참여자 삭제 성공");
