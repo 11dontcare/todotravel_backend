@@ -1,5 +1,6 @@
 package org.example.todotravel.domain.plan.service.implement;
 
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.notification.dto.request.AlarmRequestDto;
 import org.example.todotravel.domain.notification.service.AlarmService;
@@ -16,6 +17,8 @@ import org.example.todotravel.domain.plan.service.LikeService;
 import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.repository.UserRepository;
+import org.example.todotravel.global.aws.S3Service;
+import org.example.todotravel.global.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +36,7 @@ public class PlanServiceImpl implements PlanService {
     private final LikeService likeService;
     private final AlarmService alarmService; //알림 자동 생성
     private final CommentService commentService;
+    private final S3Service s3Service; // 버킷
 
     @Override
     @Transactional
@@ -110,6 +115,7 @@ public class PlanServiceImpl implements PlanService {
                 .description(plan.getDescription())
                 .startDate(plan.getStartDate())
                 .endDate(plan.getEndDate())
+                .planThumbnailUrl(plan.getPlanThumbnailUrl())
                 .bookmarkNumber(bookmarkService.countBookmark(plan))
                 .likeNumber(likeService.countLike(plan))
                 .planUserNickname(plan.getPlanUser().getNickname())
@@ -278,5 +284,35 @@ public class PlanServiceImpl implements PlanService {
     @Transactional(readOnly = true)
     public List<Plan> getAllPlanByPlanUser(User user) {
         return planRepository.findByPlanUser(user);
+
+    // 프로필 썸네일 등록
+    public void updateThumbnailImage(Long planId, MultipartFile file) {
+        Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("플랜을 찾을 수 없습니다."));
+
+        String existingImageUrl = plan.getPlanThumbnailUrl();
+
+        if (existingImageUrl != null && !existingImageUrl.isEmpty()) {
+            String existingFileName = existingImageUrl.substring(existingImageUrl.lastIndexOf("/") + 1);
+            try {
+                s3Service.deleteFile(existingFileName);
+            } catch (IOException e) {
+                throw new RuntimeException("존재하는 플랜 썸네일 삭제를 실패했습니다.", e);
+            }
+        }
+
+        String imageUrl = null;
+        try {
+            imageUrl = s3Service.uploadFile(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        plan.setPlanThumbnailUrl(imageUrl);
+        planRepository.save(plan);
+    }
+
+    @Override
+    public Plan getThumbnailImageUrl(Long planId) {
+        return planRepository.findById(planId).orElseThrow(() -> new RuntimeException("플랜을 찾을 수 없습니다."));
     }
 }

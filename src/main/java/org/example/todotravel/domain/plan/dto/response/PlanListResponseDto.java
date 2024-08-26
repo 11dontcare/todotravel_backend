@@ -30,4 +30,6 @@ public class PlanListResponseDto {
     private Long likeNumber;
 
     private String planUserNickname;
+
+    private String planThumbnailUrl;
 }

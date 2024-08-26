@@ -7,6 +7,7 @@ import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.user.entity.User;
 
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface PlanService {
     Plan createPlan(PlanRequestDto planRequestDto, User user);
@@ -28,4 +29,8 @@ public interface PlanService {
     PlanListResponseDto convertToPlanListResponseDto(Plan plan);
 
     List<Plan> getAllPlanByPlanUser(User user);
+  
+    // 플랜 썸네일 이미지 등록
+    void updateThumbnailImage(Long planId, MultipartFile file);
+    Plan getThumbnailImageUrl(Long planId);
 }
