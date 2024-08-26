@@ -14,6 +14,7 @@ import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.plan.service.PlanUserService;
 import org.example.todotravel.domain.plan.service.ScheduleService;
 import org.example.todotravel.domain.user.dto.response.UserListResponseDto;
+import org.example.todotravel.domain.user.entity.Follow;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.controller.ApiResponse;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -79,7 +81,15 @@ public class PlanController {
     //플랜에 사용자 초대하기 위해서 사용자 리스트 조회(현재 전체 사용자 조회, 추후 팔로잉 조회로 변경 예정)
     @GetMapping("/{plan_id}/invite")
     public ApiResponse<List<UserListResponseDto>> invite(@PathVariable("plan_id") Long planId) {
-        List<User> users = userService.getAllUsers();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails)authentication.getPrincipal();
+        User user = userService.getUserByUsername(userDetails.getUsername());
+
+        Set<Follow> followers = user.getFollowers();
+        List<User> users = new ArrayList<>();
+        for (Follow follow : followers){
+            users.add(follow.getFollowingUser());
+        }
         //해당 플랜에 참여하고 있지 않은 사용자만
         List<PlanUser> planUsers = planUserService.getAllPlanUser(planId);
         for (PlanUser planUser : planUsers) {
@@ -87,10 +97,10 @@ public class PlanController {
                 users.remove(planUser.getUser());
         }
         List<UserListResponseDto> userList = new ArrayList<>();
-        for (User user : users) {
-            userList.add(UserListResponseDto.fromEntity(user));
+        for (User resultUser : users) {
+            userList.add(UserListResponseDto.fromEntity(resultUser));
         }
-        return new ApiResponse<>(true, "사용자 목록 조회 성공", userList);
+        return new ApiResponse<>(true, "팔로워 목록 조회 성공", userList);
     }
 
     //플랜에 사용자 초대
