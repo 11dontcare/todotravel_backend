@@ -10,6 +10,8 @@ import java.util.List;
 public interface BookmarkService {
     Bookmark createBookmark(Plan plan, User user);
     void removeBookmark(Plan plan, User user);
+    void removeAllBookmarksByPlan(Plan plan);
+    void removeAllBookmarkByUser(User user);
     Long countBookmark(Plan plan);
     Long countBookmarkByPlanId(Long planId);
     Boolean isPlanBookmarkedByUser(User user, Plan plan);

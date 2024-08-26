@@ -21,7 +21,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public Optional<RefreshToken> getRefreshTokenByUserId(Long userId) {
         return refreshTokenRepository.findByUser_UserId(userId);
     }

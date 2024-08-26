@@ -15,6 +15,7 @@ import java.util.Optional;
 @Repository
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     void deleteByPlanAndBookmarkUser(Plan plan, User user);
+    void deleteAllByBookmarkUser(User user);
     Long countByPlan(Plan plan);
     Long countByPlanPlanId(Long planId);
     Optional<Bookmark> findByBookmarkUserAndPlan(User user, Plan plan);

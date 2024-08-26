@@ -2,6 +2,7 @@ package org.example.todotravel.domain.plan.service;
 
 import org.example.todotravel.domain.plan.dto.request.ScheduleCreateRequestDto;
 import org.example.todotravel.domain.plan.dto.response.ScheduleResponseDto;
+import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.Schedule;
 import org.springframework.stereotype.Service;
 
@@ -24,4 +25,6 @@ public interface ScheduleService {
 
     //플랜 상세 조회 - 김민정
     List<ScheduleResponseDto> getSchedulesByPlan(Long planId);
+
+    void deleteAllSchedulesByPlan(Plan plan);
 }

@@ -97,4 +97,12 @@ public class FollowServiceImpl implements FollowService {
 
         return new PagedResponseDto<>(followingDtos);
     }
+
+    // 회원 탈퇴 시 모든 팔로워, 팔로잉 삭제
+    @Override
+    @Transactional
+    public void removeAllFollowRelationships(User user) {
+        followRepository.deleteAllByFollowerUser(user);
+        followRepository.deleteAllByFollowingUser(user);
+    }
 }

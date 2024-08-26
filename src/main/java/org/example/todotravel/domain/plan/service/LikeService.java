@@ -11,6 +11,8 @@ import java.util.List;
 public interface LikeService {
     Like createLike(Plan plan, User user);
     void removeLike(Plan plan, User user);
+    void removeAllLikeByPlan(Plan plan);
+    void removeAllLikeByUser(User user);
     Long countLike(Plan plan);
     Long countLikeByPlanId(Long planId);
     Boolean isPlanLikedByUser(User user, Plan plan);

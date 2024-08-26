@@ -9,5 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CommentSummaryResponseDto {
     private Long planId;
+    private String title;
+    private String location;
     private String content;
 }

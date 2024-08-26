@@ -56,4 +56,6 @@ public interface UserService {
     void updateProfileImage(Long userId, MultipartFile file);
 
     User getProfileImageUrl(Long userId);
+
+    void removeUser(User user);
 }

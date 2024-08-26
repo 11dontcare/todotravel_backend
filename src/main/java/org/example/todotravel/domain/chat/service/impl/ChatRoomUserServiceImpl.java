@@ -1,26 +1,32 @@
 package org.example.todotravel.domain.chat.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.chat.dto.request.FirstUserCheckRequestDto;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomListResponseDto;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomUserResponseDto;
 import org.example.todotravel.domain.chat.entity.ChatRoom;
 import org.example.todotravel.domain.chat.entity.ChatRoomUser;
 import org.example.todotravel.domain.chat.repository.ChatRoomUserRepository;
+import org.example.todotravel.domain.chat.service.ChatMessageService;
 import org.example.todotravel.domain.chat.service.ChatRoomUserService;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.global.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatRoomUserServiceImpl implements ChatRoomUserService {
     private final ChatRoomUserRepository chatRoomUserRepository;
+    private final ChatMessageService chatMessageService;
 
     // 특정 채팅방의 첫 번째 유저인지 판별
     @Override
@@ -69,5 +75,26 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
                 .nickname(chatRoomUser.getUser().getNickname())
                 .build())
             .collect(Collectors.toList());
+    }
+
+    // 채팅방에 존재하는 사용자인지 확인
+    @Override
+    @Transactional(readOnly = true)
+    public boolean checkUserInChatRoom(ChatRoom chatRoom, User user) {
+        return chatRoomUserRepository.existsByChatRoomAndUser(chatRoom, user);
+    }
+
+    // 회원 탈퇴 시 특정 채팅방의 사용자 모두 제거
+    @Override
+    @Transactional
+    public void removeAllUserFromChatRoom(ChatRoom chatRoom) {
+        chatRoomUserRepository.deleteByChatRoom(chatRoom);
+    }
+
+    // 회원 탈퇴 시 채팅방에서 사용자 제거
+    @Override
+    @Transactional
+    public void removeUserFromChatRoom(ChatRoom chatRoom, User user) {
+        chatRoomUserRepository.deleteByChatRoomIdAndUserId(chatRoom.getRoomId(), user.getUserId());
     }
 }

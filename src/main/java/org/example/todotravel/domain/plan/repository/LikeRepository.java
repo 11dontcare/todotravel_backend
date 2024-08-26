@@ -15,6 +15,7 @@ import java.util.Optional;
 @Repository
 public interface LikeRepository extends JpaRepository<Like, Long> {
     void deleteByPlanAndLikeUser(Plan plan, User user);
+    void deleteAllByLikeUser(User user);
     Long countByPlan(Plan plan);
     Long countByPlanPlanId(Long planId);
 

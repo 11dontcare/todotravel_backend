@@ -279,4 +279,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
 
     }
+
+    // 회원 탈퇴 시 사용자 정보 모두 삭제
+    @Override
+    @Transactional
+    public void removeUser(User user) {
+        userRepository.deleteByUserId(user.getUserId());
+    }
 }

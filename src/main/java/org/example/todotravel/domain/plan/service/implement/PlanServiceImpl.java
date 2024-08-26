@@ -95,6 +95,13 @@ public class PlanServiceImpl implements PlanService {
         planRepository.deleteByPlanId(planId);
     }
 
+    // 회원 탈퇴 시 사용자가 생성한 모든 플랜 삭제
+    @Override
+    @Transactional
+    public void removeAllPlanByUser(User user) {
+        planRepository.deleteAllByPlanUser(user);
+    }
+
     @Override
     @Transactional
     public List<PlanListResponseDto> getPublicPlans() {
@@ -272,6 +279,12 @@ public class PlanServiceImpl implements PlanService {
             .build();
     }
 
+    // 사용자가 생성한 플랜 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<Plan> getAllPlanByPlanUser(User user) {
+        return planRepository.findByPlanUser(user);
+
     // 프로필 썸네일 등록
     public void updateThumbnailImage(Long planId, MultipartFile file) {
         Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("플랜을 찾을 수 없습니다."));
@@ -301,6 +314,5 @@ public class PlanServiceImpl implements PlanService {
     @Override
     public Plan getThumbnailImageUrl(Long planId) {
         return planRepository.findById(planId).orElseThrow(() -> new RuntimeException("플랜을 찾을 수 없습니다."));
-
     }
 }

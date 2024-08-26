@@ -88,12 +88,26 @@ public class PlanUserServiceImpl implements PlanUserService {
         planUserRepository.deletePlanUserByPlanAndUser(plan, user);
     }
 
+    // 회원 탈퇴 시 사용자가 생성한 플랜에서 모든 사용자 제거
+    @Override
+    @Transactional
+    public void removePlanUserFromOwnPlan(Plan plan) {
+        planUserRepository.deleteAllByPlan(plan);
+    }
+
+    // 회원 탈퇴 시 참여하고 있던 모든 플랜에서 사용자 제거
+    @Override
+    @Transactional
+    public void removePlanUserFromPlan(Plan plan, User user) {
+        planUserRepository.deleteByPlanIdAndUserId(plan.getPlanId(), user.getUserId());
+    }
+
     // 사용자 프로필 조회
     @Override
     @Transactional(readOnly = true)
     public UserProfileResponseDto getUserProfile(String subject, User user, boolean isFollowing) {
         Long userId = user.getUserId();
-        List<PlanListResponseDto> planList = getAllPlansByUser(userId);
+        List<PlanListResponseDto> planList = getAllPlansByUserAndStatus(userId);
         int planCount = planList.size();
 
         if (subject.equals("my")) {
@@ -114,10 +128,17 @@ public class PlanUserServiceImpl implements PlanUserService {
             .build();
     }
 
-    // 특정 사용자가 참여한 모든 플랜 조회
+    // 특정 사용자가 관여한 모든 플랜 조회
     @Override
     @Transactional(readOnly = true)
-    public List<PlanListResponseDto> getAllPlansByUser(Long userId) {
+    public List<Plan> getAllPlansByUser(User user) {
+        return planUserRepository.findAllPlansByUserId(user.getUserId(), PlanUser.StatusType.ACCEPTED);
+    }
+
+    // 특정 사용자가 참여한 모든 플랜 DTO로 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<PlanListResponseDto> getAllPlansByUserAndStatus(Long userId) {
         List<Plan> plans = planUserRepository.findAllPlansByUserId(userId, PlanUser.StatusType.ACCEPTED);
         return plans.stream()
             .map(planService::convertToPlanListResponseDto)
