@@ -11,4 +11,5 @@ import java.util.List;
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     //플랜 상세 조회 - 김민정
     List<Schedule> findAllByPlan(Plan plan);
+    void deleteAllByPlan(Plan plan);
 }

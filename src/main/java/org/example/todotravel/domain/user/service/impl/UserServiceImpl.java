@@ -252,8 +252,18 @@ public class UserServiceImpl implements UserService {
     public void updateProfileImage(Long userId, MultipartFile file) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
 
-        String imageUrl = null;
+        String existingImageUrl = user.getProfileImageUrl();
 
+        if (existingImageUrl != null && !existingImageUrl.isEmpty()) {
+            String existingFileName = existingImageUrl.substring(existingImageUrl.lastIndexOf("/") + 1);
+            try {
+                s3Service.deleteFile(existingFileName);
+            } catch (IOException e) {
+                throw new RuntimeException("존재하는 프로필 이미지 삭제를 실패했습니다.", e);
+            }
+        }
+
+        String imageUrl = null;
         try {
             imageUrl = s3Service.uploadFile(file);
         } catch (IOException e) {
@@ -268,5 +278,12 @@ public class UserServiceImpl implements UserService {
     public User getProfileImageUrl(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
 
+    }
+
+    // 회원 탈퇴 시 사용자 정보 모두 삭제
+    @Override
+    @Transactional
+    public void removeUser(User user) {
+        userRepository.deleteByUserId(user.getUserId());
     }
 }

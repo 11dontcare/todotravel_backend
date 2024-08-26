@@ -128,4 +128,11 @@ public class ScheduleServiceImpl implements ScheduleService {
         schedules.forEach(schedule -> scheduleList.add(ScheduleResponseDto.fromEntity(schedule)));
         return scheduleList;
     }
+
+    // 회원 탈퇴 시 사용자가 생성한 플랜의 모든 일정 삭제하기
+    @Override
+    @Transactional
+    public void deleteAllSchedulesByPlan(Plan plan) {
+        scheduleRepository.deleteAllByPlan(plan);
+    }
 }

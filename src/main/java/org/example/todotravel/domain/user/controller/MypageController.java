@@ -1,13 +1,15 @@
 package org.example.todotravel.domain.user.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.todotravel.domain.chat.service.ChatRoomUserService;
+import org.example.todotravel.domain.notification.service.AlarmService;
 import org.example.todotravel.domain.plan.dto.response.CommentSummaryResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
-import org.example.todotravel.domain.plan.service.CommentService;
-import org.example.todotravel.domain.plan.service.PlanService;
-import org.example.todotravel.domain.plan.service.PlanUserService;
+import org.example.todotravel.domain.plan.service.*;
 import org.example.todotravel.domain.user.dto.request.FollowRequestDto;
 import org.example.todotravel.domain.user.dto.request.NicknameRequestDto;
 import org.example.todotravel.domain.user.dto.request.PasswordUpdateRequestDto;
@@ -15,11 +17,13 @@ import org.example.todotravel.domain.user.dto.request.UserInfoRequestDto;
 import org.example.todotravel.domain.user.dto.response.*;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.FollowService;
+import org.example.todotravel.domain.user.service.RefreshTokenService;
 import org.example.todotravel.domain.user.service.UserService;
+import org.example.todotravel.domain.user.service.UserWithdrawalService;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.example.todotravel.global.dto.PagedResponseDto;
 import org.example.todotravel.global.jwt.util.AuthenticationUtil;
-import org.springframework.data.domain.Page;
+import org.example.todotravel.global.jwt.util.JwtTokenizer;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,11 +38,19 @@ import java.util.List;
 public class MypageController {
     private final AuthenticationUtil authenticationUtil;
     private final PasswordEncoder passwordEncoder;
+
+    private final UserWithdrawalService userWithdrawalService;
+    private final ChatRoomUserService chatRoomUserService;
+    private final RefreshTokenService refreshTokenService;
+    private final BookmarkService bookmarkService;
     private final PlanUserService planUserService;
     private final CommentService commentService;
     private final FollowService followService;
+    private final AlarmService alarmService;
+    private final LikeService likeService;
     private final PlanService planService;
     private final UserService userService;
+    private final JwtTokenizer jwtTokenizer;
 
     // 특정 사용자 프로필 보기 (본인, 타인에 대한 처리)
     @GetMapping("/profile/{nickname}")
@@ -121,11 +133,29 @@ public class MypageController {
         return new ApiResponse<>(true, "비밀번호 변경을 완료했습니다.");
     }
 
-    // 회원 탈퇴 - 모든 정보를 삭제?
-//    @DeleteMapping("/{user_id}/withdraw")
-//    public ApiResponse<?> deleteAllUserInformation(@PathVariable("user_id") Long userId) {
-//
-//    }
+    // 회원 탈퇴 - 모든 정보를 삭제
+    @DeleteMapping("/{user_id}/withdraw")
+    public ApiResponse<?> deleteAllUserInformation(@PathVariable("user_id") Long userId, Authentication authentication,
+                                                   HttpServletRequest request, HttpServletResponse response) {
+        try {
+            // 해당 사용자 찾기
+            User user = userService.getUserById(userId);
+
+            // 본인 확인
+            if (!authenticationUtil.isAuthenticatedUser(authentication, user)) {
+                throw new AccessDeniedException("접근 권한이 없습니다.");
+            }
+
+            // 회원 탈퇴 작업 수행
+            userWithdrawalService.withdrawUser(user);
+            jwtTokenizer.deleteRefreshTokenCookie(request, response);
+
+            return new ApiResponse<>(true, "회원 탈퇴가 완료되었습니다. 그동안 저희 서비스를 이용해 주셔서 감사합니다.");
+        } catch (Exception e) {
+            log.error("회원 탈퇴 실패", e);
+            return new ApiResponse<>(false, "회원 탈퇴 중 오류가 발생했습니다. 다시 시도해 주세요.");
+        }
+    }
 
     // 사용자 팔로우
     @PostMapping("/follow")
@@ -162,7 +192,7 @@ public class MypageController {
     // 내 여행 전체 조회
     @GetMapping("/{user_id}/my-trip")
     public ApiResponse<?> getAllPlans(@PathVariable("user_id") Long userId) {
-        List<PlanListResponseDto> planList = planUserService.getAllPlansByUser(userId);
+        List<PlanListResponseDto> planList = planUserService.getAllPlansByUserAndStatus(userId);
         return new ApiResponse<>(true, "전체 여행 조회에 성공했습니다.", planList);
     }
 

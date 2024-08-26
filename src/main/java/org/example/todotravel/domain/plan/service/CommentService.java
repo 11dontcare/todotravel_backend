@@ -13,6 +13,8 @@ public interface CommentService {
     Comment getComment(Long commentId);
     Comment updateComment(Long commentId, CommentRequestDto commentRequestDto);
     void removeComment(Long commentId);
+    void removeAllCommentByPlan(Plan plan);
+    void removeAllCommentByUser(User user);
     List<Comment> getCommentsByPlan(Plan plan);
     List<CommentSummaryResponseDto> getAllCommentedPlansByUser(User user);
     List<CommentSummaryResponseDto> getRecentCommentedPlansByUser(User user);

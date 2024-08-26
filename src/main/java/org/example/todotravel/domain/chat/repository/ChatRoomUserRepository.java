@@ -4,6 +4,7 @@ import org.example.todotravel.domain.chat.entity.ChatRoom;
 import org.example.todotravel.domain.chat.entity.ChatRoomUser;
 import org.example.todotravel.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -34,4 +35,12 @@ public interface ChatRoomUserRepository extends JpaRepository<ChatRoomUser, Long
     List<ChatRoomUser> findByChatRoomRoomId(Long roomId);
 
     Optional<ChatRoomUser> findByUserAndChatRoomRoomId(User user, Long roomId);
+
+    boolean existsByChatRoomAndUser(ChatRoom chatRoom, User user);
+
+    void deleteByChatRoom(ChatRoom chatRoom);
+
+    @Modifying
+    @Query("DELETE FROM ChatRoomUser cru WHERE cru.chatRoom.roomId = :roomId AND cru.user.userId = :userId")
+    void deleteByChatRoomIdAndUserId(@Param("roomId") Long roomId, @Param("userId") Long userId);
 }
