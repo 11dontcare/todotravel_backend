@@ -1,7 +1,9 @@
 package org.example.todotravel.domain.user.service.impl;
 
 import io.jsonwebtoken.Claims;
+
 import java.io.IOException;
+
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.user.dto.request.*;
 import org.example.todotravel.domain.user.dto.response.*;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -82,6 +85,7 @@ public class UserServiceImpl implements UserService {
         String email = claims.getSubject();
         User user = getUserByEmail(email);
 
+        user.setNickname(dto.getNickname());
         user.setGender(dto.getGender());
         user.setBirthDate(dto.getBirthDate());
         user.setRole(Role.ROLE_USER);
