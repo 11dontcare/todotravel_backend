@@ -10,10 +10,7 @@ import org.example.todotravel.domain.notification.service.AlarmService;
 import org.example.todotravel.domain.plan.dto.response.CommentSummaryResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.service.*;
-import org.example.todotravel.domain.user.dto.request.FollowRequestDto;
-import org.example.todotravel.domain.user.dto.request.NicknameRequestDto;
-import org.example.todotravel.domain.user.dto.request.PasswordUpdateRequestDto;
-import org.example.todotravel.domain.user.dto.request.UserInfoRequestDto;
+import org.example.todotravel.domain.user.dto.request.*;
 import org.example.todotravel.domain.user.dto.response.*;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.FollowService;
@@ -28,6 +25,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -239,5 +237,22 @@ public class MypageController {
 
         List<CommentSummaryResponseDto> planList = commentService.getAllCommentedPlansByUser(user);
         return new ApiResponse<>(true, "댓글을 단 여행 조회에 성공했습니다.", planList);
+    }
+
+    // 프로필 이미지
+    @PostMapping("/profile-image/{userId}")
+    public ApiResponse<UserProfileImageRequestDTO> uploadProfileImage(@PathVariable("userId") Long userId,
+                                                                      @RequestParam("file") MultipartFile file) {
+        try {
+            userService.updateProfileImage(userId, file);
+
+            User user = userService.getProfileImageUrl(userId);
+            String profileImageUrl = user.getProfileImageUrl();
+
+            UserProfileImageRequestDTO response = new UserProfileImageRequestDTO(userId, profileImageUrl);
+            return new ApiResponse<>(true, "프로필 이미지가 성공적으로 업로드 되었습니다.", response);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "프로필 이미지 업로드 실패했습니다.");
+        }
     }
 }

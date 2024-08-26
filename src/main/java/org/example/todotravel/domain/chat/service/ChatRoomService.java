@@ -20,4 +20,5 @@ public interface ChatRoomService {
     Plan getPlanByRoomId(Long roomId);
     void removeUserFromChatRoom(Long roomId, Long userId);
     void deleteChatRoom(Long roomId);
+    void deleteChatRoomAndMessage(Long roomId);
 }

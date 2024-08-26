@@ -24,7 +24,7 @@ public interface UserService {
 
     User checkLoginAvailable(String username, String password, PasswordEncoder passwordEncoder);
 
-    UsernameResponseDto getUsername(UsernameRequestDto dto);
+    Object getUsernameOrEmail(UsernameRequestDto dto);
 
     void updateUserInfo(User user, UserInfoRequestDto dto);
 

@@ -20,6 +20,7 @@ public class UserProfileResponseDto {
     private Gender gender;
     private int age;
     private String info;
+    private String profileImageUrl;
     private boolean isFollowing;
     private int followerCount;
     private int followingCount;

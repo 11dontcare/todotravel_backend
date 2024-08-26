@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.todotravel.domain.user.dto.request.*;
 import org.example.todotravel.domain.user.dto.response.LoginResponseDto;
+import org.example.todotravel.domain.user.dto.response.OAuth2EmailResponseDto;
 import org.example.todotravel.domain.user.dto.response.UsernameResponseDto;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.UserService;
@@ -106,8 +107,15 @@ public class UserController {
     // 아이디 찾기 인증확인
     @PostMapping("/find-username")
     public ApiResponse<?> findUsername(@Valid @RequestBody UsernameRequestDto dto) {
-        UsernameResponseDto usernameResponseDto = userService.getUsername(dto);
-        return new ApiResponse<>(true, "아이디 찾기를 성공했습니다.", usernameResponseDto);
+        Object response = userService.getUsernameOrEmail(dto);
+
+        if (response instanceof UsernameResponseDto) {
+            return new ApiResponse<>(true, "아이디 찾기를 성공했습니다.", response);
+        } else if (response instanceof OAuth2EmailResponseDto) {
+            return new ApiResponse<>(true, "소셜 로그인 사용자의 이메일 정보를 찾았습니다.", response);
+        } else {
+            return new ApiResponse<>(false, "알 수 없는 오류가 발생했습니다.", null);
+        }
     }
 
     // 비밀번호 재설정
@@ -130,22 +138,4 @@ public class UserController {
         // 클라이언트에게 AccessToken 삭제 지시 (프론트엔드에서 처리)
         return new ApiResponse<>(true, "로그아웃을 성공했습니다.");
     }
-
-    // 프로필 이미지
-    @PostMapping("/profile-image/{userId}")
-    public ApiResponse<UserProfileImageRequestDTO> uploadProfileImage(@PathVariable("userId") Long userId,
-                                                                      @RequestParam("file") MultipartFile file) {
-        try {
-            userService.updateProfileImage(userId, file);
-
-            User user = userService.getProfileImageUrl(userId);
-            String profileImageUrl = user.getProfileImageUrl();
-
-            UserProfileImageRequestDTO response = new UserProfileImageRequestDTO(userId, profileImageUrl);
-            return new ApiResponse<>(true, "프로필 이미지가 성공적으로 업로드 되었습니다.", response);
-        } catch (Exception e) {
-            return new ApiResponse<>(false, "프로필 이미지 업로드 실패했습니다.");
-        }
-    }
-
 }

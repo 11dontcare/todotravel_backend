@@ -87,12 +87,11 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     @Transactional
-    public void deletePlan(Long planId) {
-        Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("여행 플랜을 찾을 수 없습니다."));
+    public void deletePlan(Plan plan) {
         commentService.removeAllByPlan(plan);
         bookmarkService.removeAllByPlan(plan);
         likeService.removeAllByPlan(plan);
-        planRepository.deleteByPlanId(planId);
+        planRepository.deleteByPlanId(plan.getPlanId());
     }
 
     // 회원 탈퇴 시 사용자가 생성한 모든 플랜 삭제
@@ -100,6 +99,13 @@ public class PlanServiceImpl implements PlanService {
     @Transactional
     public void removeAllPlanByUser(User user) {
         planRepository.deleteAllByPlanUser(user);
+    }
+
+    // 회원 탈퇴 시 사용자가 생성한 해당 플랜에 대해서만 삭제
+    @Override
+    @Transactional
+    public void removeJustPlan(Plan plan) {
+        planRepository.deleteByPlanId(plan.getPlanId());
     }
 
     @Override

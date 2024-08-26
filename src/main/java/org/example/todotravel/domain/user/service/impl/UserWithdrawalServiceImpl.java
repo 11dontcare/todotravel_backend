@@ -14,11 +14,19 @@ import org.example.todotravel.domain.user.service.FollowService;
 import org.example.todotravel.domain.user.service.RefreshTokenService;
 import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.domain.user.service.UserWithdrawalService;
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.dao.PessimisticLockingFailureException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionSystemException;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -40,35 +48,80 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
     private final PlanService planService;
     private final UserService userService;
 
+    // 삭제된 채팅방 ID를 추적하기 위한 Set
+    private final Set<Long> deletedChatRoomIds = new HashSet<>();
+
+    private static final int MAX_RETRIES = 3;
+    private static final long RETRY_DELAY = 1000; // 1초
+
     @Override
-    @Transactional
+    @Transactional(timeout = 60) // 60초 타임아웃 설정
     public void withdrawUser(User user) {
+        int retries = 0;
+        while (retries < MAX_RETRIES) {
+            try {
+                executeWithdrawal(user);
+                return;
+            } catch (PessimisticLockingFailureException | ObjectOptimisticLockingFailureException e) {
+                log.warn("Lock acquisition failed. Retrying... (Attempt {})", retries + 1, e);
+                retries++;
+                if (retries < MAX_RETRIES) {
+                    try {
+                        Thread.sleep(RETRY_DELAY);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            } catch (TransactionSystemException e) {
+                log.error("Transaction system error during user withdrawal (userId: {})", user.getUserId(), e);
+                throw new RuntimeException("회원 탈퇴 중 트랜잭션 오류 발생", e);
+            } catch (Exception e) {
+                log.error("회원 탈퇴 실패 (userId: {})", user.getUserId(), e);
+                throw new RuntimeException("회원 탈퇴 실패", e);
+            }
+        }
+        throw new RuntimeException("회원 탈퇴 실패: 최대 재시도 횟수 초과");
+    }
+
+    private void executeWithdrawal(User user) {
         try {
             List<Plan> userPlans = planService.getAllPlanByPlanUser(user);
 
-            // 채팅 메시지 삭제를 비동기로 처리
             CompletableFuture<Void> chatMessageDeletionFuture = CompletableFuture.runAsync(() ->
                 deleteChatMessages(userPlans).block()
             );
 
-            // 나머지 작업은 동기적으로 수행
             deleteUserData(user, userPlans);
             handleNonCreatedPlans(user);
 
-            // 채팅 메시지 삭제 완료 대기
             chatMessageDeletionFuture.join();
 
-            // 마지막으로 사용자 제거
+            chatRoomUserService.removeUserFromAllChatRoom(user);
+            alarmService.deleteAllAlarm(user.getUserId());
+            refreshTokenService.deleteRefreshToken(user.getUserId());
+            followService.removeAllFollowRelationships(user);
+
             userService.removeUser(user);
+
+            // 짧은 지연 추가
+            Thread.sleep(1000);
+
+            // deleted_messages 컬렉션에서 메시지 삭제를 동기적으로 실행
+            log.info("Starting to remove deleted messages for rooms: {}", deletedChatRoomIds);
+            chatMessageService.removeDeletedMessagesForRooms(deletedChatRoomIds)
+                .doOnSuccess(v -> log.info("Successfully removed deleted messages for rooms: {}", deletedChatRoomIds))
+                .doOnError(e -> log.error("Error removing deleted messages: ", e))
+                .block(); // 작업이 완료될 때까지 기다립니다.
+            log.info("Finished removing deleted messages");
 
         } catch (Exception e) {
             log.error("회원 탈퇴 실패 (userId: {}): {}", user.getUserId(), e.getMessage());
-            // MySQL 데이터는 @Transactional 에 의해 자동 롤백
-            // 채팅 메시지 복구를 비동기로 처리
             CompletableFuture.runAsync(() ->
-                restoreChatMessages(planService.getAllPlanByPlanUser(user)).block()
+                restoreChatMessages(deletedChatRoomIds).block()
             );
             throw new RuntimeException("회원 탈퇴 실패", e);
+        } finally {
+            deletedChatRoomIds.clear();
         }
     }
 
@@ -76,17 +129,15 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
     private Mono<Void> deleteChatMessages(List<Plan> userPlans) {
         return Mono.fromCallable(() -> chatRoomService.getAllChatRoomByPlan(userPlans))
             .flatMapIterable(rooms -> rooms)
-            .flatMap(chatRoom -> chatMessageService.deleteAllMessageForChatRoom(chatRoom.getRoomId()))
+            .flatMap(chatRoom -> {
+                deletedChatRoomIds.add(chatRoom.getRoomId()); // 삭제되는 채팅방 추적
+                return chatMessageService.deleteAllMessageForChatRoom(chatRoom.getRoomId());
+            })
             .then();
     }
 
     // 사용자 관련 데이터 삭제 수행
     private void deleteUserData(User user, List<Plan> userPlans) {
-        Long userId = user.getUserId();
-
-        alarmService.deleteAllAlarm(userId);
-        refreshTokenService.deleteRefreshToken(userId);
-        followService.removeAllFollowRelationships(user);
 
         // 사용자가 생성한 플랜의 채팅방 삭제
         List<ChatRoom> chatRooms = chatRoomService.getAllChatRoomByPlan(userPlans);
@@ -118,10 +169,18 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
         ChatRoom chatRoom = chatRoomService.getChatRoomByPlanId(plan.getPlanId());
         if (chatRoom.getChatRoomUsers().size() == 1 || plan.getPlanUsers().size() == 1) {
             deleteEntirePlan(plan);
+
+            // 메시지 삭제를 비동기로 처리
+            CompletableFuture.runAsync(() ->
+                chatMessageService.deleteAllMessageForChatRoom(chatRoom.getRoomId()).block()
+            );
+
             chatRoomUserService.removeAllUserFromChatRoom(chatRoom);
             chatRoomService.deleteChatRoom(chatRoom.getRoomId());
+            deletedChatRoomIds.add(chatRoom.getRoomId()); // 삭제되는 채팅방 추적
         } else {
             updateUserInPlan(user, plan, chatRoom);
+            planUserService.removePlanUserFromPlan(plan, user);
         }
     }
 
@@ -130,13 +189,9 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
         String oldNickname = user.getNickname();
         try {
             chatMessageService.updateNicknameForUser(user.getUserId(), "(알 수 없음)")
-                .doOnSuccess(v -> {
-                    chatRoomUserService.removeUserFromChatRoom(chatRoom, user);
-                    planUserService.removePlanUserFromPlan(plan, user);
-                })
                 .doOnError(e -> {
                     log.error("Error updating nickname for user ID: {}", user.getUserId(), e);
-                    chatMessageService.updateNicknameForUser(user.getUserId(), oldNickname).block();
+                    chatMessageService.updateNicknameForUser(user.getUserId(), oldNickname);
                 })
                 .block();
         } catch (Exception e) {
@@ -147,20 +202,19 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
     }
 
     // 사용자가 생성한 플랜의 댓글, 좋아요, 북마크, 참여자, 일정, 해당 플랜 순서대로 삭제
-    private void deleteEntirePlan(Plan plan) {
+    protected void deleteEntirePlan(Plan plan) {
         commentService.removeAllCommentByPlan(plan);
         likeService.removeAllLikeByPlan(plan);
         bookmarkService.removeAllBookmarksByPlan(plan);
         planUserService.removePlanUserFromOwnPlan(plan);
         scheduleService.deleteAllSchedulesByPlan(plan);
-        planService.deletePlan(plan.getPlanId());
+        planService.removeJustPlan(plan);
     }
 
     // 탈퇴 중 오류 발생 시 채팅 메시지 복구
-    private Mono<Void> restoreChatMessages(List<Plan> userPlans) {
-        return Mono.fromCallable(() -> chatRoomService.getAllChatRoomByPlan(userPlans))
-            .flatMapIterable(rooms -> rooms)
-            .flatMap(chatRoom -> chatMessageService.restoreMessagesForChatRoom(chatRoom.getRoomId()))
+    private Mono<Void> restoreChatMessages(Set<Long> roomIds) {
+        return Flux.fromIterable(roomIds)
+            .flatMap(chatMessageService::restoreMessagesForChatRoom)
             .then();
     }
 }

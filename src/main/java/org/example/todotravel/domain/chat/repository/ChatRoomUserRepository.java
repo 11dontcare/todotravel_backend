@@ -38,9 +38,17 @@ public interface ChatRoomUserRepository extends JpaRepository<ChatRoomUser, Long
 
     boolean existsByChatRoomAndUser(ChatRoom chatRoom, User user);
 
-    void deleteByChatRoom(ChatRoom chatRoom);
+    @Modifying
+    @Query("DELETE FROM ChatRoomUser cru WHERE cru.chatRoom.roomId = :roomId")
+    void deleteByChatRoom(@Param("roomId") Long roomId);
 
     @Modifying
     @Query("DELETE FROM ChatRoomUser cru WHERE cru.chatRoom.roomId = :roomId AND cru.user.userId = :userId")
     void deleteByChatRoomIdAndUserId(@Param("roomId") Long roomId, @Param("userId") Long userId);
+
+    Optional<ChatRoomUser> findByChatRoomAndUser(ChatRoom chatRoom, User user);
+
+    @Modifying
+    @Query("DELETE FROM ChatRoomUser cru WHERE cru.user = :user")
+    void deleteByChatRoomUser(@Param("user") User user);
 }

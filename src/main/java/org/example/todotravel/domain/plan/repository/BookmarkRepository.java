@@ -5,6 +5,7 @@ import org.example.todotravel.domain.plan.entity.Bookmark;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,7 +16,11 @@ import java.util.Optional;
 @Repository
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     void deleteByPlanAndBookmarkUser(Plan plan, User user);
-    void deleteAllByBookmarkUser(User user);
+
+    @Modifying
+    @Query("DELETE FROM Bookmark b WHERE b.bookmarkUser = :user")
+    void deleteAllByBookmarkUser(@Param("user") User user);
+
     Long countByPlan(Plan plan);
     Long countByPlanPlanId(Long planId);
     Optional<Bookmark> findByBookmarkUserAndPlan(User user, Plan plan);
@@ -36,5 +41,7 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     List<PlanSummaryDto> findRecentCommentedPlansByUserId(@Param("userId") Long userId);
 
     //플랜 삭제 시 플랜에 달린 북마크 삭제
-    void deleteAllByPlan(Plan plan);
+    @Modifying
+    @Query("DELETE FROM Bookmark b WHERE b.plan = :plan")
+    void deleteAllByPlan(@Param("plan") Plan plan);
 }

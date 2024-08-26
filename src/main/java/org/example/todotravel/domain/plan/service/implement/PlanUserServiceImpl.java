@@ -120,6 +120,7 @@ public class PlanUserServiceImpl implements PlanUserService {
             .gender(user.getGender())
             .age(Period.between(user.getBirthDate(), LocalDate.now()).getYears())
             .info(user.getInfo())
+            .profileImageUrl(user.getProfileImageUrl())
             .isFollowing(isFollowing)
             .followerCount(user.getFollowings().size()) // 팔로워 수 : 나를 팔로잉 하는 수
             .followingCount(user.getFollowers().size()) // 팔로잉 수 : 내가 팔로잉 하는 수
