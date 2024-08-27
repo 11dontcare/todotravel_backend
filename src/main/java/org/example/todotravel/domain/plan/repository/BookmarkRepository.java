@@ -36,7 +36,7 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
         JOIN users u ON p.user_id = u.user_id
         WHERE b.user_id = :userId
         ORDER BY b.bookmark_id DESC
-        LIMIT 3
+        LIMIT 4
         """)
     List<PlanSummaryDto> findRecentCommentedPlansByUserId(@Param("userId") Long userId);
 

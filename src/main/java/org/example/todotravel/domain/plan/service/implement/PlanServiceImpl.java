@@ -216,7 +216,7 @@ public class PlanServiceImpl implements PlanService {
             .build();
     }
 
-    // 특정 사용자가 최근 북마크한 플랜 3개 조회 후 Dto로 반환
+    // 특정 사용자가 최근 북마크한 플랜 4개 조회 후 Dto로 반환
     @Override
     @Transactional(readOnly = true)
     public List<PlanListResponseDto> getRecentBookmarkedPlans(User user) {
@@ -236,7 +236,7 @@ public class PlanServiceImpl implements PlanService {
             .collect(Collectors.toList());
     }
 
-    // 특정 사용자가 최근 좋아요한 플랜 3개 조회 후 Dto로 반환
+    // 특정 사용자가 최근 좋아요한 플랜 4개 조회 후 Dto로 반환
     @Override
     @Transactional(readOnly = true)
     public List<PlanListResponseDto> getRecentLikedPlans(User user) {
