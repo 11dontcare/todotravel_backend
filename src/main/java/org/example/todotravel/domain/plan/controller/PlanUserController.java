@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.chat.entity.ChatRoom;
 import org.example.todotravel.domain.chat.service.ChatRoomService;
 import org.example.todotravel.domain.plan.dto.response.PlanUserResponseDto;
+import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
+import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.plan.service.PlanUserService;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,7 @@ import java.util.List;
 public class PlanUserController {
     private final PlanUserService planUserService;
     private final ChatRoomService chatRoomService;
+    private final PlanService planService;
 
     // 플랜 초대 거절
     @PutMapping("/invite/{plan_participant_id}/reject")
@@ -59,6 +62,13 @@ public class PlanUserController {
         // ChatRoomUser에서도 해당 사용자 제거
         ChatRoom chatRoom = chatRoomService.getChatRoomByPlanId(planId);
         chatRoomService.removeUserFromChatRoom(chatRoom.getRoomId(), userId);
+
+        //플랜에 참여자가 없으면 플랜 삭제
+        if(planUserService.getAllPlanUser(planId) == null){
+            chatRoomService.deleteChatRoom(chatRoom.getRoomId());
+            Plan plan = planService.getPlan(planId);
+            planService.deletePlan(plan);
+        }
 
         return new ApiResponse<>(true, "플랜 참여자 삭제 성공");
     }
