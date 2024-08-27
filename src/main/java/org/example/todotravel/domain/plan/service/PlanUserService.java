@@ -22,4 +22,6 @@ public interface PlanUserService {
     List<Plan> getAllPlansByUser(User user);
     List<PlanListResponseDto> getAllPlansByUserAndStatus(Long userId);
     List<PlanListResponseDto> getRecentPlansByUser(Long userId);
+
+    Boolean existsPlanUser(Plan plan, Long userId);
 }

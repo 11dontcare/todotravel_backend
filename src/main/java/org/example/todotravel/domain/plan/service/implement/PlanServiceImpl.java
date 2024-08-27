@@ -322,4 +322,9 @@ public class PlanServiceImpl implements PlanService {
     public Plan getThumbnailImageUrl(Long planId) {
         return planRepository.findById(planId).orElseThrow(() -> new RuntimeException("플랜을 찾을 수 없습니다."));
     }
+
+    @Override
+    public void savePlan(Plan plan) {
+        planRepository.save(plan);
+    }
 }

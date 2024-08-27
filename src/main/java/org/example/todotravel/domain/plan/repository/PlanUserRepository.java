@@ -32,4 +32,6 @@ public interface PlanUserRepository extends JpaRepository<PlanUser, Long> {
         ORDER BY pu.plan.planId DESC
         """)
     List<Plan> findAllPlansByUserId(@Param("userId") Long userId, @Param("status") PlanUser.StatusType status);
+
+    Boolean existsPlanUserByPlanAndUser(Plan plan, User user);
 }
