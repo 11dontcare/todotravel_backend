@@ -16,6 +16,7 @@ public class CommentResponseDto {
     private Long planId;
     private String content;
     private Boolean beforeTravel;
+    private String nickname;
 
     public static CommentResponseDto fromEntity(Comment comment){
         return CommentResponseDto.builder()
@@ -24,6 +25,7 @@ public class CommentResponseDto {
                 .planId(comment.getPlan().getPlanId())
                 .content(comment.getContent())
                 .beforeTravel(comment.getBeforeTravel())
+                .nickname(comment.getCommentUser().getNickname())
                 .build();
     }
 }
