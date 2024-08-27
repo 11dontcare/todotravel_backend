@@ -37,7 +37,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
            JOIN users u ON p.user_id = u.user_id
            WHERE l.user_id = :userId
            ORDER BY l.like_id DESC
-           LIMIT 3
+           LIMIT 4
            """)
     List<PlanSummaryDto> findRecentLikedPlansByUserId(@Param("userId") Long userId);
 

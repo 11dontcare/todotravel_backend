@@ -81,7 +81,7 @@ public class BookmarkServiceImpl implements BookmarkService {
         return bookmarkRepository.findBookmarkedPlansByUserId(userId);
     }
 
-    // 특정 사용자가 최근 북마크한 플랜 3개 조회
+    // 특정 사용자가 최근 북마크한 플랜 4개 조회
     @Override
     @Transactional(readOnly = true)
     public List<PlanSummaryDto> getRecentBookmarkedPlansByUser(Long userId) {
