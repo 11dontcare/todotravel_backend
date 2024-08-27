@@ -111,7 +111,7 @@ public class PlanUserServiceImpl implements PlanUserService {
         int planCount = planList.size();
 
         if (subject.equals("my")) {
-            planList = planCount > 3 ? planList.subList(0, 3) : planList;
+            planList = planCount > 4 ? planList.subList(0, 4) : planList;
         }
 
         return UserProfileResponseDto.builder()

@@ -81,7 +81,7 @@ public class LikeServiceImpl implements LikeService {
         return likeRepository.findLikedPlansByUserId(userId);
     }
 
-    // 특정 사용자가 최근 좋아요한 플랜 3개 조회
+    // 특정 사용자가 최근 좋아요한 플랜 4개 조회
     @Override
     @Transactional(readOnly = true)
     public List<PlanSummaryDto> getRecentLikedPlansByUser(Long userId) {
