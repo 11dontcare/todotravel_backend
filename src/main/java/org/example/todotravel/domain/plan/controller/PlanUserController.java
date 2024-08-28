@@ -8,6 +8,7 @@ import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
 import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.plan.service.PlanUserService;
+import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,13 +64,29 @@ public class PlanUserController {
         ChatRoom chatRoom = chatRoomService.getChatRoomByPlanId(planId);
         chatRoomService.removeUserFromChatRoom(chatRoom.getRoomId(), userId);
 
+        Plan plan = planService.getPlan(planId);
+
         //플랜에 참여자가 없으면 플랜 삭제
-        if(planUserService.getAllPlanUser(planId) == null){
+        if(planUserService.getAllPlanUser(planId).isEmpty()){
             chatRoomService.deleteChatRoom(chatRoom.getRoomId());
-            Plan plan = planService.getPlan(planId);
             planService.deletePlan(plan);
         }
+        else if (plan.getPlanUser().getUserId().equals(userId)){
+            User user = planUserService.getAllPlanUser(planId).getFirst().getUser();
+            plan.toBuilder()
+                    .planUser(user)
+                    .build();
+            planService.savePlan(plan);
+        }//플랜에 참여자가 있고 나간 사용자가 플랜 생성자면 플랜 생성자 변경
 
         return new ApiResponse<>(true, "플랜 참여자 삭제 성공");
+    }
+
+    //플랜에 참여 중인 사용자인지 확인
+    @GetMapping("/plan/{plan_id}/exist/{user_id}")
+    public ApiResponse<Boolean> isUserInPlan(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId){
+        Plan plan = planService.getPlan(planId);
+        Boolean existsPlanUser = planUserService.existsPlanUser(plan, userId);
+        return new ApiResponse<>(true, "플랜 참여 여부 조회 성공", existsPlanUser);
     }
 }

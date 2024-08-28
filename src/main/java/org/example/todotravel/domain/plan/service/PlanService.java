@@ -22,6 +22,7 @@ public interface PlanService {
     Plan copyPlan(Long planId, User user);
     List<PlanListResponseDto> getSpecificPlans(String keyword);
     PlanResponseDto getPlanForModify(Long planId);
+    void savePlan(Plan plan);
 
     List<PlanListResponseDto> getRecentBookmarkedPlans(User user);
     List<PlanListResponseDto> getAllBookmarkedPlans(User user);

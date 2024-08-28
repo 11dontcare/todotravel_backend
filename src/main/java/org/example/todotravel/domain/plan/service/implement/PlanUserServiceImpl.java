@@ -157,4 +157,10 @@ public class PlanUserServiceImpl implements PlanUserService {
             .map(planService::convertToPlanListResponseDto)
             .collect(Collectors.toList());
     }
+
+    @Override
+    public Boolean existsPlanUser(Plan plan, Long userId) {
+        User user = userService.getUserById(userId);
+        return planUserRepository.existsPlanUserByPlanAndUser(plan, user);
+    }
 }
