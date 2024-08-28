@@ -10,7 +10,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface PlanService {
-    Plan createPlan(PlanRequestDto planRequestDto, User user);
+    Plan createPlan(PlanRequestDto planRequestDto, MultipartFile file, User user);
     void deletePlan(Plan plan);
     void removeAllPlanByUser(User user);
     void removeJustPlan(Plan plan);

@@ -42,11 +42,11 @@ public class PlanController {
 
     //플랜 생성
     @PostMapping
-    public ApiResponse<Long> createPlan(@Valid @RequestBody PlanRequestDto planRequestDto) {
+    public ApiResponse<Long> createPlan(@Valid @RequestPart("planRequestDto") PlanRequestDto planRequestDto, @RequestParam("planThumbnail") MultipartFile planThumbnail) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails)authentication.getPrincipal();
         User user = userService.getUserByUsername(userDetails.getUsername());
-        Plan plan = planService.createPlan(planRequestDto, user);
+        Plan plan = planService.createPlan(planRequestDto, planThumbnail, user);
 
         // 채팅방 자동 생성
         chatRoomService.createChatRoom(plan);

@@ -6,6 +6,7 @@ import org.example.todotravel.domain.user.entity.User;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import org.springframework.web.multipart.MultipartFile;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,6 +22,7 @@ public class PlanRequestDto {
     private Boolean isPublic;
     private Boolean status;
     private Long totalBudget;
+    private String planThumbnailUrl;
 
     public Plan toEntity(){
         return Plan.builder()
@@ -31,6 +33,7 @@ public class PlanRequestDto {
                 .isPublic(isPublic)
                 .status(status)
                 .totalBudget(totalBudget)
+                .planThumbnailUrl(planThumbnailUrl)
                 .build();
     }
 }
