@@ -30,7 +30,7 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 
     @Query(nativeQuery = true, value = """
         SELECT p.plan_id as planId, p.title, p.location, p.description, p.start_date as startDate,
-               p.end_date as endDate, u.nickname as planUserNickname
+               p.end_date as endDate, u.nickname as planUserNickname, p.plan_thumbnail_url
         FROM plans p
         JOIN bookmarks b ON p.plan_id = b.plan_id
         JOIN users u ON p.user_id = u.user_id
