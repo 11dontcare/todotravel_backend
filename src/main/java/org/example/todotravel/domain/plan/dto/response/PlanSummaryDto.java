@@ -10,4 +10,5 @@ public interface PlanSummaryDto {
     LocalDate getStartDate();
     LocalDate getEndDate();
     String getPlanUserNickname();
+    String getPlanThumbnailUrl();
 }
