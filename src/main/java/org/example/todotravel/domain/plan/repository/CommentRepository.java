@@ -27,7 +27,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             c.plan.location,
             (SELECT c2.content FROM Comment c2
              WHERE c2.plan = c.plan
-             AND c2.commentId = (SELECT MAX(c3.commentId) FROM Comment c3 WHERE c3.plan = c.plan))
+             AND c2.commentId = (SELECT MAX(c3.commentId) FROM Comment c3 WHERE c3.plan = c.plan)),
+             c.plan.planThumbnailUrl
         )
         FROM Comment c
         WHERE c.commentUser.userId = :userId
@@ -41,7 +42,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             c.plan.planId,
             c.plan.title,
             c.plan.location,
-            c.content
+            c.content,
+            c.plan.planThumbnailUrl
         )
         FROM Comment c
         WHERE c.commentUser.userId = :userId

@@ -12,4 +12,5 @@ public class CommentSummaryResponseDto {
     private String title;
     private String location;
     private String content;
+    private String planThumbnailUrl;
 }

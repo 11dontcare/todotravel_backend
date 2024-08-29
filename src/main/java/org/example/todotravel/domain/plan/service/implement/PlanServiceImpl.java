@@ -280,6 +280,7 @@ public class PlanServiceImpl implements PlanService {
             .bookmarkNumber(bookmarkService.countBookmark(plan))
             .likeNumber(likeService.countLike(plan))
             .planUserNickname(plan.getPlanUser().getNickname())
+            .planThumbnailUrl(plan.getPlanThumbnailUrl())
             .build();
     }
 
@@ -294,6 +295,7 @@ public class PlanServiceImpl implements PlanService {
             .bookmarkNumber(bookmarkService.countBookmarkByPlanId(summaryDto.getPlanId()))
             .likeNumber(likeService.countLikeByPlanId(summaryDto.getPlanId()))
             .planUserNickname(summaryDto.getPlanUserNickname())
+            .planThumbnailUrl(summaryDto.getPlanThumbnailUrl())
             .build();
     }
 
