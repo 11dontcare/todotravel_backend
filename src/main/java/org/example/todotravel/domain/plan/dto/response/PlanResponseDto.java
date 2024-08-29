@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.todotravel.domain.plan.entity.Plan;
+import org.example.todotravel.domain.plan.entity.PlanUser;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,6 +33,10 @@ public class PlanResponseDto {
 
     private Integer participantsCount;
 
+    private Long planUserCount;
+
+    private Boolean recruitment;
+
     private Long totalBudget;
 
     private Long planUserId;
@@ -57,6 +62,8 @@ public class PlanResponseDto {
                 .isPublic(plan.getIsPublic())
                 .status(plan.getStatus())
                 .participantsCount(plan.getParticipantsCount())
+                .planUserCount(plan.getPlanUsers().stream().filter(planUser -> planUser.getStatus() == PlanUser.StatusType.ACCEPTED).count())
+                .recruitment(plan.getRecruitment())
                 .totalBudget(plan.getTotalBudget())
                 .planUserId(plan.getPlanUser().getUserId())
                 .planUserNickname(plan.getPlanUser().getNickname())
