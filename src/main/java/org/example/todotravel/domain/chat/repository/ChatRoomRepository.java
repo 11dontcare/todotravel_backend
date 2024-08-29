@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,4 +20,8 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     @Modifying
     @Query("DELETE FROM ChatRoom cr WHERE cr.roomId = :roomId")
     void deleteByRoomId(@Param("roomId") Long roomId);
+
+    @Modifying
+    @Query("UPDATE ChatRoom cr SET cr.roomDate = :roomDate WHERE cr.roomId = :roomId")
+    int updateChatRoomByRoomId(@Param("roomId") Long roomId, @Param("roomDate")LocalDateTime roomDate);
 }
