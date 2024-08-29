@@ -14,11 +14,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MyProfileResponseDto extends UserProfileResponseDto {
+    private List<PlanListResponseDto> recruitingPlans;
     private List<PlanListResponseDto> recentBookmarks;
     private List<PlanListResponseDto> recentLikes;
     private List<CommentSummaryResponseDto> recentComments;
 
     public static MyProfileResponseDto from(UserProfileResponseDto userProfileResponseDto,
+                                            List<PlanListResponseDto> recruitingPlans,
                                             List<PlanListResponseDto> recentBookmarks,
                                             List<PlanListResponseDto> recentLikes,
                                             List<CommentSummaryResponseDto> recentComments) {
@@ -34,6 +36,7 @@ public class MyProfileResponseDto extends UserProfileResponseDto {
             .followingCount(userProfileResponseDto.getFollowingCount())
             .planCount(userProfileResponseDto.getPlanCount())
             .planList(userProfileResponseDto.getPlanList())
+            .recruitingPlans(recruitingPlans)
             .recentBookmarks(recentBookmarks)
             .recentLikes(recentLikes)
             .recentComments(recentComments)

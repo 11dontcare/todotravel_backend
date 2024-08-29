@@ -151,13 +151,21 @@ public class PlanUserServiceImpl implements PlanUserService {
             .collect(Collectors.toList());
     }
 
-    // 특정 사용자가 참여한 최근 플랜 3개 조회
+    // 특정 사용자가 관여한 플랜 중 모집 중인 플랜 4개 DTO로 조회
     @Override
     @Transactional(readOnly = true)
-    public List<PlanListResponseDto> getRecentPlansByUser(Long userId) {
-        List<Plan> plans = planUserRepository.findAllPlansByUserId(userId, PlanUser.StatusType.ACCEPTED);
-        plans = plans.size() > 3 ? plans.subList(0, 3) : plans;
+    public List<PlanListResponseDto> getOwnRecruitmentPlansLimit4(User user) {
+        List<Plan> plans = planUserRepository.findRecruitingPlansByUserIdLimit4(user.getUserId(), PlanUser.StatusType.ACCEPTED);
+        return plans.stream()
+            .map(planService::convertToPlanListResponseDto)
+            .collect(Collectors.toList());
+    }
 
+    // 특정 사용자가 관여한 플랜 중 모집 중인 모든 플랜 DTO로 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<PlanListResponseDto> getAllRecruitmentPlans(Long userId) {
+        List<Plan> plans = planUserRepository.findAllRecruitingPlansByUserId(userId, PlanUser.StatusType.ACCEPTED);
         return plans.stream()
             .map(planService::convertToPlanListResponseDto)
             .collect(Collectors.toList());
