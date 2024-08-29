@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.example.todotravel.domain.user.entity.User;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "plans")
@@ -49,6 +50,10 @@ public class Plan {
     //db에 반영 안 될 시 alter table plans modify column participants_count int null;
     @Column(name = "participants_count")
     private Integer participantsCount;
+
+    @Column(name = "recruitment")
+    @ColumnDefault("false")
+    private Boolean recruitment;
 
     @Column(name = "total_budget")
     private Long totalBudget;

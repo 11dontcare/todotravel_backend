@@ -32,7 +32,7 @@ public class PlanUserServiceImpl implements PlanUserService {
     private final UserService userService;
     private final AlarmService alarmService; //알림 자동 생성
 
-    //플랜 초대
+    //플랜 초대, 플랜 모집 참가
     @Override
     @Transactional
     public PlanUser addPlanUser(Long planId, Long userId) {
@@ -46,10 +46,15 @@ public class PlanUserServiceImpl implements PlanUserService {
 
         PlanUser newPlanUser = planUserRepository.save(planUser);
 
-
-        AlarmRequestDto requestDto = new AlarmRequestDto(plan.getPlanUser().getUserId(),
-            "[" + plan.getTitle() + "] 플랜에 " + user.getNickname() + "님이 초대 되었습니다.");
-        alarmService.createAlarm(requestDto);
+        if (!plan.getRecruitment()) {
+            AlarmRequestDto requestDto = new AlarmRequestDto(plan.getPlanUser().getUserId(),
+                    "[" + plan.getTitle() + "] 플랜에 " + user.getNickname() + "님이 초대 되었습니다.");
+            alarmService.createAlarm(requestDto);
+        }else {
+            AlarmRequestDto requestDto = new AlarmRequestDto(plan.getPlanUser().getUserId(),
+                    "[" + plan.getTitle() + "] 플랜에 " + user.getNickname() + "님이 참가하기를 요청했습니다.");
+            alarmService.createAlarm(requestDto);
+        }
 
         return newPlanUser;
     }
@@ -161,6 +166,6 @@ public class PlanUserServiceImpl implements PlanUserService {
     @Override
     public Boolean existsPlanUser(Plan plan, Long userId) {
         User user = userService.getUserById(userId);
-        return planUserRepository.existsPlanUserByPlanAndUser(plan, user);
+        return planUserRepository.existsPlanUserByPlanAndUserAndStatus(plan, user, PlanUser.StatusType.ACCEPTED);
     }
 }
