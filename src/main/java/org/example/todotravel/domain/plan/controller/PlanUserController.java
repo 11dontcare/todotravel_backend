@@ -73,7 +73,7 @@ public class PlanUserController {
         }
         else if (plan.getPlanUser().getUserId().equals(userId)){
             User user = planUserService.getAllPlanUser(planId).getFirst().getUser();
-            plan.toBuilder()
+            plan = plan.toBuilder()
                     .planUser(user)
                     .build();
             planService.savePlan(plan);

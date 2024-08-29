@@ -29,6 +29,10 @@ public class PlanListResponseDto {
 
     private Long likeNumber;
 
+    private Integer participantsCount;
+
+    private Long planUserCount;
+
     private String planUserNickname;
 
     private String planThumbnailUrl;
