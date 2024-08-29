@@ -341,4 +341,29 @@ public class PlanServiceImpl implements PlanService {
     public void savePlan(Plan plan) {
         planRepository.save(plan);
     }
+
+    //플랜 모집
+    @Override
+    @Transactional
+    public List<PlanListResponseDto> getRecruitmentPlans() {
+        List<Plan> plans = planRepository.findAllByRecruitmentTrue();
+        List<PlanListResponseDto> planList = new ArrayList<>();
+        for (Plan plan : plans) {
+            planList.add(PlanListResponseDto.builder()
+                    .planId(plan.getPlanId())
+                    .title(plan.getTitle())
+                    .location(plan.getLocation())
+                    .description(plan.getDescription())
+                    .startDate(plan.getStartDate())
+                    .endDate(plan.getEndDate())
+                    .participantsCount(plan.getParticipantsCount())
+                    .planUserCount(plan.getPlanUsers().stream().filter(planUser -> planUser.getStatus() == PlanUser.StatusType.ACCEPTED).count())
+                    .planUserNickname(plan.getPlanUser().getNickname())
+                    .planThumbnailUrl(plan.getPlanThumbnailUrl())
+                    .bookmarkNumber(bookmarkService.countBookmark(plan))
+                    .likeNumber(likeService.countLike(plan))
+                    .build());
+        }
+        return planList;
+    }
 }

@@ -26,4 +26,6 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     List<Plan> findAllByIsPublicTrue();
     List<Plan> findAllByIsPublicTrueAndTitleContains(String keyword);
     List<Plan> findByPlanUser(User user);
+
+    List<Plan> findAllByRecruitmentTrue();
 }

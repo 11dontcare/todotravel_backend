@@ -24,6 +24,8 @@ public interface PlanService {
     PlanResponseDto getPlanForModify(Long planId);
     void savePlan(Plan plan);
 
+    List<PlanListResponseDto> getRecruitmentPlans();
+
     List<PlanListResponseDto> getRecentBookmarkedPlans(User user);
     List<PlanListResponseDto> getAllBookmarkedPlans(User user);
     List<PlanListResponseDto> getRecentLikedPlans(User user);
