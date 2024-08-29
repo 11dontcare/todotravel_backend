@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.notification.dto.request.AlarmRequestDto;
 import org.example.todotravel.domain.notification.service.AlarmService;
 import org.example.todotravel.domain.plan.dto.request.PlanRequestDto;
-import org.example.todotravel.domain.plan.dto.response.CommentResponseDto;
-import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
-import org.example.todotravel.domain.plan.dto.response.PlanResponseDto;
-import org.example.todotravel.domain.plan.dto.response.PlanSummaryDto;
+import org.example.todotravel.domain.plan.dto.response.*;
 import org.example.todotravel.domain.plan.entity.*;
 import org.example.todotravel.domain.plan.repository.PlanRepository;
 import org.example.todotravel.domain.plan.service.BookmarkService;
@@ -25,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -124,22 +123,7 @@ public class PlanServiceImpl implements PlanService {
     @Transactional
     public List<PlanListResponseDto> getPublicPlans() {
         List<Plan> plans = planRepository.findAllByIsPublicTrue();
-        List<PlanListResponseDto> planList = new ArrayList<>();
-        for (Plan plan : plans) {
-            planList.add(PlanListResponseDto.builder()
-                .planId(plan.getPlanId())
-                .title(plan.getTitle())
-                .location(plan.getLocation())
-                .description(plan.getDescription())
-                .startDate(plan.getStartDate())
-                .endDate(plan.getEndDate())
-                .planThumbnailUrl(plan.getPlanThumbnailUrl())
-                .bookmarkNumber(bookmarkService.countBookmark(plan))
-                .likeNumber(likeService.countLike(plan))
-                .planUserNickname(plan.getPlanUser().getNickname())
-                .build());
-        }
-        return planList;
+        return convertToPlanListResponseDto(plans);
     }
 
     @Override
@@ -232,10 +216,8 @@ public class PlanServiceImpl implements PlanService {
     @Override
     @Transactional(readOnly = true)
     public List<PlanListResponseDto> getRecentBookmarkedPlans(User user) {
-        List<PlanSummaryDto> plans = bookmarkService.getRecentBookmarkedPlansByUser(user.getUserId());
-        return plans.stream()
-            .map(this::convertSummaryToPlanListResponseDto)
-            .collect(Collectors.toList());
+        List<Plan> plans = bookmarkService.getRecentBookmarkedPlansByUser(user.getUserId());
+        return convertToPlanListResponseDto(plans);
     }
 
     // 특정 사용자가 북마크한 플랜 조회 후 Dto로 반환
@@ -243,19 +225,15 @@ public class PlanServiceImpl implements PlanService {
     @Transactional(readOnly = true)
     public List<PlanListResponseDto> getAllBookmarkedPlans(User user) {
         List<Plan> plans = bookmarkService.getAllBookmarkedPlansByUser(user.getUserId());
-        return plans.stream()
-            .map(this::convertToPlanListResponseDto)
-            .collect(Collectors.toList());
+        return convertToPlanListResponseDto(plans);
     }
 
     // 특정 사용자가 최근 좋아요한 플랜 4개 조회 후 Dto로 반환
     @Override
     @Transactional(readOnly = true)
     public List<PlanListResponseDto> getRecentLikedPlans(User user) {
-        List<PlanSummaryDto> plans = likeService.getRecentLikedPlansByUser(user.getUserId());
-        return plans.stream()
-            .map(this::convertSummaryToPlanListResponseDto)
-            .collect(Collectors.toList());
+        List<Plan> plans = likeService.getRecentLikedPlansByUser(user.getUserId());
+        return convertToPlanListResponseDto(plans);
     }
 
     // 특정 사용자가 좋아요한 플랜 조회 후 Dto로 반환
@@ -263,25 +241,37 @@ public class PlanServiceImpl implements PlanService {
     @Transactional(readOnly = true)
     public List<PlanListResponseDto> getAllLikedPlans(User user) {
         List<Plan> plans = likeService.getAllLikedPlansByUser(user.getUserId());
-        return plans.stream()
-            .map(this::convertToPlanListResponseDto)
-            .collect(Collectors.toList());
+        return convertToPlanListResponseDto(plans);
+    }
+
+    // 북마크 수와 좋아요 수를 카운팅하는 메서드
+    @Override
+    public Map<Long, PlanCountProjection> getBookmarkAndLikeCounts(List<Long> planIds) {
+        List<PlanCountProjection> counts = planRepository.countBookmarksAndLikesByPlanIds(planIds);
+        return counts.stream()
+            .collect(Collectors.toMap(PlanCountProjection::getPlanId, Function.identity()));
     }
 
     @Override
-    public PlanListResponseDto convertToPlanListResponseDto(Plan plan) {
-        return PlanListResponseDto.builder()
-            .planId(plan.getPlanId())
-            .title(plan.getTitle())
-            .location(plan.getLocation())
-            .description(plan.getDescription())
-            .startDate(plan.getStartDate())
-            .endDate(plan.getEndDate())
-            .bookmarkNumber(bookmarkService.countBookmark(plan))
-            .likeNumber(likeService.countLike(plan))
-            .planUserNickname(plan.getPlanUser().getNickname())
-            .planThumbnailUrl(plan.getPlanThumbnailUrl())
-            .build();
+    public List<PlanListResponseDto> convertToPlanListResponseDto(List<Plan> plans) {
+        List<Long> planIds = plans.stream().map(Plan::getPlanId).collect(Collectors.toList());
+        Map<Long, PlanCountProjection> countMap = getBookmarkAndLikeCounts(planIds);
+
+        return plans.stream().map(plan -> {
+            PlanCountProjection counts = countMap.get(plan.getPlanId());
+            return PlanListResponseDto.builder()
+                .planId(plan.getPlanId())
+                .title(plan.getTitle())
+                .location(plan.getLocation())
+                .description(plan.getDescription())
+                .startDate(plan.getStartDate())
+                .endDate(plan.getEndDate())
+                .bookmarkNumber(counts != null ? counts.getBookmarkCount() : 0)
+                .likeNumber(counts != null ? counts.getLikeCount() : 0)
+                .planUserNickname(plan.getPlanUser().getNickname())
+                .planThumbnailUrl(plan.getPlanThumbnailUrl())
+                .build();
+        }).collect(Collectors.toList());
     }
 
     private PlanListResponseDto convertSummaryToPlanListResponseDto(PlanSummaryDto summaryDto) {

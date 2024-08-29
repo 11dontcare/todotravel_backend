@@ -17,6 +17,6 @@ public interface LikeService {
     Long countLikeByPlanId(Long planId);
     Boolean isPlanLikedByUser(User user, Plan plan);
     List<Plan> getAllLikedPlansByUser(Long userId);
-    List<PlanSummaryDto> getRecentLikedPlansByUser(Long userId);
+    List<Plan> getRecentLikedPlansByUser(Long userId);
     void removeAllByPlan(Plan plan);
 }

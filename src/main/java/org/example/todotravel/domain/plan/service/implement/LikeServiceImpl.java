@@ -9,6 +9,7 @@ import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.repository.LikeRepository;
 import org.example.todotravel.domain.plan.service.LikeService;
 import org.example.todotravel.domain.user.entity.User;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,8 +85,8 @@ public class LikeServiceImpl implements LikeService {
     // 특정 사용자가 최근 좋아요한 플랜 4개 조회
     @Override
     @Transactional(readOnly = true)
-    public List<PlanSummaryDto> getRecentLikedPlansByUser(Long userId) {
-        return likeRepository.findRecentLikedPlansByUserId(userId);
+    public List<Plan> getRecentLikedPlansByUser(Long userId) {
+        return likeRepository.findRecentLikedPlansByUserId(userId, PageRequest.of(0, 4));
     }
 
     //플랜 삭제 시 플랜에 달린 좋아요 삭제

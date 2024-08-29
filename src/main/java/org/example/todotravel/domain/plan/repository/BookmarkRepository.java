@@ -4,6 +4,7 @@ import org.example.todotravel.domain.plan.dto.response.PlanSummaryDto;
 import org.example.todotravel.domain.plan.entity.Bookmark;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.user.entity.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -28,17 +29,13 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     @Query("SELECT b.plan FROM Bookmark b WHERE b.bookmarkUser.userId = :userId ORDER BY b.bookmarkId DESC")
     List<Plan> findBookmarkedPlansByUserId(@Param("userId") Long userId);
 
-    @Query(nativeQuery = true, value = """
-        SELECT p.plan_id as planId, p.title, p.location, p.description, p.start_date as startDate,
-               p.end_date as endDate, u.nickname as planUserNickname, p.plan_thumbnail_url
-        FROM plans p
-        JOIN bookmarks b ON p.plan_id = b.plan_id
-        JOIN users u ON p.user_id = u.user_id
-        WHERE b.user_id = :userId
-        ORDER BY b.bookmark_id DESC
-        LIMIT 4
+    @Query("""
+        SELECT p FROM Plan p
+        JOIN Bookmark b ON p.planId = b.plan.planId
+        WHERE b.bookmarkUser.userId = :userId
+        ORDER BY b.bookmarkId DESC
         """)
-    List<PlanSummaryDto> findRecentCommentedPlansByUserId(@Param("userId") Long userId);
+    List<Plan> findRecentCommentedPlansByUserId(@Param("userId") Long userId, Pageable pageable);
 
     //플랜 삭제 시 플랜에 달린 북마크 삭제
     @Modifying

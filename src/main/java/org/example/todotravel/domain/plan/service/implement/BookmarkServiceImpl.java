@@ -9,6 +9,7 @@ import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.repository.BookmarkRepository;
 import org.example.todotravel.domain.plan.service.BookmarkService;
 import org.example.todotravel.domain.user.entity.User;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,8 +85,8 @@ public class BookmarkServiceImpl implements BookmarkService {
     // 특정 사용자가 최근 북마크한 플랜 4개 조회
     @Override
     @Transactional(readOnly = true)
-    public List<PlanSummaryDto> getRecentBookmarkedPlansByUser(Long userId) {
-        return bookmarkRepository.findRecentCommentedPlansByUserId(userId);
+    public List<Plan> getRecentBookmarkedPlansByUser(Long userId) {
+        return bookmarkRepository.findRecentCommentedPlansByUserId(userId, PageRequest.of(0, 4));
     }
 
     //플랜 삭제 시 플랜에 달린 북마크 삭제

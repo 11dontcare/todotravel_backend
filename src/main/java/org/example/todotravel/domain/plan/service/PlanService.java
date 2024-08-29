@@ -1,12 +1,15 @@
 package org.example.todotravel.domain.plan.service;
 
 import org.example.todotravel.domain.plan.dto.request.PlanRequestDto;
+import org.example.todotravel.domain.plan.dto.response.PlanCountProjection;
 import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanResponseDto;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.user.entity.User;
 
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.web.multipart.MultipartFile;
 
 public interface PlanService {
@@ -30,7 +33,8 @@ public interface PlanService {
     List<PlanListResponseDto> getAllBookmarkedPlans(User user);
     List<PlanListResponseDto> getRecentLikedPlans(User user);
     List<PlanListResponseDto> getAllLikedPlans(User user);
-    PlanListResponseDto convertToPlanListResponseDto(Plan plan);
+    Map<Long, PlanCountProjection> getBookmarkAndLikeCounts(List<Long> planIds);
+    List<PlanListResponseDto> convertToPlanListResponseDto(List<Plan> plans);
 
     List<Plan> getAllPlanByPlanUser(User user);
   
