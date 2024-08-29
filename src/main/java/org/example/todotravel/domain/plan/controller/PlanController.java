@@ -27,7 +27,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Set;
 
 @RestController
@@ -42,9 +44,10 @@ public class PlanController {
 
     //플랜 생성
     @PostMapping
-    public ApiResponse<Long> createPlan(@Valid @RequestPart("planRequestDto") PlanRequestDto planRequestDto, @RequestParam("planThumbnail") MultipartFile planThumbnail) {
+    public ApiResponse<Long> createPlan(@Valid @RequestPart("planRequestDto") PlanRequestDto planRequestDto,
+                                        @RequestParam(value = "planThumbnail", required = false) MultipartFile planThumbnail) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails)authentication.getPrincipal();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         User user = userService.getUserByUsername(userDetails.getUsername());
         Plan plan = planService.createPlan(planRequestDto, planThumbnail, user);
 
@@ -59,8 +62,8 @@ public class PlanController {
     public ApiResponse<PlanResponseDto> getPlan(@PathVariable("plan_id") Long planId) {
         PlanResponseDto planDetails = planService.getPlanDetails(planId);
         planDetails = planDetails.toBuilder()
-                .scheduleList(scheduleService.getSchedulesByPlan(planId))
-                .build();
+            .scheduleList(scheduleService.getSchedulesByPlan(planId))
+            .build();
         return new ApiResponse<>(true, "플랜 조회 성공", planDetails);
     }
 
@@ -89,12 +92,12 @@ public class PlanController {
     @GetMapping("/{plan_id}/invite")
     public ApiResponse<List<UserListResponseDto>> invite(@PathVariable("plan_id") Long planId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails)authentication.getPrincipal();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         User user = userService.getUserByUsername(userDetails.getUsername());
 
         Set<Follow> followers = user.getFollowers();
         List<User> users = new ArrayList<>();
-        for (Follow follow : followers){
+        for (Follow follow : followers) {
             users.add(follow.getFollowingUser());
         }
         //해당 플랜에 참여하고 있지 않은 사용자만
@@ -128,7 +131,7 @@ public class PlanController {
     //플랜 가져오기(댓글x, 일정x)   (플랜 정보, 북마크, 좋아요)
     //상단의 getPlan이 플랜의 모든 관련 정보들을 return
     @GetMapping("/public/{plan_id}")
-    public ApiResponse<PlanResponseDto> getPublicPlan(@PathVariable("plan_id") Long planId){
+    public ApiResponse<PlanResponseDto> getPublicPlan(@PathVariable("plan_id") Long planId) {
         PlanResponseDto plan = planService.getPlanForModify(planId);
         return new ApiResponse<>(true, "수정할 플랜 조회 성공", plan);
     }
@@ -137,7 +140,7 @@ public class PlanController {
     @PostMapping("/{plan_id}/load")
     public ApiResponse<Long> getLoadPlan(@PathVariable("plan_id") Long planId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails)authentication.getPrincipal();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         User user = userService.getUserByUsername(userDetails.getUsername());
         Plan plan = planService.copyPlan(planId, user);
         return new ApiResponse<>(true, "플랜 불러오기 성공", plan.getPlanId());
@@ -153,7 +156,7 @@ public class PlanController {
     // 플랜 썸네일 이미지 등록
     @PostMapping("/thumbnail/{plan_id}")
     public ApiResponse<PlanThumbnailRequestDto> uploadThumbnailImage(@PathVariable("plan_id") Long planId, @RequestParam("file")
-                                                                     MultipartFile file) {
+    MultipartFile file) {
         try {
             planService.updateThumbnailImage(planId, file);
 

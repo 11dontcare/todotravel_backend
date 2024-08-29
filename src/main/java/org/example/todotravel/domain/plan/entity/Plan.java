@@ -27,6 +27,9 @@ public class Plan {
     @Column(name = "title", nullable = false, length = 100)
     private String title;
 
+    @Column(name = "front_location", nullable = false)
+    private String frontLocation;
+
     @Column(name = "location", nullable = false, length = 50)
     private String location;
 
