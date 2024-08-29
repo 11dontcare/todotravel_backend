@@ -171,6 +171,7 @@ public class PlanServiceImpl implements PlanService {
             .endDate(plan.getEndDate())
             .isPublic(false)
             .status(false)
+            .recruitment(false)
             .totalBudget(plan.getTotalBudget())
             .planUser(user)
             .build();
