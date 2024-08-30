@@ -21,5 +21,4 @@ public class ScheduleCreateRequestDto {
     //null 허용
     private String description;
     private LocalTime travelTime;
-    private Long budgetId;
 }
