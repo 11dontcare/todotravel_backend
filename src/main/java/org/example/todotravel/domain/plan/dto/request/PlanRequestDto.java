@@ -16,9 +16,10 @@ import org.springframework.web.multipart.MultipartFile;
 @ToString
 public class PlanRequestDto {
     private String title;
-    private String location;
     private LocalDate startDate;
     private LocalDate endDate;
+    private String frontLocation;
+    private String location;
     private Boolean isPublic;
     private Boolean status;
     private Long totalBudget;
@@ -28,6 +29,7 @@ public class PlanRequestDto {
         return Plan.builder()
                 .title(title)
                 .location(location)
+                .frontLocation(frontLocation)
                 .startDate(startDate)
                 .endDate(endDate)
                 .isPublic(isPublic)

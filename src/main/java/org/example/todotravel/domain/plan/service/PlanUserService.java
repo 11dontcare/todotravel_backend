@@ -21,7 +21,9 @@ public interface PlanUserService {
     UserProfileResponseDto getUserProfile(String subject, User user, boolean isFollowing);
     List<Plan> getAllPlansByUser(User user);
     List<PlanListResponseDto> getAllPlansByUserAndStatus(Long userId);
-    List<PlanListResponseDto> getRecentPlansByUser(Long userId);
+    List<PlanListResponseDto> getAllPlansByUserAndStatusTop4(Long userId);
+    List<PlanListResponseDto> getOwnRecruitmentPlansLimit4(User user);
+    List<PlanListResponseDto> getAllRecruitmentPlans(Long userId);
 
     Boolean existsPlanUser(Plan plan, Long userId);
 }

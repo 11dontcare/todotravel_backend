@@ -1,5 +1,6 @@
 package org.example.todotravel.domain.chat.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 
@@ -11,6 +12,7 @@ import org.example.todotravel.domain.chat.entity.ChatMessage;
 import org.example.todotravel.domain.chat.entity.ChatRoomUser;
 import org.example.todotravel.domain.chat.entity.DeletedMessage;
 import org.example.todotravel.domain.chat.repository.ChatMessageRepository;
+import org.example.todotravel.domain.chat.repository.ChatRoomRepository;
 import org.example.todotravel.domain.chat.repository.ChatRoomUserRepository;
 import org.example.todotravel.domain.chat.repository.DeletedMessageRepository;
 import org.example.todotravel.domain.chat.service.ChatMessageService;
@@ -33,6 +35,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final DeletedMessageRepository deletedMessageRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomUserRepository chatRoomUserRepository;
+    private final ChatRoomRepository chatRoomRepository;
     private final UserRepository userRepository;
     private final ReactiveMongoTemplate reactiveMongoTemplate;
     private final TransactionalOperator transactionalOperator;
@@ -54,6 +57,10 @@ public class ChatMessageServiceImpl implements ChatMessageService {
             .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
 
         Optional<ChatRoomUser> chatRoomUserOpt = chatRoomUserRepository.findByUserAndChatRoomRoomId(user, roomId);
+        int updatedCount = chatRoomRepository.updateChatRoomByRoomId(roomId, LocalDateTime.now());
+        if (updatedCount == 0) {
+            throw new RuntimeException("ChatRoom with id " + roomId + " not found");
+        }
 
         return Mono.justOrEmpty(chatRoomUserOpt)
             .flatMap(chatRoomUser -> {

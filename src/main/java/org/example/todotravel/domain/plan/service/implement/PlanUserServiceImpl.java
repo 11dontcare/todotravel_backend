@@ -13,6 +13,7 @@ import org.example.todotravel.domain.user.dto.response.UserProfileResponseDto;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.security.CustomUserDetails;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -112,12 +113,14 @@ public class PlanUserServiceImpl implements PlanUserService {
     @Transactional(readOnly = true)
     public UserProfileResponseDto getUserProfile(String subject, User user, boolean isFollowing) {
         Long userId = user.getUserId();
-        List<PlanListResponseDto> planList = getAllPlansByUserAndStatus(userId);
-        int planCount = planList.size();
+        List<PlanListResponseDto> planList;
 
         if (subject.equals("my")) {
-            planList = planCount > 4 ? planList.subList(0, 4) : planList;
+            planList = getAllPlansByUserAndStatusTop4(userId);
+        } else {
+            planList = getAllPlansByUserAndStatus(userId);
         }
+        int planCount = planList.size();
 
         return UserProfileResponseDto.builder()
             .userId(userId)
@@ -146,21 +149,31 @@ public class PlanUserServiceImpl implements PlanUserService {
     @Transactional(readOnly = true)
     public List<PlanListResponseDto> getAllPlansByUserAndStatus(Long userId) {
         List<Plan> plans = planUserRepository.findAllPlansByUserId(userId, PlanUser.StatusType.ACCEPTED);
-        return plans.stream()
-            .map(planService::convertToPlanListResponseDto)
-            .collect(Collectors.toList());
+        return planService.convertToPlanListResponseDto(plans);
     }
 
-    // 특정 사용자가 참여한 최근 플랜 3개 조회
+    // 특정 사용자가 참여한 플랜 4개 DTO로 조회
     @Override
     @Transactional(readOnly = true)
-    public List<PlanListResponseDto> getRecentPlansByUser(Long userId) {
-        List<Plan> plans = planUserRepository.findAllPlansByUserId(userId, PlanUser.StatusType.ACCEPTED);
-        plans = plans.size() > 3 ? plans.subList(0, 3) : plans;
+    public List<PlanListResponseDto> getAllPlansByUserAndStatusTop4(Long userId) {
+        List<Plan> plans = planUserRepository.findAllPlansByUserIdTop4(userId, PlanUser.StatusType.ACCEPTED, PageRequest.of(0, 4));
+        return planService.convertToPlanListResponseDto(plans);
+    }
 
-        return plans.stream()
-            .map(planService::convertToPlanListResponseDto)
-            .collect(Collectors.toList());
+    // 특정 사용자가 관여한 플랜 중 모집 중인 플랜 4개 DTO로 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<PlanListResponseDto> getOwnRecruitmentPlansLimit4(User user) {
+        List<Plan> plans = planUserRepository.findRecruitingPlansByUserIdLimit4(user.getUserId(), PlanUser.StatusType.ACCEPTED);
+        return planService.convertToPlanListResponseDto(plans);
+    }
+
+    // 특정 사용자가 관여한 플랜 중 모집 중인 모든 플랜 DTO로 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<PlanListResponseDto> getAllRecruitmentPlans(Long userId) {
+        List<Plan> plans = planUserRepository.findAllRecruitingPlansByUserId(userId, PlanUser.StatusType.ACCEPTED);
+        return planService.convertToPlanListResponseDto(plans);
     }
 
     @Override
