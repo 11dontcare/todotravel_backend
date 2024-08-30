@@ -1,6 +1,7 @@
 package org.example.todotravel.domain.plan.service.implement;
 
 import java.io.IOException;
+
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.notification.dto.request.AlarmRequestDto;
 import org.example.todotravel.domain.notification.service.AlarmService;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -74,10 +76,33 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     @Transactional
-    public Plan updatePlan(Long planId, PlanRequestDto dto) {
+    public Plan updatePlan(Long planId, PlanRequestDto dto, MultipartFile newPlanThumbnail) {
         Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("여행 플랜을 찾을 수 없습니다."));
 
-        //수정을 위해 toBuilder 사용
+        // 새 썸네일이 존재할 경우, 존재하는 썸네일 이미지 S3에서 삭제
+        String existingImageUrl = plan.getPlanThumbnailUrl();
+        if (newPlanThumbnail != null && !newPlanThumbnail.isEmpty() &&
+            existingImageUrl != null && !existingImageUrl.isEmpty()) {
+            String existingFileName = existingImageUrl.substring(existingImageUrl.lastIndexOf("/") + 1);
+            try {
+                s3Service.deleteFile(existingFileName);
+            } catch (IOException e) {
+                throw new RuntimeException("존재하는 썸네일 이미지 삭제를 실패했습니다.", e);
+            }
+        }
+
+        // 썸네일 업데이트 (S3 & DB)
+        String imageUrl = null;
+        if (newPlanThumbnail != null && !newPlanThumbnail.isEmpty()) {
+            try {
+                imageUrl = s3Service.uploadFile(newPlanThumbnail);
+                plan.setPlanThumbnailUrl(imageUrl);
+            } catch (IOException e) {
+                throw new RuntimeException("썸네일 업데이트에 실패했습니다.", e);
+            }
+        }
+
+        // 수정을 위해 toBuilder 사용
         plan = plan.toBuilder()
             .title(dto.getTitle())
             .location(dto.getLocation())
@@ -88,10 +113,9 @@ public class PlanServiceImpl implements PlanService {
             .build();
 
         Plan updatedPlan = planRepository.save(plan);
-
-        AlarmRequestDto requestDto = new AlarmRequestDto(plan.getPlanUser().getUserId(),
-            "[" + plan.getTitle() + "] 플랜이 수정되었습니다.");
-        alarmService.createAlarm(requestDto);
+        alarmService.createAlarm(
+            new AlarmRequestDto(plan.getPlanUser().getUserId(), "[" + plan.getTitle() + "] 플랜이 수정되었습니다.")
+        );
 
         return updatedPlan;
     }
@@ -340,19 +364,19 @@ public class PlanServiceImpl implements PlanService {
         List<PlanListResponseDto> planList = new ArrayList<>();
         for (Plan plan : plans) {
             planList.add(PlanListResponseDto.builder()
-                    .planId(plan.getPlanId())
-                    .title(plan.getTitle())
-                    .location(plan.getLocation())
-                    .description(plan.getDescription())
-                    .startDate(plan.getStartDate())
-                    .endDate(plan.getEndDate())
-                    .participantsCount(plan.getParticipantsCount())
-                    .planUserCount(plan.getPlanUsers().stream().filter(planUser -> planUser.getStatus() == PlanUser.StatusType.ACCEPTED).count())
-                    .planUserNickname(plan.getPlanUser().getNickname())
-                    .planThumbnailUrl(plan.getPlanThumbnailUrl())
-                    .bookmarkNumber(bookmarkService.countBookmark(plan))
-                    .likeNumber(likeService.countLike(plan))
-                    .build());
+                .planId(plan.getPlanId())
+                .title(plan.getTitle())
+                .location(plan.getLocation())
+                .description(plan.getDescription())
+                .startDate(plan.getStartDate())
+                .endDate(plan.getEndDate())
+                .participantsCount(plan.getParticipantsCount())
+                .planUserCount(plan.getPlanUsers().stream().filter(planUser -> planUser.getStatus() == PlanUser.StatusType.ACCEPTED).count())
+                .planUserNickname(plan.getPlanUser().getNickname())
+                .planThumbnailUrl(plan.getPlanThumbnailUrl())
+                .bookmarkNumber(bookmarkService.countBookmark(plan))
+                .likeNumber(likeService.countLike(plan))
+                .build());
         }
         return planList;
     }

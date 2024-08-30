@@ -67,10 +67,13 @@ public class PlanController {
         return new ApiResponse<>(true, "플랜 조회 성공", planDetails);
     }
 
-    //플랜 수정
+    // 플랜 수정
     @PutMapping("/{plan_id}")
-    public ApiResponse<Long> updatePlan(@PathVariable("plan_id") Long planId, @Valid @RequestBody PlanRequestDto dto) {
-        Plan plan = planService.updatePlan(planId, dto);
+    public ApiResponse<Long> updatePlan(@PathVariable("plan_id") Long planId,
+                                        @RequestPart("planRequestDto") PlanRequestDto dto,
+                                        @RequestPart(value = "planThumbnail", required = false) MultipartFile planThumbnail) {
+        // @RequestPart - Multipart/form-data가 포함되어 있는 경우에 사용, 없다면 @RequestBody와 동일
+        Plan plan = planService.updatePlan(planId, dto, planThumbnail);
         return new ApiResponse<>(true, "플랜 수정 성공", planId);
     }
 

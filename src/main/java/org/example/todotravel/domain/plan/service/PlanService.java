@@ -18,7 +18,7 @@ public interface PlanService {
     void removeAllPlanByUser(User user);
     void removeJustPlan(Plan plan);
     Plan getPlan(Long planId);
-    Plan updatePlan(Long planId, PlanRequestDto dto);
+    Plan updatePlan(Long planId, PlanRequestDto dto, MultipartFile planThumbnail);
     List<PlanListResponseDto> getPublicPlans();
 
     PlanResponseDto getPlanDetails(Long planId);

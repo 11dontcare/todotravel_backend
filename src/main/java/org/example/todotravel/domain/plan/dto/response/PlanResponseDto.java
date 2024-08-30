@@ -31,6 +31,8 @@ public class PlanResponseDto {
 
     private Boolean status;
 
+    private String planThumbnailUrl;
+
     private Integer participantsCount;
 
     private Long planUserCount;
@@ -61,6 +63,7 @@ public class PlanResponseDto {
                 .endDate(plan.getEndDate())
                 .isPublic(plan.getIsPublic())
                 .status(plan.getStatus())
+                .planThumbnailUrl(plan.getPlanThumbnailUrl())
                 .participantsCount(plan.getParticipantsCount())
                 .planUserCount(plan.getPlanUsers().stream().filter(planUser -> planUser.getStatus() == PlanUser.StatusType.ACCEPTED).count())
                 .recruitment(plan.getRecruitment())
