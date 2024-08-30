@@ -201,6 +201,10 @@ public class PlanController {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         User user = userService.getUserByUsername(userDetails.getUsername());
         Plan plan = planService.copyPlan(planId, user);
+
+        // 채팅방 자동 생성
+        chatRoomService.createChatRoom(plan);
+
         return new ApiResponse<>(true, "플랜 불러오기 성공", plan.getPlanId());
     }
 
