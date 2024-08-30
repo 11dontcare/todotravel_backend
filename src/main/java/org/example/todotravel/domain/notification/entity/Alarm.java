@@ -32,4 +32,18 @@ public class Alarm {
 
     @Column(name = "status", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean status;
+
+    // @PrePersist 메서드를 추가하여 기본값 설정
+    @PrePersist
+    protected void onCreate() {
+        // status 필드가 null인 경우, 기본값으로 false 설정
+        if (this.status == null) {
+            this.status = Boolean.FALSE;
+        }
+
+        // createdDate 필드가 null인 경우, 현재 시간으로 설정
+        if (this.createdDate == null) {
+            this.createdDate = LocalDateTime.now();
+        }
+    }
 }
