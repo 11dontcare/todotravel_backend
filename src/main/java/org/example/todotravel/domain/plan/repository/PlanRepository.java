@@ -37,4 +37,9 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
         FROM Plan p WHERE p.planId IN :planIds
         """)
     List<PlanCountProjection> countBookmarksAndLikesByPlanIds(@Param("planIds") List<Long> planIds);
+
+    // 플랜 조회 시 조회 수 증가
+    @Modifying
+    @Query("UPDATE Plan p SET p.viewCount = p.viewCount + 1 WHERE p.planId = :planId")
+    void incrementViewCount(@Param("planId") Long planId);
 }

@@ -160,6 +160,10 @@ public class PlanServiceImpl implements PlanService {
         for (Comment comment : comments) {
             commentList.add(CommentResponseDto.fromEntity(comment));
         }
+
+        // 해당 플랜의 조회 수 증가 (인기순 정렬을 위한)
+        planRepository.incrementViewCount(planId);
+
         return planResponseDto.toBuilder()
             .commentList(commentList)
             .bookmarkNumber(bookmarkService.countBookmark(plan))
