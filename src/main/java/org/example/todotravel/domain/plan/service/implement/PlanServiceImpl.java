@@ -16,7 +16,12 @@ import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.repository.UserRepository;
 import org.example.todotravel.global.aws.S3Service;
+import org.example.todotravel.global.dto.PagedResponseDto;
 import org.example.todotravel.global.exception.UserNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,6 +70,8 @@ public class PlanServiceImpl implements PlanService {
             .plan(plan)
             .build();
         plan.setPlanUsers(Collections.singleton(planUser));
+        plan.setViewCount(0L);
+        plan.setRecruitment(false);
         return planRepository.save(plan);
     }
 
@@ -177,6 +184,7 @@ public class PlanServiceImpl implements PlanService {
         Plan plan = planRepository.findByPlanId(planId).orElseThrow(() -> new RuntimeException("플랜을 찾을 수 없습니다."));
         Plan newPlan = Plan.builder()
             .title(plan.getTitle())
+            .frontLocation(plan.getFrontLocation())
             .location(plan.getLocation())
             .description(plan.getDescription())
             .startDate(plan.getStartDate())
@@ -184,6 +192,8 @@ public class PlanServiceImpl implements PlanService {
             .isPublic(false)
             .status(false)
             .totalBudget(plan.getTotalBudget())
+            .viewCount(0L)
+            .recruitment(false)
             .planUser(user)
             .build();
         List<Schedule> newSchedules = new ArrayList<>();
@@ -272,14 +282,6 @@ public class PlanServiceImpl implements PlanService {
         return convertToPlanListResponseDto(plans);
     }
 
-    // 북마크 수와 좋아요 수를 카운팅하는 메서드
-    @Override
-    public Map<Long, PlanCountProjection> getBookmarkAndLikeCounts(List<Long> planIds) {
-        List<PlanCountProjection> counts = planRepository.countBookmarksAndLikesByPlanIds(planIds);
-        return counts.stream()
-            .collect(Collectors.toMap(PlanCountProjection::getPlanId, Function.identity()));
-    }
-
     @Override
     public List<PlanListResponseDto> convertToPlanListResponseDto(List<Plan> plans) {
         List<Long> planIds = plans.stream().map(Plan::getPlanId).collect(Collectors.toList());
@@ -302,19 +304,62 @@ public class PlanServiceImpl implements PlanService {
         }).collect(Collectors.toList());
     }
 
-    private PlanListResponseDto convertSummaryToPlanListResponseDto(PlanSummaryDto summaryDto) {
-        return PlanListResponseDto.builder()
-            .planId(summaryDto.getPlanId())
-            .title(summaryDto.getTitle())
-            .location(summaryDto.getLocation())
-            .description(summaryDto.getDescription())
-            .startDate(summaryDto.getStartDate())
-            .endDate(summaryDto.getEndDate())
-            .bookmarkNumber(bookmarkService.countBookmarkByPlanId(summaryDto.getPlanId()))
-            .likeNumber(likeService.countLikeByPlanId(summaryDto.getPlanId()))
-            .planUserNickname(summaryDto.getPlanUserNickname())
-            .planThumbnailUrl(summaryDto.getPlanThumbnailUrl())
-            .build();
+    // 북마크 수와 좋아요 수를 카운팅하는 메서드
+    @Override
+    public Map<Long, PlanCountProjection> getBookmarkAndLikeCounts(List<Long> planIds) {
+        List<PlanCountProjection> counts = planRepository.countBookmarksAndLikesByPlanIds(planIds);
+        return counts.stream()
+            .collect(Collectors.toMap(PlanCountProjection::getPlanId, Function.identity()));
+    }
+
+    // 모집 중이지 않은 플랜 중 인기순으로 페이징 조회
+    @Override
+    @Transactional(readOnly = true)
+    public PagedResponseDto<PlanListResponseDto> getPopularPlansNotInRecruitment(int page, int size) {
+        return getPagedPlans(page, size, planRepository::findPopularPlansNotInRecruitment);
+    }
+
+    // 모집 중이지 않은 플랜 중 행정구역과 인기순으로 페이징 조회
+    @Override
+    @Transactional(readOnly = true)
+    public PagedResponseDto<PlanListResponseDto> getPopularPlansWithFrontLocation(int page, int size, String frontLocation) {
+        return getPagedPlans(page, size, pageable -> planRepository.findPopularPlansWithFrontLocation(frontLocation, pageable));
+    }
+
+    // 모집 중이지 않은 플랜 중 행정구역+도시와 인기순으로 페이징 조회
+    @Override
+    @Transactional(readOnly = true)
+    public PagedResponseDto<PlanListResponseDto> getPopularPlansWithAllLocation(int page, int size, String frontLocation, String location) {
+        return getPagedPlans(page, size, pageable -> planRepository.findPopularPlansWithAllLocation(frontLocation, location, pageable));
+    }
+
+    // 모집 중이지 않은 플랜 중 최신순으로 페이징 조회
+    @Override
+    @Transactional(readOnly = true)
+    public PagedResponseDto<PlanListResponseDto> getRecentPlansNotInRecruitment(int page, int size) {
+        return getPagedPlans(page, size, planRepository::findRecentPlansNotInRecruitment);
+    }
+
+    // 모집 중이지 않은 플랜 중 행정구역과 최신순으로 페이징 조회
+    @Override
+    @Transactional(readOnly = true)
+    public PagedResponseDto<PlanListResponseDto> getRecentPlansWithFrontLocation(int page, int size, String frontLocation) {
+        return getPagedPlans(page, size, pageable -> planRepository.findRecentPlansWithFrontLocation(frontLocation, pageable));
+    }
+
+    // 모집 중이지 않은 플랜 중 행정구역+도시와 최신순으로 페이징 조회
+    @Override
+    @Transactional(readOnly = true)
+    public PagedResponseDto<PlanListResponseDto> getRecentPlansWithAllLocation(int page, int size, String frontLocation, String location) {
+        return getPagedPlans(page, size, pageable -> planRepository.findRecentPlansWithAllLocation(frontLocation, location, pageable));
+    }
+
+    // 페이징 플랜 공통 메서드
+    private PagedResponseDto<PlanListResponseDto> getPagedPlans(int page, int size, Function<Pageable, Page<Plan>> queryFunction) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Plan> plans = queryFunction.apply(pageable);
+        List<PlanListResponseDto> planListDtos = convertToPlanListResponseDto(plans.getContent());
+        return new PagedResponseDto<>(new PageImpl<>(planListDtos));
     }
 
     // 사용자가 생성한 플랜 조회

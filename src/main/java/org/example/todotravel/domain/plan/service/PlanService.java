@@ -10,6 +10,7 @@ import org.example.todotravel.domain.user.entity.User;
 import java.util.List;
 import java.util.Map;
 
+import org.example.todotravel.global.dto.PagedResponseDto;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface PlanService {
@@ -33,6 +34,14 @@ public interface PlanService {
     List<PlanListResponseDto> getAllBookmarkedPlans(User user);
     List<PlanListResponseDto> getRecentLikedPlans(User user);
     List<PlanListResponseDto> getAllLikedPlans(User user);
+    PagedResponseDto<PlanListResponseDto> getPopularPlansNotInRecruitment(int page, int size);
+    PagedResponseDto<PlanListResponseDto> getPopularPlansWithFrontLocation(int page, int size, String frontLocation);
+    PagedResponseDto<PlanListResponseDto> getPopularPlansWithAllLocation(int page, int size, String frontLocation, String location);
+
+    PagedResponseDto<PlanListResponseDto> getRecentPlansNotInRecruitment(int page, int size);
+    PagedResponseDto<PlanListResponseDto> getRecentPlansWithFrontLocation(int page, int size, String frontLocation);
+    PagedResponseDto<PlanListResponseDto> getRecentPlansWithAllLocation(int page, int size, String frontLocation, String location);
+
     Map<Long, PlanCountProjection> getBookmarkAndLikeCounts(List<Long> planIds);
     List<PlanListResponseDto> convertToPlanListResponseDto(List<Plan> plans);
 
