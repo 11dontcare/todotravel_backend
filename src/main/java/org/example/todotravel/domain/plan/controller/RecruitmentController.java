@@ -16,7 +16,11 @@ import org.example.todotravel.domain.plan.service.PlanUserService;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,6 +35,11 @@ public class RecruitmentController {
     @PutMapping("/recruitment/{plan_id}")
     public ApiResponse<Long> recruitmentPlan(@PathVariable("plan_id") Long planId, @RequestBody Integer participantsCount){
         Plan plan = planService.getPlan(planId);
+        for (PlanUser planUser : plan.getPlanUsers()){
+            if (planUser.getStatus() != PlanUser.StatusType.ACCEPTED) {
+                planUserService.removePlanUserFromPlan(plan, planUser.getUser());
+            }
+        }
         plan = plan.toBuilder()
                 .recruitment(true)
                 .isPublic(true)
@@ -44,6 +53,11 @@ public class RecruitmentController {
     @PutMapping("/recruitment/cancel/{plan_id}")
     public ApiResponse<Long> cancelRecruitmentPlan(@PathVariable("plan_id") Long planId){
         Plan plan = planService.getPlan(planId);
+        for (PlanUser planUser : plan.getPlanUsers()){
+            if (planUser.getStatus() != PlanUser.StatusType.ACCEPTED) {
+                planUserService.removePlanUserFromPlan(plan, planUser.getUser());
+            }
+        }
         plan = plan.toBuilder()
                 .recruitment(false)
                 .participantsCount(null)
@@ -64,21 +78,21 @@ public class RecruitmentController {
     public ApiResponse<PlanUserResponseDto> requestRecruitment(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId) {
         PlanUser planUser = planUserService.addPlanUser(planId, userId);
 
-//        //일대일 채팅방 생성
-//        OneToOneChatRoomRequestDto chatRoomDto = OneToOneChatRoomRequestDto.builder()
-//                .senderId(userId)
-//                .receiverId(planUser.getPlan().getPlanUser().getUserId())
-//                .build();
-//        ChatRoomResponseDto chatRoom = chatRoomService.createOneToOneChatRoom(chatRoomDto);
-//
-//        //자동으로 요청 메시지 생성
-//        ChatMessageRequestDto messageDto = ChatMessageRequestDto.builder()
-//                .userId(userId)
-//                .roomId(chatRoom.getRoomId())
-//                .nickname(planUser.getUser().getNickname())
-//                .content("[" + planUser.getPlan().getTitle() + "] 플랜에 " + planUser.getUser().getNickname() + "님이 참가하기를 요청했습니다.")
-//                .build();
-//        chatMessageService.saveChatMessage(messageDto);
+        //일대일 채팅방 생성
+        OneToOneChatRoomRequestDto chatRoomDto = OneToOneChatRoomRequestDto.builder()
+                .senderId(userId)
+                .receiverId(planUser.getPlan().getPlanUser().getUserId())
+                .build();
+        ChatRoomResponseDto chatRoom = chatRoomService.createOneToOneChatRoom(chatRoomDto);
+
+        //자동으로 요청 메시지 생성
+        ChatMessageRequestDto messageDto = ChatMessageRequestDto.builder()
+                .userId(userId)
+                .roomId(chatRoom.getRoomId())
+                .nickname(planUser.getUser().getNickname())
+                .content("[" + planUser.getPlan().getTitle() + "] 플랜에 " + planUser.getUser().getNickname() + "님이 참가하기를 요청했습니다.")
+                .build();
+        chatMessageService.saveChatMessage(messageDto);
 
         PlanUserResponseDto planUserResponseDto = PlanUserResponseDto.fromEntity(planUser);
         return new ApiResponse<>(true, "플랜 참가 요청 성공", planUserResponseDto);
