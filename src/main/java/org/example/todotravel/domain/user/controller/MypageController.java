@@ -97,7 +97,7 @@ public class MypageController {
 
     // 닉네임 변경
     @PutMapping("/nickname")
-    public ApiResponse<?> changeNickname(@RequestBody NicknameRequestDto dto, Authentication authentication) {
+    public ApiResponse<?> changeNickname(@Valid @RequestBody NicknameRequestDto dto, Authentication authentication) {
         // 해당 사용자 찾기
         User user = userService.getUserById(dto.getUserId());
 
@@ -112,7 +112,7 @@ public class MypageController {
 
     // 비밀번호 변경 - UserController 에도 있지만, 마이페이지에서 기존 비밀번호를 알아야 가능한 변경
     @PutMapping("/password")
-    public ApiResponse<?> changePassword(@RequestBody PasswordUpdateRequestDto dto, Authentication authentication) {
+    public ApiResponse<?> changePassword(@Valid @RequestBody PasswordUpdateRequestDto dto, Authentication authentication) {
         // 해당 사용자 찾기
         User user = userService.getUserById(dto.getUserId());
 

@@ -61,6 +61,9 @@ public class Plan {
     @Column(name = "total_budget")
     private Long totalBudget;
 
+    @Column(name = "view_count")
+    private Long viewCount;
+
     //생성자
     @ManyToOne
     @JoinColumn(name = "user_id")

@@ -36,23 +36,23 @@ public class User {
     private Long userId;
 
     // ID
-    @Column(name = "username", nullable = false, length = 50)
+    @Column(name = "username", nullable = false, length = 100)
     private String username;
 
     // 이메일
-    @Column(name = "email", nullable = false, length = 100)
+    @Column(name = "email", nullable = false, length = 255)
     private String email;
 
     // 비밀번호
-    @Column(name = "password", nullable = false, length = 100)
+    @Column(name = "password", nullable = false, length = 60)
     private String password;
 
     // 이름
-    @Column(name = "name", nullable = false, length = 50)
+    @Column(name = "name", nullable = false, length = 20)
     private String name;
 
     // 닉네임
-    @Column(name = "nickname", nullable = false, length = 50)
+    @Column(name = "nickname", nullable = false, length = 100)
     private String nickname;
 
     @Column(name = "profile_image_url")
