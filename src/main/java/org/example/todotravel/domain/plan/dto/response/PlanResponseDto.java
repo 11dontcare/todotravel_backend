@@ -19,6 +19,8 @@ public class PlanResponseDto {
 
     private String title;
 
+    private String frontLocation;
+
     private String location;
 
     private String description;
@@ -57,6 +59,7 @@ public class PlanResponseDto {
         return PlanResponseDto.builder()
                 .planId(plan.getPlanId())
                 .title(plan.getTitle())
+                .frontLocation(plan.getFrontLocation())
                 .location(plan.getLocation())
                 .description(plan.getDescription())
                 .startDate(plan.getStartDate())

@@ -22,12 +22,15 @@ public class UserListResponseDto {
     // 닉네임
     private String nickname;
 
+    private String profileImageUrl;
+
     public static UserListResponseDto fromEntity(User user){
         return UserListResponseDto.builder()
                 .userId(user.getUserId())
                 .username(user.getUsername())
                 .name(user.getName())
                 .nickname(user.getNickname())
+                .profileImageUrl(user.getProfileImageUrl())
                 .build();
     }
 }

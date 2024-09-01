@@ -25,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -112,6 +113,7 @@ public class PlanServiceImpl implements PlanService {
         // 수정을 위해 toBuilder 사용
         plan = plan.toBuilder()
             .title(dto.getTitle())
+            .frontLocation(dto.getFrontLocation())
             .location(dto.getLocation())
             .startDate(dto.getStartDate())
             .endDate(dto.getEndDate())
@@ -194,7 +196,6 @@ public class PlanServiceImpl implements PlanService {
             .recruitment(false)
             .totalBudget(plan.getTotalBudget())
             .viewCount(0L)
-            .recruitment(false)
             .planUser(user)
             .build();
         List<Schedule> newSchedules = new ArrayList<>();
@@ -299,6 +300,8 @@ public class PlanServiceImpl implements PlanService {
                 .endDate(plan.getEndDate())
                 .bookmarkNumber(counts != null ? counts.getBookmarkCount() : 0)
                 .likeNumber(counts != null ? counts.getLikeCount() : 0)
+                .participantsCount(plan.getParticipantsCount())
+                .planUserCount(plan.getPlanUsers().stream().filter(planUser -> planUser.getStatus() == PlanUser.StatusType.ACCEPTED).count())
                 .planUserNickname(plan.getPlanUser().getNickname())
                 .planThumbnailUrl(plan.getPlanThumbnailUrl())
                 .build();
@@ -334,25 +337,46 @@ public class PlanServiceImpl implements PlanService {
         return getPagedPlans(page, size, pageable -> planRepository.findPopularPlansWithAllLocation(frontLocation, location, pageable));
     }
 
-    // 모집 중이지 않은 플랜 중 최신순으로 페이징 조회
+    // 플랜 중 최신순으로 페이징 조회
     @Override
     @Transactional(readOnly = true)
-    public PagedResponseDto<PlanListResponseDto> getRecentPlansNotInRecruitment(int page, int size) {
-        return getPagedPlans(page, size, planRepository::findRecentPlansNotInRecruitment);
+    public PagedResponseDto<PlanListResponseDto> getRecentPlansByRecruitment(int page, int size, Boolean recruitment) {
+        return getPagedPlans(page, size, pageable -> planRepository.findRecentPlansByRecruitment(recruitment, pageable));
     }
 
-    // 모집 중이지 않은 플랜 중 행정구역과 최신순으로 페이징 조회
+    // 플랜 중 행정구역과 최신순으로 페이징 조회
     @Override
     @Transactional(readOnly = true)
-    public PagedResponseDto<PlanListResponseDto> getRecentPlansWithFrontLocation(int page, int size, String frontLocation) {
-        return getPagedPlans(page, size, pageable -> planRepository.findRecentPlansWithFrontLocation(frontLocation, pageable));
+    public PagedResponseDto<PlanListResponseDto> getRecentPlansWithFrontLocation(int page, int size, String frontLocation, Boolean recruitment) {
+        return getPagedPlans(page, size, pageable -> planRepository.findRecentPlansWithFrontLocation(frontLocation, recruitment, pageable));
     }
 
-    // 모집 중이지 않은 플랜 중 행정구역+도시와 최신순으로 페이징 조회
+    // 플랜 중 행정구역+도시와 최신순으로 페이징 조회
     @Override
     @Transactional(readOnly = true)
-    public PagedResponseDto<PlanListResponseDto> getRecentPlansWithAllLocation(int page, int size, String frontLocation, String location) {
-        return getPagedPlans(page, size, pageable -> planRepository.findRecentPlansWithAllLocation(frontLocation, location, pageable));
+    public PagedResponseDto<PlanListResponseDto> getRecentPlansWithAllLocation(int page, int size, String frontLocation, String location, Boolean recruitment) {
+        return getPagedPlans(page, size, pageable -> planRepository.findRecentPlansWithAllLocation(frontLocation, location, recruitment, pageable));
+    }
+
+    // 플랜 중 여행 시작 날짜와 최신순으로 페이징 조회
+    @Override
+    @Transactional(readOnly = true)
+    public PagedResponseDto<PlanListResponseDto> getRecentPlansRecruitmentByStartDate(int page, int size, Boolean recruitment, LocalDate startDate) {
+        return getPagedPlans(page, size, pageable -> planRepository.findRecentPlansRecruitmentByStartDate(recruitment, startDate, pageable));
+    }
+
+    // 플랜 중 행정구역, 여행 시작 날짜와 최신순으로 페이징 조회
+    @Override
+    @Transactional(readOnly = true)
+    public PagedResponseDto<PlanListResponseDto> getRecentPlansWithFrontLocationAndStartDate(int page, int size, String frontLocation, Boolean recruitment, LocalDate startDate) {
+        return getPagedPlans(page, size, pageable -> planRepository.findRecentPlansWithFrontLocationAndStartDate(frontLocation, recruitment, startDate, pageable));
+    }
+
+    // 플랜 중 행정구역+도시, 여행 시작 날짜와 최신순으로 페이징 조회
+    @Override
+    @Transactional(readOnly = true)
+    public PagedResponseDto<PlanListResponseDto> getRecentPlansWithAllLocationAndStartDate(int page, int size, String frontLocation, String location, Boolean recruitment, LocalDate startDate) {
+        return getPagedPlans(page, size, pageable -> planRepository.findRecentPlansWithAllLocationAndStartDate(frontLocation, location, recruitment, startDate, pageable));
     }
 
     // 페이징 플랜 공통 메서드
