@@ -64,11 +64,7 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     @Transactional
     public void updateAllAlarm(Long userId) {
-        List<Alarm> alarmList = findByUserId(userId);
-        for (Alarm alarm : alarmList) {
-            alarm.setStatus(true);
-        }
-        alarmRepository.saveAll(alarmList);
+        alarmRepository.markAllAlarmsAsReadByUserId(userId);
     }
 
     //알림 삭제하기
