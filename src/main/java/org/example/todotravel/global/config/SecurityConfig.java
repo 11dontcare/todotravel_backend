@@ -40,6 +40,7 @@ public class SecurityConfig {
             "/api/notification/**",
             "/api/mypage/**",
             "/api/token/refresh",
+            "/api/recruitment/**",
             "/api/auth/logout",
             "/api/auth/profile-image/**",
             "/ws/**",
