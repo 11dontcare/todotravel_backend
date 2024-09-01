@@ -7,6 +7,7 @@ import org.example.todotravel.domain.plan.dto.response.PlanResponseDto;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.user.entity.User;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -38,9 +39,13 @@ public interface PlanService {
     PagedResponseDto<PlanListResponseDto> getPopularPlansWithFrontLocation(int page, int size, String frontLocation);
     PagedResponseDto<PlanListResponseDto> getPopularPlansWithAllLocation(int page, int size, String frontLocation, String location);
 
-    PagedResponseDto<PlanListResponseDto> getRecentPlansNotInRecruitment(int page, int size);
-    PagedResponseDto<PlanListResponseDto> getRecentPlansWithFrontLocation(int page, int size, String frontLocation);
-    PagedResponseDto<PlanListResponseDto> getRecentPlansWithAllLocation(int page, int size, String frontLocation, String location);
+    PagedResponseDto<PlanListResponseDto> getRecentPlansByRecruitment(int page, int size, Boolean recruitment);
+    PagedResponseDto<PlanListResponseDto> getRecentPlansWithFrontLocation(int page, int size, String frontLocation, Boolean recruitment);
+    PagedResponseDto<PlanListResponseDto> getRecentPlansWithAllLocation(int page, int size, String frontLocation, String location, Boolean recruitment);
+
+    PagedResponseDto<PlanListResponseDto> getRecentPlansRecruitmentByStartDate(int page, int size, Boolean recruitment, LocalDate startDate);
+    PagedResponseDto<PlanListResponseDto> getRecentPlansWithFrontLocationAndStartDate(int page, int size, String frontLocation, Boolean recruitment, LocalDate startDate);
+    PagedResponseDto<PlanListResponseDto> getRecentPlansWithAllLocationAndStartDate(int page, int size, String frontLocation, String location, Boolean recruitment, LocalDate startDate);
 
     Map<Long, PlanCountProjection> getBookmarkAndLikeCounts(List<Long> planIds);
     List<PlanListResponseDto> convertToPlanListResponseDto(List<Plan> plans);

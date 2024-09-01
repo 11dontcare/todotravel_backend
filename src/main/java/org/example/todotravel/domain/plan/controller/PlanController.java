@@ -163,7 +163,7 @@ public class PlanController {
     @GetMapping("/recent")
     public ApiResponse<?> getRecentPlans(@RequestParam(defaultValue = "0") int page,
                                          @RequestParam(defaultValue = "12") int size) {
-        PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansNotInRecruitment(page, size);
+        PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansByRecruitment(page, size, false);
         return new ApiResponse<>(true, "최신순 플랜 조회에 성공했습니다.", planList);
     }
 
@@ -172,7 +172,7 @@ public class PlanController {
     public ApiResponse<?> getRecentPlansByFrontLocation(@RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "12") int size,
                                                         @RequestParam String frontLocation) {
-        PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansWithFrontLocation(page, size, frontLocation);
+        PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansWithFrontLocation(page, size, frontLocation, false);
         return new ApiResponse<>(true, "행정구역별 최신순 플랜 조회에 성공했습니다.", planList);
     }
 
@@ -182,7 +182,7 @@ public class PlanController {
                                                    @RequestParam(defaultValue = "12") int size,
                                                    @RequestParam String frontLocation,
                                                    @RequestParam String location) {
-        PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansWithAllLocation(page, size, frontLocation, location);
+        PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansWithAllLocation(page, size, frontLocation, location, false);
         return new ApiResponse<>(true, "행정구역+도시별 최신순 플랜 조회에 성공했습니다.", planList);
     }
 
