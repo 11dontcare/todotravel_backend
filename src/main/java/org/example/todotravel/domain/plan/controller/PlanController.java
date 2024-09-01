@@ -20,6 +20,7 @@ import org.example.todotravel.domain.user.entity.Follow;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.domain.user.service.UserService;
 import org.example.todotravel.global.controller.ApiResponse;
+import org.example.todotravel.global.dto.PagedResponseDto;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -67,10 +68,13 @@ public class PlanController {
         return new ApiResponse<>(true, "플랜 조회 성공", planDetails);
     }
 
-    //플랜 수정
+    // 플랜 수정
     @PutMapping("/{plan_id}")
-    public ApiResponse<Long> updatePlan(@PathVariable("plan_id") Long planId, @Valid @RequestBody PlanRequestDto dto) {
-        Plan plan = planService.updatePlan(planId, dto);
+    public ApiResponse<Long> updatePlan(@PathVariable("plan_id") Long planId,
+                                        @RequestPart("planRequestDto") PlanRequestDto dto,
+                                        @RequestPart(value = "planThumbnail", required = false) MultipartFile planThumbnail) {
+        // @RequestPart - Multipart/form-data가 포함되어 있는 경우에 사용, 없다면 @RequestBody와 동일
+        Plan plan = planService.updatePlan(planId, dto, planThumbnail);
         return new ApiResponse<>(true, "플랜 수정 성공", planId);
     }
 
@@ -126,6 +130,60 @@ public class PlanController {
     public ApiResponse<List<PlanListResponseDto>> viewPublicPlans() {
         List<PlanListResponseDto> planList = planService.getPublicPlans();
         return new ApiResponse<>(true, "플랜 목록 조회 성공", planList);
+    }
+
+    // 플랜 기본 인기순으로 가져오기 (Public, No Recruitment)
+    @GetMapping("/popular")
+    public ApiResponse<?> getPopularPlans(@RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "12") int size) {
+        PagedResponseDto<PlanListResponseDto> planList = planService.getPopularPlansNotInRecruitment(page, size);
+        return new ApiResponse<>(true, "다음 인기순 플랜 조회에 성공했습니다.", planList);
+    }
+
+    // 행정구역별 인기순 플랜 가져오기
+    @GetMapping("/popular/frontLocation")
+    public ApiResponse<?> getPopularPlansByFrontLocation(@RequestParam(defaultValue = "0") int page,
+                                                         @RequestParam(defaultValue = "12") int size,
+                                                         @RequestParam String frontLocation) {
+        PagedResponseDto<PlanListResponseDto> planList = planService.getPopularPlansWithFrontLocation(page, size, frontLocation);
+        return new ApiResponse<>(true, "행정구역별 인기순 플랜 조회에 성공했습니다.", planList);
+    }
+
+    // 행정구역+도시별 인기순 플랜 가져오기
+    @GetMapping("/popular/location")
+    public ApiResponse<?> getPopularPlansByLocation(@RequestParam(defaultValue = "0") int page,
+                                                    @RequestParam(defaultValue = "12") int size,
+                                                    @RequestParam String frontLocation,
+                                                    @RequestParam String location) {
+        PagedResponseDto<PlanListResponseDto> planList = planService.getPopularPlansWithAllLocation(page, size, frontLocation, location);
+        return new ApiResponse<>(true, "행정구역+도시별 인기순 플랜 조회에 성공했습니다.", planList);
+    }
+
+    // 플랜 기본 최신순으로 가져오기 (Public, No Recruitment)
+    @GetMapping("/recent")
+    public ApiResponse<?> getRecentPlans(@RequestParam(defaultValue = "0") int page,
+                                         @RequestParam(defaultValue = "12") int size) {
+        PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansByRecruitment(page, size, false);
+        return new ApiResponse<>(true, "최신순 플랜 조회에 성공했습니다.", planList);
+    }
+
+    // 행정구역별 최신순 플랜 가져오기
+    @GetMapping("/recent/frontLocation")
+    public ApiResponse<?> getRecentPlansByFrontLocation(@RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "12") int size,
+                                                        @RequestParam String frontLocation) {
+        PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansWithFrontLocation(page, size, frontLocation, false);
+        return new ApiResponse<>(true, "행정구역별 최신순 플랜 조회에 성공했습니다.", planList);
+    }
+
+    // 행정구역+도시별 최신순 플랜 가져오기
+    @GetMapping("/recent/location")
+    public ApiResponse<?> getRecentPlansByLocation(@RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "12") int size,
+                                                   @RequestParam String frontLocation,
+                                                   @RequestParam String location) {
+        PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansWithAllLocation(page, size, frontLocation, location, false);
+        return new ApiResponse<>(true, "행정구역+도시별 최신순 플랜 조회에 성공했습니다.", planList);
     }
 
     //플랜 가져오기(댓글x, 일정x)   (플랜 정보, 북마크, 좋아요)

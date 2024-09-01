@@ -19,6 +19,8 @@ public class PlanResponseDto {
 
     private String title;
 
+    private String frontLocation;
+
     private String location;
 
     private String description;
@@ -30,6 +32,8 @@ public class PlanResponseDto {
     private Boolean isPublic;
 
     private Boolean status;
+
+    private String planThumbnailUrl;
 
     private Integer participantsCount;
 
@@ -55,12 +59,14 @@ public class PlanResponseDto {
         return PlanResponseDto.builder()
                 .planId(plan.getPlanId())
                 .title(plan.getTitle())
+                .frontLocation(plan.getFrontLocation())
                 .location(plan.getLocation())
                 .description(plan.getDescription())
                 .startDate(plan.getStartDate())
                 .endDate(plan.getEndDate())
                 .isPublic(plan.getIsPublic())
                 .status(plan.getStatus())
+                .planThumbnailUrl(plan.getPlanThumbnailUrl())
                 .participantsCount(plan.getParticipantsCount())
                 .planUserCount(plan.getPlanUsers().stream().filter(planUser -> planUser.getStatus() == PlanUser.StatusType.ACCEPTED).count())
                 .recruitment(plan.getRecruitment())

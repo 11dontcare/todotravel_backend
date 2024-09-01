@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UserRegisterRequestDto {
 
+    @Size(max = 20, message = "아이디는 20자 내로 설정해주세요.")
     @Pattern(regexp = "^[\\S]+$", message = "아이디에 공백을 포함할 수 없습니다.")
     @NotBlank(message = "아이디는 필수 입력 값입니다.")
     private String username;
@@ -33,10 +34,12 @@ public class UserRegisterRequestDto {
     @NotBlank(message = "비밀번호는 필수 입력 값입니다.")
     private String password;
 
+    @Size(max = 8, message = "닉네임은 8자 내로 사용가능합니다.")
     @Pattern(regexp = "^[\\S]+$", message = "닉네임에 공백을 포함할 수 없습니다.")
     @NotBlank(message = "닉네임은 필수 입력 값입니다.")
     private String nickname;
 
+    @Size(max = 17, message = "이름은 17자 내로 입력해주세요.")
     @Pattern(regexp = "^[\\S]+$", message = "이름에 공백을 포함할 수 없습니다.")
     @NotBlank(message = "이름은 필수 입력 값입니다.")
     private String name;

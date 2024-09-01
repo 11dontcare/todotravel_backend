@@ -38,7 +38,7 @@ public class UserController {
 
     // OAuth2 첫 가입시 추가 정보 입력 후 로그인 처리
     @PutMapping("/oauth2/additional-info")
-    public ApiResponse<?> updateOAuth2UserAdditionalInfo(@RequestBody OAuth2AdditionalInfoRequestDto dto,
+    public ApiResponse<?> updateOAuth2UserAdditionalInfo(@Valid @RequestBody OAuth2AdditionalInfoRequestDto dto,
                                                          HttpServletResponse response) {
         try {
             User updatedUser = userService.updateOAuth2UserAdditionalInfo(dto);
@@ -120,7 +120,7 @@ public class UserController {
 
     // 비밀번호 재설정
     @PutMapping("/password-reset")
-    public ApiResponse<?> resetPassword(@RequestBody PasswordResetRequestDto dto) {
+    public ApiResponse<?> resetPassword(@Valid @RequestBody PasswordResetRequestDto dto) {
         try {
             userService.renewPassword(dto, passwordEncoder);
             return new ApiResponse<>(true, "비밀번호 재설정을 완료했습니다.");

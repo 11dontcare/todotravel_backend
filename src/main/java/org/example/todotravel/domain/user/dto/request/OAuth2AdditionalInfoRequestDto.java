@@ -5,6 +5,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 public class OAuth2AdditionalInfoRequestDto {
     private String token;
 
+    @Size(max = 8, message = "닉네임은 8자 내로 사용가능합니다.")
     @Pattern(regexp = "^[\\S]+$", message = "닉네임에 공백을 포함할 수 없습니다.")
     @NotBlank(message = "닉네임은 필수 입력 값입니다.")
     private String nickname;
