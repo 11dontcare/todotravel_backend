@@ -16,6 +16,7 @@ public class PlanUserResponseDto {
     private Long userId;
     private Long planId;
     private String nickname;
+    private String profileImageUrl;
 
     public static PlanUserResponseDto fromEntity(PlanUser planUser){
         return PlanUserResponseDto.builder()
@@ -24,6 +25,7 @@ public class PlanUserResponseDto {
                 .userId(planUser.getUser().getUserId())
                 .planId(planUser.getPlan().getPlanId())
                 .nickname(planUser.getUser().getNickname())
+                .profileImageUrl(planUser.getUser().getProfileImageUrl())
                 .build();
     }
 }
