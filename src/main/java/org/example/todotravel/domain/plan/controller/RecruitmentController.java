@@ -123,8 +123,8 @@ public class RecruitmentController {
 
     // 모집 플랜 최신순으로 가져오기 (Public, Recruitment)
     @GetMapping("/recruitment/recent")
-    public ApiResponse<?> getRecentPlans(@RequestParam(defaultValue = "0") int page,
-                                         @RequestParam(defaultValue = "12") int size) {
+    public ApiResponse<?> getRecentPlans(@RequestParam(name = "page", defaultValue = "0") int page,
+                                         @RequestParam(name = "size", defaultValue = "12") int size) {
         PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansByRecruitment(page, size, true);
         return new ApiResponse<>(true, "최신순 플랜 조회에 성공했습니다.", planList);
     }
