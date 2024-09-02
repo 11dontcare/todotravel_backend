@@ -120,7 +120,7 @@ public class PlanUserServiceImpl implements PlanUserService {
         if (subject.equals("my")) {
             planList = getAllPlansByUserAndStatusTop4(userId);
         } else {
-            planList = getAllPlansByUserAndStatus(userId);
+            planList = getAllPlansByUserAndStatusInPublic(userId);
         }
         int planCount = planList.size();
 
@@ -144,6 +144,14 @@ public class PlanUserServiceImpl implements PlanUserService {
     @Transactional(readOnly = true)
     public List<Plan> getAllPlansByUser(User user) {
         return planUserRepository.findAllPlansByUserId(user.getUserId(), PlanUser.StatusType.ACCEPTED);
+    }
+
+    // 특정 사용자가 참여한 모든 Public한 플랜 DTO로 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<PlanListResponseDto> getAllPlansByUserAndStatusInPublic(Long userId) {
+        List<PlanListResponseDto> dtos = planUserRepository.findAllPublicPlanDtosByUserId(userId, PlanUser.StatusType.ACCEPTED);
+        return planService.setBookmarkAndLikeCounts(dtos);
     }
 
     // 특정 사용자가 참여한 모든 플랜 DTO로 조회

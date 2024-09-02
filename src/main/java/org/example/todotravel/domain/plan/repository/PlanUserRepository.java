@@ -35,6 +35,20 @@ public interface PlanUserRepository extends JpaRepository<PlanUser, Long> {
         """)
     List<Plan> findAllPlansByUserId(@Param("userId") Long userId, @Param("status") PlanUser.StatusType status);
 
+    // 타인의 퍼블릭한 플랜 모두 조회
+    @Query("""
+        SELECT new org.example.todotravel.domain.plan.dto.response.PlanListResponseDto(
+            p.planId, p.title, p.location, p.description, p.startDate, p.endDate,
+            p.planThumbnailUrl, u.nickname)
+        FROM Plan p
+        JOIN p.planUser u
+        JOIN PlanUser pu ON p.planId = pu.plan.planId
+        WHERE pu.user.userId = :userId AND pu.status = :status AND pu.plan.isPublic = true
+        ORDER BY p.planId DESC
+        """)
+    List<PlanListResponseDto> findAllPublicPlanDtosByUserId(@Param("userId") Long userId, @Param("status") PlanUser.StatusType status);
+
+    // 본인이 참여한 모든 플랜 조회
     @Query("""
         SELECT new org.example.todotravel.domain.plan.dto.response.PlanListResponseDto(
             p.planId, p.title, p.location, p.description, p.startDate, p.endDate,
