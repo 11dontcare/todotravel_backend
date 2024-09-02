@@ -22,4 +22,11 @@ public class LocationController {
         );
         return new ApiResponse<>(true, "장소 저장 성공", location);
     }
+
+    //여행 장소 검색하기
+    @GetMapping("/{location_id}")
+    public ApiResponse<Location> findByLocationId(@PathVariable("location_id") Long locationId) {
+        Location location = locationService.findByLocationId(locationId);
+        return new ApiResponse<>(true, "장소 검색 성공", location);
+    }
 }

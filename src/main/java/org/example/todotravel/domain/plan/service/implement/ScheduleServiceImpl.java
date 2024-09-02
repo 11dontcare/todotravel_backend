@@ -44,8 +44,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     public Schedule createSchedule(Long planId, ScheduleCreateRequestDto dto) {
         Plan plan = planService.getPlan(planId);
 
-        Location location = locationService.findByLocationId(dto.getLocationId())
-                .orElseThrow(() -> new RuntimeException("장소를 찾을 수 없습니다."));
+        Location location = locationService.findByLocationId(dto.getLocationId());
 
         Schedule schedule = Schedule.builder()
                 .status(false)

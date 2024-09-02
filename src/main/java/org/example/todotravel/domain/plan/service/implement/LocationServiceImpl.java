@@ -24,8 +24,8 @@ public class LocationServiceImpl implements LocationService {
     //위치 찾기 - id
     @Override
     @Transactional(readOnly = true)
-    public Optional<Location> findByLocationId(Long locationId) {
-        return locationRepository.findById(locationId);
+    public Location findByLocationId(Long locationId) {
+        return locationRepository.findById(locationId).orElseThrow(() -> new RuntimeException("장소를 찾을 수 없습니다."));
     }
 
     //위치 저장하기
