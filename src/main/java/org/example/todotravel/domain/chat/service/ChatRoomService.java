@@ -1,6 +1,5 @@
 package org.example.todotravel.domain.chat.service;
 
-import org.example.todotravel.domain.chat.dto.request.ChatRoomCreateRequestDto;
 import org.example.todotravel.domain.chat.dto.request.ChatRoomNameRequestDto;
 import org.example.todotravel.domain.chat.dto.request.OneToOneChatRoomRequestDto;
 import org.example.todotravel.domain.chat.dto.response.ChatRoomNameResponseDto;

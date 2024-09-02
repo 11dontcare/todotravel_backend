@@ -1,6 +1,5 @@
 package org.example.todotravel.domain.user.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,7 +15,6 @@ import java.util.Set;
 import lombok.*;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 
 import org.example.todotravel.domain.notification.entity.Alarm;
 import org.example.todotravel.domain.plan.entity.Plan;
