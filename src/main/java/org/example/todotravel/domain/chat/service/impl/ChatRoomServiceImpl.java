@@ -133,7 +133,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
             .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다."));
         User user = userService.getUserById(userId);
-        ChatRoomUser chatRoomUser = chatRoomUserService.getUserByUserId(user);
+        ChatRoomUser chatRoomUser = chatRoomUserService.getChatRoomUserByUserAndRoom(user, chatRoom);
 
         // 채팅방 사용자 제거 후 저장
         chatRoom.getChatRoomUsers().remove(chatRoomUser);

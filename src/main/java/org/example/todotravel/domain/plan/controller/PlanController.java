@@ -99,10 +99,10 @@ public class PlanController {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         User user = userService.getUserByUsername(userDetails.getUsername());
 
-        Set<Follow> followers = user.getFollowers();
+        Set<Follow> followers = user.getFollowings();
         List<User> users = new ArrayList<>();
         for (Follow follow : followers) {
-            users.add(follow.getFollowingUser());
+            users.add(follow.getFollowerUser());
         }
         //해당 플랜에 참여하고 있지 않은 사용자만
         List<PlanUser> planUsers = planUserService.getAllPlanUser(planId);

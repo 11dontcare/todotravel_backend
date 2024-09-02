@@ -155,7 +155,7 @@ public class RecruitmentController {
                                                     @RequestParam(name = "startDate") LocalDate startDate) {
         PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansRecruitmentByStartDate(page, size, true, startDate);
 
-        return new ApiResponse<>(true, "최신순 플랜 조회에 성공했습니다.", planList);
+        return new ApiResponse<>(true, "날짜, 최신순 플랜 조회에 성공했습니다.", planList);
     }
 
     // 날짜, 행정구역별 모집 플랜 최신순 가져오기
@@ -165,7 +165,7 @@ public class RecruitmentController {
                                                                     @RequestParam(name = "frontLocation") String frontLocation,
                                                                     @RequestParam(name = "startDate") LocalDate startDate) {
         PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansWithFrontLocationAndStartDate(page, size, frontLocation, true, startDate);
-        return new ApiResponse<>(true, "행정구역별 최신순 플랜 조회에 성공했습니다.", planList);
+        return new ApiResponse<>(true, "날짜, 행정구역별 최신순 플랜 조회에 성공했습니다.", planList);
     }
 
     // 날짜, 행정구역+도시별 모집 플랜 최신순 가져오기
@@ -176,6 +176,6 @@ public class RecruitmentController {
                                                                @RequestParam(name = "location") String location,
                                                                @RequestParam(name = "startDate") LocalDate startDate) {
         PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansWithAllLocationAndStartDate(page, size, frontLocation, location, true, startDate);
-        return new ApiResponse<>(true, "행정구역+도시별 최신순 플랜 조회에 성공했습니다.", planList);
+        return new ApiResponse<>(true, "날짜, 행정구역+도시별 최신순 플랜 조회에 성공했습니다.", planList);
     }
 }

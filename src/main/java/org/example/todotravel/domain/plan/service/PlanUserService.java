@@ -26,7 +26,7 @@ public interface PlanUserService {
     List<PlanListResponseDto> getOwnRecruitmentPlansLimit4(User user);
     List<PlanListResponseDto> getAllRecruitmentPlans(Long userId);
 
-    Boolean existsPlanUser(Plan plan, Long userId);
+    Boolean existsPlanUser(Plan plan, Long userId, PlanUser.StatusType status);
 
     List<PendingPlanUserDto> getAllParticipantsByUserId(Long userId);
 }

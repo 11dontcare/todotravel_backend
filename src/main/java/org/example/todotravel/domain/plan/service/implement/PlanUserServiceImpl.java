@@ -181,10 +181,16 @@ public class PlanUserServiceImpl implements PlanUserService {
         return planService.convertToPlanListResponseDto(plans);
     }
 
+    //현재 사용자가 해당 플랜에 존재하는지
     @Override
-    public Boolean existsPlanUser(Plan plan, Long userId) {
+    public Boolean existsPlanUser(Plan plan, Long userId, PlanUser.StatusType status) {
         User user = userService.getUserById(userId);
-        return planUserRepository.existsPlanUserByPlanAndUserAndStatus(plan, user, PlanUser.StatusType.ACCEPTED);
+        if (status == PlanUser.StatusType.ACCEPTED) {
+            return planUserRepository.existsPlanUserByPlanAndUserAndStatus(plan, user, PlanUser.StatusType.ACCEPTED);
+        }
+        else {
+            return planUserRepository.existsPlanUserByPlanAndUser(plan, user);
+        }
     }
 
     @Override

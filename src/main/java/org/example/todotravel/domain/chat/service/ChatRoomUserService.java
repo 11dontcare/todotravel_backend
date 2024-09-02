@@ -18,7 +18,7 @@ public interface ChatRoomUserService {
     List<ChatRoomListResponseDto> getChatRoomsByUserId(Long userId);
 
     // 채팅방에 유저 존재 찾기
-    ChatRoomUser getUserByUserId(User user);
+    ChatRoomUser getChatRoomUserByUserAndRoom(User user, ChatRoom chatRoom);
 
     // 채팅방 유저 목록 조회
     List<ChatRoomUserResponseDto> getUsersByRoomId(Long roomId);
