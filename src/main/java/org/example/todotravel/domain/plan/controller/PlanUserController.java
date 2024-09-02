@@ -87,12 +87,20 @@ public class PlanUserController {
         return new ApiResponse<>(true, "플랜 참여자 삭제 성공");
     }
 
-    //플랜에 참여 중인 사용자인지 확인
+    //플랜에 참여 중(accepted)인 사용자인지 확인(수락 상태)
+    @GetMapping("/plan/{plan_id}/exist/{user_id}/accepted")
+    public ApiResponse<Boolean> isUserInPlanAccepted(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId){
+        Plan plan = planService.getPlan(planId);
+        Boolean existsPlanUser = planUserService.existsPlanUser(plan, userId, PlanUser.StatusType.ACCEPTED);
+        return new ApiResponse<>(true, "플랜 참여 여부 조회 성공", existsPlanUser);
+    }
+
+    //플랜에 참여 중인 사용자인지 확인(모든(대기,거절,수락) 상태)
     @GetMapping("/plan/{plan_id}/exist/{user_id}")
     public ApiResponse<Boolean> isUserInPlan(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId){
         Plan plan = planService.getPlan(planId);
-        Boolean existsPlanUser = planUserService.existsPlanUser(plan, userId);
-        return new ApiResponse<>(true, "플랜 참여 여부 조회 성공", existsPlanUser);
+        Boolean existsPlanUser = planUserService.existsPlanUser(plan, userId, null);
+        return new ApiResponse<>(true, "플랜에 사용자 존재 여부 조회 성공", existsPlanUser);
     }
 
     //수락,거절을 위한 사용자의 플랜 참가, 초대 목록 가져오기

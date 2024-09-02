@@ -81,6 +81,7 @@ public interface PlanUserRepository extends JpaRepository<PlanUser, Long> {
     List<Plan> findAllRecruitingPlansByUserId(@Param("userId") Long userId, @Param("status") PlanUser.StatusType status);
 
     Boolean existsPlanUserByPlanAndUserAndStatus(Plan plan, User user, PlanUser.StatusType status);
+    Boolean existsPlanUserByPlanAndUser(Plan plan, User user);
 
     @Query("""
         SELECT pu FROM PlanUser pu
