@@ -20,6 +20,7 @@ public class PlanRequestDto {
     private LocalDate endDate;
     private String frontLocation;
     private String location;
+    private String description;
     private Boolean isPublic;
     private Boolean status;
     private Long totalBudget;
@@ -30,6 +31,7 @@ public class PlanRequestDto {
                 .title(title)
                 .location(location)
                 .frontLocation(frontLocation)
+                .description(description)
                 .startDate(startDate)
                 .endDate(endDate)
                 .isPublic(isPublic)

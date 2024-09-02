@@ -116,13 +116,16 @@ public class PlanUserServiceImpl implements PlanUserService {
     public UserProfileResponseDto getUserProfile(String subject, User user, boolean isFollowing) {
         Long userId = user.getUserId();
         List<PlanListResponseDto> planList;
+        int planCount;
 
         if (subject.equals("my")) {
-            planList = getAllPlansByUserAndStatusTop4(userId);
-        } else {
             planList = getAllPlansByUserAndStatus(userId);
+            planCount = planList.size();
+            planList = planList.size() > 4 ? planList.subList(0, 4) : planList; // 본인이면 4개만 잘라서 보여주기
+        } else {
+            planList = getAllPlansByUserAndStatusInPublic(userId);
+            planCount = planList.size();
         }
-        int planCount = planList.size();
 
         return UserProfileResponseDto.builder()
             .userId(userId)
@@ -146,19 +149,19 @@ public class PlanUserServiceImpl implements PlanUserService {
         return planUserRepository.findAllPlansByUserId(user.getUserId(), PlanUser.StatusType.ACCEPTED);
     }
 
+    // 특정 사용자가 참여한 모든 Public한 플랜 DTO로 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<PlanListResponseDto> getAllPlansByUserAndStatusInPublic(Long userId) {
+        List<PlanListResponseDto> dtos = planUserRepository.findAllPublicPlanDtosByUserId(userId, PlanUser.StatusType.ACCEPTED);
+        return planService.setBookmarkAndLikeCounts(dtos);
+    }
+
     // 특정 사용자가 참여한 모든 플랜 DTO로 조회
     @Override
     @Transactional(readOnly = true)
     public List<PlanListResponseDto> getAllPlansByUserAndStatus(Long userId) {
         List<PlanListResponseDto> dtos = planUserRepository.findAllPlanDtosByUserId(userId, PlanUser.StatusType.ACCEPTED);
-        return planService.setBookmarkAndLikeCounts(dtos);
-    }
-
-    // 특정 사용자가 참여한 플랜 4개 DTO로 조회
-    @Override
-    @Transactional(readOnly = true)
-    public List<PlanListResponseDto> getAllPlansByUserAndStatusTop4(Long userId) {
-        List<PlanListResponseDto> dtos = planUserRepository.findAllPlanDtosByUserIdTop4(userId, PlanUser.StatusType.ACCEPTED, PageRequest.of(0, 4));
         return planService.setBookmarkAndLikeCounts(dtos);
     }
 
