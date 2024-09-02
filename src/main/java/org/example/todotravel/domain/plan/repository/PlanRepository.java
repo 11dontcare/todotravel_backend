@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,7 +65,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     @Query("""
         SELECT p FROM Plan p
         LEFT JOIN Like l ON p.planId = l.plan.planId
-        WHERE p.recruitment = false AND p.isPublic = true 
+        WHERE p.recruitment = false AND p.isPublic = true
         AND p.frontLocation = :frontLocation
         GROUP BY p.planId
         ORDER BY (p.viewCount * 0.075 + COUNT(l)) DESC
@@ -76,7 +77,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     @Query("""
         SELECT p FROM Plan p
         LEFT JOIN Like l ON p.planId = l.plan.planId
-        WHERE p.recruitment = false AND p.isPublic = true 
+        WHERE p.recruitment = false AND p.isPublic = true
         AND p.frontLocation = :frontLocation AND p.location = :location
         GROUP BY p.planId
         ORDER BY (p.viewCount * 0.075 + COUNT(l)) DESC
@@ -84,33 +85,65 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     Page<Plan> findPopularPlansWithAllLocation(@Param("frontLocation") String frontLocation,
                                                @Param("location") String location, Pageable pageable);
 
-    // 기본 최신순 조회 (Public, No Recruitment)
+    // 기본 최신순 조회
     @EntityGraph(attributePaths = "planUser")
     @Query("""
         SELECT p FROM Plan p
-        WHERE p.recruitment = false AND p.isPublic = true
+        WHERE p.recruitment = :recruitment AND p.isPublic = true
         ORDER BY p.planId DESC
         """)
-    Page<Plan> findRecentPlansNotInRecruitment(Pageable pageable);
+    Page<Plan> findRecentPlansByRecruitment(@Param("recruitment") Boolean recruitment, Pageable pageable);
 
-    // 행정구역과 최신순 조회 (Public, No Recruitment)
+    // 행정구역과 최신순 조회
     @EntityGraph(attributePaths = "planUser")
     @Query("""
         SELECT p FROM Plan p
-        WHERE p.recruitment = false AND p.isPublic = true 
+        WHERE p.recruitment = :recruitment AND p.isPublic = true
         AND p.frontLocation = :frontLocation
         ORDER BY p.planId DESC
         """)
-    Page<Plan> findRecentPlansWithFrontLocation(@Param("frontLocation") String frontLocation, Pageable pageable);
+    Page<Plan> findRecentPlansWithFrontLocation(@Param("frontLocation") String frontLocation, @Param("recruitment") Boolean recruitment, Pageable pageable);
 
-    // 행정구역 + 도시와 최신순 조회 (Public, No Recruitment)
+    // 행정구역 + 도시와 최신순 조회
     @EntityGraph(attributePaths = "planUser")
     @Query("""
         SELECT p FROM Plan p
-        WHERE p.recruitment = false AND p.isPublic = true 
+        WHERE p.recruitment = :recruitment AND p.isPublic = true
         AND p.frontLocation = :frontLocation AND p.location = :location
         ORDER BY p.planId DESC
         """)
     Page<Plan> findRecentPlansWithAllLocation(@Param("frontLocation") String frontLocation,
-                                              @Param("location") String location, Pageable pageable);
+                                              @Param("location") String location,
+                                              @Param("recruitment") Boolean recruitment, Pageable pageable);
+
+    // 여행 시작 날짜, 최신순 조회 (Public, Recruitment)
+    @Query("""
+        SELECT p FROM Plan p
+        WHERE p.recruitment = :recruitment AND p.isPublic = true
+        AND p.startDate = :startDate
+        ORDER BY p.planId DESC
+        """)
+    Page<Plan> findRecentPlansRecruitmentByStartDate(@Param("recruitment") Boolean recruitment,
+                                                     @Param("startDate") LocalDate startDate, Pageable pageable);
+    // 여행 시작 날짜, 행정구역과 최신순 조회
+    @Query("""
+        SELECT p FROM Plan p
+        WHERE p.recruitment = :recruitment AND p.isPublic = true
+        AND p.frontLocation = :frontLocation AND p.startDate = :startDate
+        ORDER BY p.planId DESC
+        """)
+    Page<Plan> findRecentPlansWithFrontLocationAndStartDate(@Param("frontLocation") String frontLocation,
+                                                            @Param("recruitment") Boolean recruitment,
+                                                            @Param("startDate") LocalDate startDate, Pageable pageable);
+    // 여행 시작 날짜, 행정구역 + 도시와 최신순 조회
+    @Query("""
+        SELECT p FROM Plan p
+        WHERE p.recruitment = :recruitment AND p.isPublic = true
+        AND p.frontLocation = :frontLocation AND p.location = :location AND p.startDate = :startDate
+        ORDER BY p.planId DESC
+        """)
+    Page<Plan> findRecentPlansWithAllLocationAndStartDate(@Param("frontLocation") String frontLocation,
+                                                          @Param("location") String location,
+                                                          @Param("recruitment") Boolean recruitment,
+                                                          @Param("startDate") LocalDate startDate, Pageable pageable);
 }

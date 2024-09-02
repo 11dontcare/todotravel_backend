@@ -3,6 +3,7 @@ package org.example.todotravel.domain.plan.service.implement;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.notification.dto.request.AlarmRequestDto;
 import org.example.todotravel.domain.notification.service.AlarmService;
+import org.example.todotravel.domain.plan.dto.response.PendingPlanUserDto;
 import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -180,5 +182,17 @@ public class PlanUserServiceImpl implements PlanUserService {
     public Boolean existsPlanUser(Plan plan, Long userId) {
         User user = userService.getUserById(userId);
         return planUserRepository.existsPlanUserByPlanAndUserAndStatus(plan, user, PlanUser.StatusType.ACCEPTED);
+    }
+
+    @Override
+    public List<PendingPlanUserDto> getAllParticipantsByUserId(Long userId) {
+        List<PendingPlanUserDto> pendingPlanUserList = new ArrayList<>();
+        for (PlanUser planUser : planUserRepository.findAllInvitePlanUserByUserId(userId, PlanUser.StatusType.PENDING)){
+            pendingPlanUserList.add(PendingPlanUserDto.fromEntity(planUser));
+        }
+        for (PlanUser planUser : planUserRepository.findAllRecruitPlanUserByUserId(userId, PlanUser.StatusType.PENDING)){
+            pendingPlanUserList.add(PendingPlanUserDto.fromEntity(planUser));
+        }
+        return pendingPlanUserList;
     }
 }

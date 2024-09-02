@@ -3,6 +3,7 @@ package org.example.todotravel.domain.plan.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.chat.entity.ChatRoom;
 import org.example.todotravel.domain.chat.service.ChatRoomService;
+import org.example.todotravel.domain.plan.dto.response.PendingPlanUserDto;
 import org.example.todotravel.domain.plan.dto.response.PlanUserResponseDto;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
@@ -10,6 +11,9 @@ import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.plan.service.PlanUserService;
 import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.global.controller.ApiResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -89,5 +93,12 @@ public class PlanUserController {
         Plan plan = planService.getPlan(planId);
         Boolean existsPlanUser = planUserService.existsPlanUser(plan, userId);
         return new ApiResponse<>(true, "플랜 참여 여부 조회 성공", existsPlanUser);
+    }
+
+    //수락,거절을 위한 사용자의 플랜 참가, 초대 목록 가져오기
+    @GetMapping("/participant/pending/{user_id}")
+    public ApiResponse<List<PendingPlanUserDto>> getPendingParticipantsByUser(@PathVariable("user_id") Long userId){
+        List<PendingPlanUserDto> pendingPlanUserDtoList = planUserService.getAllParticipantsByUserId(userId);
+        return new ApiResponse<>(true, "플랜 참가, 초대 목록 가져오기 성공", pendingPlanUserDtoList);
     }
 }
