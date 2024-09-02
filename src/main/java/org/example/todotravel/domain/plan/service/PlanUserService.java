@@ -21,8 +21,8 @@ public interface PlanUserService {
 
     UserProfileResponseDto getUserProfile(String subject, User user, boolean isFollowing);
     List<Plan> getAllPlansByUser(User user);
+    List<PlanListResponseDto> getAllPlansByUserAndStatusInPublic(Long userId);
     List<PlanListResponseDto> getAllPlansByUserAndStatus(Long userId);
-    List<PlanListResponseDto> getAllPlansByUserAndStatusTop4(Long userId);
     List<PlanListResponseDto> getOwnRecruitmentPlansLimit4(User user);
     List<PlanListResponseDto> getAllRecruitmentPlans(Long userId);
 

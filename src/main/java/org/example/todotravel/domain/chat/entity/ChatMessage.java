@@ -1,6 +1,5 @@
 package org.example.todotravel.domain.chat.entity;
 
-import java.util.Date;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

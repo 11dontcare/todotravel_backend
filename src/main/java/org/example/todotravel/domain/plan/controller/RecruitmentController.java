@@ -44,10 +44,10 @@ public class RecruitmentController {
             }
         }
         plan = plan.toBuilder()
-                .recruitment(true)
-                .isPublic(true)
-                .participantsCount(participantsCount)
-                .build();
+            .recruitment(true)
+            .isPublic(true)
+            .participantsCount(participantsCount)
+            .build();
         planService.savePlan(plan);
         return new ApiResponse<>(true, "플랜 모집 성공", planId);
     }
@@ -62,9 +62,9 @@ public class RecruitmentController {
             }
         }
         plan = plan.toBuilder()
-                .recruitment(false)
-                .participantsCount(null)
-                .build();
+            .recruitment(false)
+            .participantsCount(null)
+            .build();
         planService.savePlan(plan);
         return new ApiResponse<>(true, "플랜 모집 취소 성공", planId);
     }
@@ -83,18 +83,18 @@ public class RecruitmentController {
 
         //일대일 채팅방 생성
         OneToOneChatRoomRequestDto chatRoomDto = OneToOneChatRoomRequestDto.builder()
-                .senderId(userId)
-                .receiverId(planUser.getPlan().getPlanUser().getUserId())
-                .build();
+            .senderId(userId)
+            .receiverId(planUser.getPlan().getPlanUser().getUserId())
+            .build();
         ChatRoomResponseDto chatRoom = chatRoomService.createOneToOneChatRoom(chatRoomDto);
 
         //자동으로 요청 메시지 생성
         ChatMessageRequestDto messageDto = ChatMessageRequestDto.builder()
-                .userId(userId)
-                .roomId(chatRoom.getRoomId())
-                .nickname(planUser.getUser().getNickname())
-                .content("[" + planUser.getPlan().getTitle() + "] 플랜에 " + planUser.getUser().getNickname() + "님이 참가하기를 요청했습니다.")
-                .build();
+            .userId(userId)
+            .roomId(chatRoom.getRoomId())
+            .nickname(planUser.getUser().getNickname())
+            .content("[" + planUser.getPlan().getTitle() + "] 플랜에 " + planUser.getUser().getNickname() + "님이 참가하기를 요청했습니다.")
+            .build();
         chatMessageService.saveChatMessage(messageDto);
 
         PlanUserResponseDto planUserResponseDto = PlanUserResponseDto.fromEntity(planUser);

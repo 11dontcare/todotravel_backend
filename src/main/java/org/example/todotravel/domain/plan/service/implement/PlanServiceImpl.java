@@ -149,6 +149,17 @@ public class PlanServiceImpl implements PlanService {
     @Override
     @Transactional
     public void removeJustPlan(Plan plan) {
+        // 해당 플랜에 썸네일이 존재할 경우 S3에서도 제거
+        String existingImageUrl = plan.getPlanThumbnailUrl();
+        if (existingImageUrl != null && !existingImageUrl.isEmpty()) {
+            String existingFileName = existingImageUrl.substring(existingImageUrl.lastIndexOf("/") + 1);
+            try {
+                s3Service.deleteFile(existingFileName);
+            } catch (IOException e) {
+                throw new RuntimeException("존재하는 썸네일 이미지 삭제를 실패했습니다.", e);
+            }
+        }
+
         planRepository.deleteByPlanId(plan.getPlanId());
     }
 
