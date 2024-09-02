@@ -3,6 +3,7 @@ package org.example.todotravel.domain.plan.service.implement;
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.domain.notification.dto.request.AlarmRequestDto;
 import org.example.todotravel.domain.notification.service.AlarmService;
+import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanSummaryDto;
 import org.example.todotravel.domain.plan.entity.Like;
 import org.example.todotravel.domain.plan.entity.Plan;
@@ -78,15 +79,15 @@ public class LikeServiceImpl implements LikeService {
     // 특정 사용자가 좋아요한 플랜 조회
     @Override
     @Transactional(readOnly = true)
-    public List<Plan> getAllLikedPlansByUser(Long userId) {
-        return likeRepository.findLikedPlansByUserId(userId);
+    public List<PlanListResponseDto> getAllLikedPlansByUser(Long userId) {
+        return likeRepository.findAllLikedPlanDtosByUserId(userId);
     }
 
     // 특정 사용자가 최근 좋아요한 플랜 4개 조회
     @Override
     @Transactional(readOnly = true)
-    public List<Plan> getRecentLikedPlansByUser(Long userId) {
-        return likeRepository.findRecentLikedPlansByUserId(userId, PageRequest.of(0, 4));
+    public List<PlanListResponseDto> getRecentLikedPlansByUser(Long userId) {
+        return likeRepository.findRecentLikedPlanDtosByUserId(userId, PageRequest.of(0, 4));
     }
 
     //플랜 삭제 시 플랜에 달린 좋아요 삭제

@@ -1,5 +1,6 @@
 package org.example.todotravel.domain.plan.repository;
 
+import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
 import org.example.todotravel.domain.user.entity.User;
@@ -35,12 +36,28 @@ public interface PlanUserRepository extends JpaRepository<PlanUser, Long> {
     List<Plan> findAllPlansByUserId(@Param("userId") Long userId, @Param("status") PlanUser.StatusType status);
 
     @Query("""
-        SELECT pu.plan FROM PlanUser pu 
-        WHERE pu.user.userId = :userId 
-        AND pu.status = :status
-        ORDER BY pu.plan.planId DESC
+        SELECT new org.example.todotravel.domain.plan.dto.response.PlanListResponseDto(
+            p.planId, p.title, p.location, p.description, p.startDate, p.endDate,
+            p.planThumbnailUrl, u.nickname)
+        FROM Plan p
+        JOIN p.planUser u
+        JOIN PlanUser pu ON p.planId = pu.plan.planId
+        WHERE pu.user.userId = :userId AND pu.status = :status
+        ORDER BY p.planId DESC
         """)
-    List<Plan> findAllPlansByUserIdTop4(@Param("userId") Long userId, @Param("status") PlanUser.StatusType status, Pageable pageable);
+    List<PlanListResponseDto> findAllPlanDtosByUserId(@Param("userId") Long userId, @Param("status") PlanUser.StatusType status);
+
+    @Query("""
+        SELECT new org.example.todotravel.domain.plan.dto.response.PlanListResponseDto(
+            p.planId, p.title, p.location, p.description, p.startDate, p.endDate,
+            p.planThumbnailUrl, u.nickname)
+        FROM Plan p
+        JOIN p.planUser u
+        JOIN PlanUser pu ON p.planId = pu.plan.planId
+        WHERE pu.user.userId = :userId AND pu.status = :status
+        ORDER BY p.planId DESC
+        """)
+    List<PlanListResponseDto> findAllPlanDtosByUserIdTop4(@Param("userId") Long userId, @Param("status") PlanUser.StatusType status, Pageable pageable);
 
     @Query("""
         SELECT pu.plan FROM PlanUser pu 

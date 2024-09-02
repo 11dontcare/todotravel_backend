@@ -5,6 +5,7 @@ import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,6 +28,8 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     void deleteAllByPlanUser(@Param("user") User user);
 
     Optional<Plan> findByPlanId(Long planId);
+
+    @EntityGraph(attributePaths = "planUser")
     List<Plan> findAllByIsPublicTrue();
     List<Plan> findAllByIsPublicTrueAndTitleContains(String keyword);
     List<Plan> findByPlanUser(User user);
@@ -47,6 +50,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     void incrementViewCount(@Param("planId") Long planId);
 
     // 기본 인기순 조회 (Public, No Recruitment)
+    @EntityGraph(attributePaths = "planUser")
     @Query("""
         SELECT p FROM Plan p
         LEFT JOIN Like l ON p.planId = l.plan.planId
@@ -57,6 +61,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     Page<Plan> findPopularPlansNotInRecruitment(Pageable pageable);
 
     // 행정구역과 인기순 조회 (Public, No Recruitment)
+    @EntityGraph(attributePaths = "planUser")
     @Query("""
         SELECT p FROM Plan p
         LEFT JOIN Like l ON p.planId = l.plan.planId
@@ -68,6 +73,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     Page<Plan> findPopularPlansWithFrontLocation(@Param("frontLocation") String frontLocation, Pageable pageable);
 
     // 행정구역 + 도시와 인기순 조회 (Public, No Recruitment)
+    @EntityGraph(attributePaths = "planUser")
     @Query("""
         SELECT p FROM Plan p
         LEFT JOIN Like l ON p.planId = l.plan.planId
@@ -80,6 +86,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
                                                @Param("location") String location, Pageable pageable);
 
     // 기본 최신순 조회
+    @EntityGraph(attributePaths = "planUser")
     @Query("""
         SELECT p FROM Plan p
         WHERE p.recruitment = :recruitment AND p.isPublic = true
@@ -88,6 +95,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     Page<Plan> findRecentPlansByRecruitment(@Param("recruitment") Boolean recruitment, Pageable pageable);
 
     // 행정구역과 최신순 조회
+    @EntityGraph(attributePaths = "planUser")
     @Query("""
         SELECT p FROM Plan p
         WHERE p.recruitment = :recruitment AND p.isPublic = true
@@ -97,6 +105,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     Page<Plan> findRecentPlansWithFrontLocation(@Param("frontLocation") String frontLocation, @Param("recruitment") Boolean recruitment, Pageable pageable);
 
     // 행정구역 + 도시와 최신순 조회
+    @EntityGraph(attributePaths = "planUser")
     @Query("""
         SELECT p FROM Plan p
         WHERE p.recruitment = :recruitment AND p.isPublic = true

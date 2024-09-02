@@ -150,16 +150,16 @@ public class PlanUserServiceImpl implements PlanUserService {
     @Override
     @Transactional(readOnly = true)
     public List<PlanListResponseDto> getAllPlansByUserAndStatus(Long userId) {
-        List<Plan> plans = planUserRepository.findAllPlansByUserId(userId, PlanUser.StatusType.ACCEPTED);
-        return planService.convertToPlanListResponseDto(plans);
+        List<PlanListResponseDto> dtos = planUserRepository.findAllPlanDtosByUserId(userId, PlanUser.StatusType.ACCEPTED);
+        return planService.setBookmarkAndLikeCounts(dtos);
     }
 
     // 특정 사용자가 참여한 플랜 4개 DTO로 조회
     @Override
     @Transactional(readOnly = true)
     public List<PlanListResponseDto> getAllPlansByUserAndStatusTop4(Long userId) {
-        List<Plan> plans = planUserRepository.findAllPlansByUserIdTop4(userId, PlanUser.StatusType.ACCEPTED, PageRequest.of(0, 4));
-        return planService.convertToPlanListResponseDto(plans);
+        List<PlanListResponseDto> dtos = planUserRepository.findAllPlanDtosByUserIdTop4(userId, PlanUser.StatusType.ACCEPTED, PageRequest.of(0, 4));
+        return planService.setBookmarkAndLikeCounts(dtos);
     }
 
     // 특정 사용자가 관여한 플랜 중 모집 중인 플랜 4개 DTO로 조회

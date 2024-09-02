@@ -35,6 +35,7 @@ public interface PlanService {
     List<PlanListResponseDto> getAllBookmarkedPlans(User user);
     List<PlanListResponseDto> getRecentLikedPlans(User user);
     List<PlanListResponseDto> getAllLikedPlans(User user);
+    List<PlanListResponseDto> setBookmarkAndLikeCounts(List<PlanListResponseDto> dtos);
     PagedResponseDto<PlanListResponseDto> getPopularPlansNotInRecruitment(int page, int size);
     PagedResponseDto<PlanListResponseDto> getPopularPlansWithFrontLocation(int page, int size, String frontLocation);
     PagedResponseDto<PlanListResponseDto> getPopularPlansWithAllLocation(int page, int size, String frontLocation, String location);
