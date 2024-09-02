@@ -65,6 +65,15 @@ public class ScheduleServiceImpl implements ScheduleService {
         scheduleRepository.delete(findByScheduleId(scheduleId));
     }
 
+    //여행 일정 등록(수정)하기 - price
+    @Override
+    @Transactional
+    public Schedule updateDescription(Long scheduleId, String description) {
+        Schedule schedule = findByScheduleId(scheduleId);
+        schedule.setDescription(description);
+        return scheduleRepository.save(schedule);
+    }
+
     //여행 일정 수정하기 - status
     @Override
     @Transactional
@@ -90,15 +99,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleRepository.save(schedule);
     }
 
-    //여행 일정 삭제하기 - vehicle
-    @Override
-    @Transactional
-    public Schedule deleteVehicle(Long scheduleId) {
-        Schedule schedule = findByScheduleId(scheduleId);
-        schedule.setVehicle(null);
-        return scheduleRepository.save(schedule);
-    }
-
     //여행 일정 등록(수정)하기 - price
     @Override
     @Transactional
@@ -108,14 +108,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleRepository.save(schedule);
     }
 
-    //여행 일정 삭제하기 - price
-    @Override
-    @Transactional
-    public Schedule deletePrice(Long scheduleId) {
-        Schedule schedule = findByScheduleId(scheduleId);
-        schedule.setPrice(null);
-        return scheduleRepository.save(schedule);
-    }
 
     //플랜 상세 조회 - 김민정
     @Override
