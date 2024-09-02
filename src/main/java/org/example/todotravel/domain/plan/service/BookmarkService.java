@@ -1,5 +1,6 @@
 package org.example.todotravel.domain.plan.service;
 
+import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanSummaryDto;
 import org.example.todotravel.domain.plan.entity.Bookmark;
 import org.example.todotravel.domain.plan.entity.Plan;
@@ -15,7 +16,7 @@ public interface BookmarkService {
     Long countBookmark(Plan plan);
     Long countBookmarkByPlanId(Long planId);
     Boolean isPlanBookmarkedByUser(User user, Plan plan);
-    List<Plan> getAllBookmarkedPlansByUser(Long userId);
-    List<Plan> getRecentBookmarkedPlansByUser(Long userId);
+    List<PlanListResponseDto> getAllBookmarkedPlansByUser(Long userId);
+    List<PlanListResponseDto> getRecentBookmarkedPlansByUser(Long userId);
     void removeAllByPlan(Plan plan);
 }

@@ -14,12 +14,9 @@ import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.global.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -58,8 +55,8 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
     // 채팅방에 유저 존재 찾기
     @Override
     @Transactional(readOnly = true)
-    public ChatRoomUser getUserByUserId(User user) {
-        return chatRoomUserRepository.findByUser(user)
+    public ChatRoomUser getChatRoomUserByUserAndRoom(User user, ChatRoom chatRoom) {
+        return chatRoomUserRepository.findByUserAndChatRoom(user, chatRoom)
             .orElseThrow(() -> new UserNotFoundException("채팅방에 유저가 존재하지 않습니다."));
     }
 

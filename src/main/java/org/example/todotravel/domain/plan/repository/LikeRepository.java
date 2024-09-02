@@ -1,5 +1,6 @@
 package org.example.todotravel.domain.plan.repository;
 
+import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanSummaryDto;
 import org.example.todotravel.domain.plan.entity.Like;
 import org.example.todotravel.domain.plan.entity.Plan;
@@ -27,16 +28,29 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
 
     Optional<Like> findByLikeUserAndPlan(User user, Plan plan);
 
-    @Query("SELECT l.plan FROM Like l WHERE l.likeUser.userId = :userId ORDER BY l.likeId DESC")
-    List<Plan> findLikedPlansByUserId(@Param("userId") Long userId);
+    @Query("""
+        SELECT new org.example.todotravel.domain.plan.dto.response.PlanListResponseDto(
+            p.planId, p.title, p.location, p.description, p.startDate, p.endDate,
+            p.planThumbnailUrl, pu.nickname)
+        FROM Plan p
+        JOIN p.planUser pu
+        JOIN Like l ON p.planId = l.plan.planId
+        WHERE l.likeUser.userId = :userId
+        ORDER BY l.likeId DESC
+        """)
+    List<PlanListResponseDto> findRecentLikedPlanDtosByUserId(@Param("userId") Long userId, Pageable pageable);
 
     @Query("""
-           SELECT p FROM Plan p
-           JOIN Like l ON l.plan.planId = p.planId
-           WHERE l.likeUser.userId = :userId
-           ORDER BY l.likeId DESC
-           """)
-    List<Plan> findRecentLikedPlansByUserId(@Param("userId") Long userId, Pageable pageable);
+        SELECT new org.example.todotravel.domain.plan.dto.response.PlanListResponseDto(
+            p.planId, p.title, p.location, p.description, p.startDate, p.endDate,
+            p.planThumbnailUrl, pu.nickname)
+        FROM Plan p
+        JOIN p.planUser pu
+        JOIN Like l ON p.planId = l.plan.planId
+        WHERE l.likeUser.userId = :userId
+        ORDER BY l.likeId DESC
+        """)
+    List<PlanListResponseDto> findAllLikedPlanDtosByUserId(@Param("userId") Long userId);
 
     //플랜 삭제 시 플랜에 달린 좋아요 삭제
     @Modifying

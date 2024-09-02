@@ -28,12 +28,12 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/chat/rooms")
 @RequiredArgsConstructor
 public class ChatRoomController {
+
     private final ChatRoomService chatRoomService;
     private final ChatRoomUserService chatRoomUserService;
     private final ChatMessageService chatMessageService;
     private final PlanUserService planUserService;
     private final PlanService planService;
-
 
     // 1:1 채팅방 생성
     @PostMapping("/one-to-one")

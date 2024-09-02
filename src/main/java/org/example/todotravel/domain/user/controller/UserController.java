@@ -17,7 +17,6 @@ import org.example.todotravel.global.controller.ApiResponse;
 import org.example.todotravel.global.jwt.util.JwtTokenizer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController

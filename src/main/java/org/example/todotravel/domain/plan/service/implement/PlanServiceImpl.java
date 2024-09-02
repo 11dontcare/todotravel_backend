@@ -149,6 +149,17 @@ public class PlanServiceImpl implements PlanService {
     @Override
     @Transactional
     public void removeJustPlan(Plan plan) {
+        // 해당 플랜에 썸네일이 존재할 경우 S3에서도 제거
+        String existingImageUrl = plan.getPlanThumbnailUrl();
+        if (existingImageUrl != null && !existingImageUrl.isEmpty()) {
+            String existingFileName = existingImageUrl.substring(existingImageUrl.lastIndexOf("/") + 1);
+            try {
+                s3Service.deleteFile(existingFileName);
+            } catch (IOException e) {
+                throw new RuntimeException("존재하는 썸네일 이미지 삭제를 실패했습니다.", e);
+            }
+        }
+
         planRepository.deleteByPlanId(plan.getPlanId());
     }
 
@@ -256,32 +267,49 @@ public class PlanServiceImpl implements PlanService {
     @Override
     @Transactional(readOnly = true)
     public List<PlanListResponseDto> getRecentBookmarkedPlans(User user) {
-        List<Plan> plans = bookmarkService.getRecentBookmarkedPlansByUser(user.getUserId());
-        return convertToPlanListResponseDto(plans);
+        List<PlanListResponseDto> dtos = bookmarkService.getRecentBookmarkedPlansByUser(user.getUserId());
+        return setBookmarkAndLikeCounts(dtos);
     }
 
     // 특정 사용자가 북마크한 플랜 조회 후 Dto로 반환
     @Override
     @Transactional(readOnly = true)
     public List<PlanListResponseDto> getAllBookmarkedPlans(User user) {
-        List<Plan> plans = bookmarkService.getAllBookmarkedPlansByUser(user.getUserId());
-        return convertToPlanListResponseDto(plans);
+        List<PlanListResponseDto> dtos = bookmarkService.getAllBookmarkedPlansByUser(user.getUserId());
+        return setBookmarkAndLikeCounts(dtos);
     }
 
     // 특정 사용자가 최근 좋아요한 플랜 4개 조회 후 Dto로 반환
     @Override
     @Transactional(readOnly = true)
     public List<PlanListResponseDto> getRecentLikedPlans(User user) {
-        List<Plan> plans = likeService.getRecentLikedPlansByUser(user.getUserId());
-        return convertToPlanListResponseDto(plans);
+        List<PlanListResponseDto> dtos = likeService.getRecentLikedPlansByUser(user.getUserId());
+        return setBookmarkAndLikeCounts(dtos);
     }
 
     // 특정 사용자가 좋아요한 플랜 조회 후 Dto로 반환
     @Override
     @Transactional(readOnly = true)
     public List<PlanListResponseDto> getAllLikedPlans(User user) {
-        List<Plan> plans = likeService.getAllLikedPlansByUser(user.getUserId());
-        return convertToPlanListResponseDto(plans);
+        List<PlanListResponseDto> dtos = likeService.getAllLikedPlansByUser(user.getUserId());
+        return setBookmarkAndLikeCounts(dtos);
+    }
+
+    // 공통 메서드: PlanListResponseDto 리스트에 북마크와 좋아요 수를 설정하는 메서드
+    @Override
+    public List<PlanListResponseDto> setBookmarkAndLikeCounts(List<PlanListResponseDto> dtos) {
+        List<Long> planIds = dtos.stream().map(PlanListResponseDto::getPlanId).collect(Collectors.toList());
+        Map<Long, PlanCountProjection> countMap = getBookmarkAndLikeCounts(planIds);
+
+        dtos.forEach(dto -> {
+            PlanCountProjection counts = countMap.get(dto.getPlanId());
+            if (counts != null) {
+                dto.setBookmarkNumber(counts.getBookmarkCount());
+                dto.setLikeNumber(counts.getLikeCount());
+            }
+        });
+
+        return dtos;
     }
 
     @Override
@@ -308,7 +336,7 @@ public class PlanServiceImpl implements PlanService {
         }).collect(Collectors.toList());
     }
 
-    // 북마크 수와 좋아요 수를 카운팅하는 메서드
+    // 공통 메서드: planId 리스트의 북마크 수와 좋아요 수를 카운팅하는 메서드
     @Override
     public Map<Long, PlanCountProjection> getBookmarkAndLikeCounts(List<Long> planIds) {
         List<PlanCountProjection> counts = planRepository.countBookmarksAndLikesByPlanIds(planIds);

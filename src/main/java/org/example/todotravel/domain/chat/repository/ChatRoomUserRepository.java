@@ -18,7 +18,7 @@ public interface ChatRoomUserRepository extends JpaRepository<ChatRoomUser, Long
     @Query("""
         SELECT cru FROM ChatRoomUser cru
         WHERE cru.chatRoom.roomId = :roomId
-        ORDER BY cru.id ASC 
+        ORDER BY cru.chatRoomUserId ASC 
         LIMIT 1
         """)
     Optional<ChatRoomUser> findFirstUserInChatRoom(@Param("roomId") Long roomId);
@@ -30,7 +30,7 @@ public interface ChatRoomUserRepository extends JpaRepository<ChatRoomUser, Long
         """)
     List<ChatRoom> findChatRoomByUserId(@Param("userId") Long userId);
 
-    Optional<ChatRoomUser> findByUser(User user);
+    Optional<ChatRoomUser> findByUserAndChatRoom(User user, ChatRoom chatRoom);
 
     List<ChatRoomUser> findByChatRoomRoomId(Long roomId);
 
@@ -41,12 +41,6 @@ public interface ChatRoomUserRepository extends JpaRepository<ChatRoomUser, Long
     @Modifying
     @Query("DELETE FROM ChatRoomUser cru WHERE cru.chatRoom.roomId = :roomId")
     void deleteByChatRoom(@Param("roomId") Long roomId);
-
-    @Modifying
-    @Query("DELETE FROM ChatRoomUser cru WHERE cru.chatRoom.roomId = :roomId AND cru.user.userId = :userId")
-    void deleteByChatRoomIdAndUserId(@Param("roomId") Long roomId, @Param("userId") Long userId);
-
-    Optional<ChatRoomUser> findByChatRoomAndUser(ChatRoom chatRoom, User user);
 
     @Modifying
     @Query("DELETE FROM ChatRoomUser cru WHERE cru.user = :user")

@@ -1,5 +1,6 @@
 package org.example.todotravel.domain.plan.repository;
 
+import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.dto.response.PlanSummaryDto;
 import org.example.todotravel.domain.plan.entity.Bookmark;
 import org.example.todotravel.domain.plan.entity.Plan;
@@ -23,19 +24,34 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     void deleteAllByBookmarkUser(@Param("user") User user);
 
     Long countByPlan(Plan plan);
+
     Long countByPlanPlanId(Long planId);
+
     Optional<Bookmark> findByBookmarkUserAndPlan(User user, Plan plan);
 
-    @Query("SELECT b.plan FROM Bookmark b WHERE b.bookmarkUser.userId = :userId ORDER BY b.bookmarkId DESC")
-    List<Plan> findBookmarkedPlansByUserId(@Param("userId") Long userId);
-
     @Query("""
-        SELECT p FROM Plan p
+        SELECT new org.example.todotravel.domain.plan.dto.response.PlanListResponseDto(
+            p.planId, p.title, p.location, p.description, p.startDate, p.endDate,
+            p.planThumbnailUrl, pu.nickname)
+        FROM Plan p
+        JOIN p.planUser pu
         JOIN Bookmark b ON p.planId = b.plan.planId
         WHERE b.bookmarkUser.userId = :userId
         ORDER BY b.bookmarkId DESC
         """)
-    List<Plan> findRecentCommentedPlansByUserId(@Param("userId") Long userId, Pageable pageable);
+    List<PlanListResponseDto> findAllBookmarkedPlansByUserId(@Param("userId") Long userId);
+
+    @Query("""
+        SELECT new org.example.todotravel.domain.plan.dto.response.PlanListResponseDto(
+            p.planId, p.title, p.location, p.description, p.startDate, p.endDate,
+            p.planThumbnailUrl, pu.nickname)
+        FROM Plan p
+        JOIN p.planUser pu
+        JOIN Bookmark b ON p.planId = b.plan.planId
+        WHERE b.bookmarkUser.userId = :userId
+        ORDER BY b.bookmarkId DESC
+        """)
+    List<PlanListResponseDto> findRecentCommentedPlansByUserId(@Param("userId") Long userId, Pageable pageable);
 
     //플랜 삭제 시 플랜에 달린 북마크 삭제
     @Modifying

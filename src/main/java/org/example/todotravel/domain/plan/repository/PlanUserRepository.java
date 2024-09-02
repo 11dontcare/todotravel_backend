@@ -1,5 +1,6 @@
 package org.example.todotravel.domain.plan.repository;
 
+import org.example.todotravel.domain.plan.dto.response.PlanListResponseDto;
 import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
 import org.example.todotravel.domain.user.entity.User;
@@ -34,13 +35,31 @@ public interface PlanUserRepository extends JpaRepository<PlanUser, Long> {
         """)
     List<Plan> findAllPlansByUserId(@Param("userId") Long userId, @Param("status") PlanUser.StatusType status);
 
+    // 타인의 퍼블릭한 플랜 모두 조회
     @Query("""
-        SELECT pu.plan FROM PlanUser pu 
-        WHERE pu.user.userId = :userId 
-        AND pu.status = :status
-        ORDER BY pu.plan.planId DESC
+        SELECT new org.example.todotravel.domain.plan.dto.response.PlanListResponseDto(
+            p.planId, p.title, p.location, p.description, p.startDate, p.endDate,
+            p.planThumbnailUrl, u.nickname)
+        FROM Plan p
+        JOIN p.planUser u
+        JOIN PlanUser pu ON p.planId = pu.plan.planId
+        WHERE pu.user.userId = :userId AND pu.status = :status AND pu.plan.isPublic = true
+        ORDER BY p.planId DESC
         """)
-    List<Plan> findAllPlansByUserIdTop4(@Param("userId") Long userId, @Param("status") PlanUser.StatusType status, Pageable pageable);
+    List<PlanListResponseDto> findAllPublicPlanDtosByUserId(@Param("userId") Long userId, @Param("status") PlanUser.StatusType status);
+
+    // 본인이 참여한 모든 플랜 조회
+    @Query("""
+        SELECT new org.example.todotravel.domain.plan.dto.response.PlanListResponseDto(
+            p.planId, p.title, p.location, p.description, p.startDate, p.endDate,
+            p.planThumbnailUrl, u.nickname)
+        FROM Plan p
+        JOIN p.planUser u
+        JOIN PlanUser pu ON p.planId = pu.plan.planId
+        WHERE pu.user.userId = :userId AND pu.status = :status
+        ORDER BY p.planId DESC
+        """)
+    List<PlanListResponseDto> findAllPlanDtosByUserId(@Param("userId") Long userId, @Param("status") PlanUser.StatusType status);
 
     @Query("""
         SELECT pu.plan FROM PlanUser pu 
@@ -62,6 +81,7 @@ public interface PlanUserRepository extends JpaRepository<PlanUser, Long> {
     List<Plan> findAllRecruitingPlansByUserId(@Param("userId") Long userId, @Param("status") PlanUser.StatusType status);
 
     Boolean existsPlanUserByPlanAndUserAndStatus(Plan plan, User user, PlanUser.StatusType status);
+    Boolean existsPlanUserByPlanAndUser(Plan plan, User user);
 
     @Query("""
         SELECT pu FROM PlanUser pu

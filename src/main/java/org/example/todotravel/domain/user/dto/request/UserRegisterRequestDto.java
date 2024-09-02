@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 import org.example.todotravel.domain.user.entity.Gender;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Builder
 @Getter

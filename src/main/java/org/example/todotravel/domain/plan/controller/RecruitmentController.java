@@ -44,10 +44,10 @@ public class RecruitmentController {
             }
         }
         plan = plan.toBuilder()
-                .recruitment(true)
-                .isPublic(true)
-                .participantsCount(participantsCount)
-                .build();
+            .recruitment(true)
+            .isPublic(true)
+            .participantsCount(participantsCount)
+            .build();
         planService.savePlan(plan);
         return new ApiResponse<>(true, "플랜 모집 성공", planId);
     }
@@ -62,9 +62,9 @@ public class RecruitmentController {
             }
         }
         plan = plan.toBuilder()
-                .recruitment(false)
-                .participantsCount(null)
-                .build();
+            .recruitment(false)
+            .participantsCount(null)
+            .build();
         planService.savePlan(plan);
         return new ApiResponse<>(true, "플랜 모집 취소 성공", planId);
     }
@@ -83,18 +83,18 @@ public class RecruitmentController {
 
         //일대일 채팅방 생성
         OneToOneChatRoomRequestDto chatRoomDto = OneToOneChatRoomRequestDto.builder()
-                .senderId(userId)
-                .receiverId(planUser.getPlan().getPlanUser().getUserId())
-                .build();
+            .senderId(userId)
+            .receiverId(planUser.getPlan().getPlanUser().getUserId())
+            .build();
         ChatRoomResponseDto chatRoom = chatRoomService.createOneToOneChatRoom(chatRoomDto);
 
         //자동으로 요청 메시지 생성
         ChatMessageRequestDto messageDto = ChatMessageRequestDto.builder()
-                .userId(userId)
-                .roomId(chatRoom.getRoomId())
-                .nickname(planUser.getUser().getNickname())
-                .content("[" + planUser.getPlan().getTitle() + "] 플랜에 " + planUser.getUser().getNickname() + "님이 참가하기를 요청했습니다.")
-                .build();
+            .userId(userId)
+            .roomId(chatRoom.getRoomId())
+            .nickname(planUser.getUser().getNickname())
+            .content("[" + planUser.getPlan().getTitle() + "] 플랜에 " + planUser.getUser().getNickname() + "님이 참가하기를 요청했습니다.")
+            .build();
         chatMessageService.saveChatMessage(messageDto);
 
         PlanUserResponseDto planUserResponseDto = PlanUserResponseDto.fromEntity(planUser);
@@ -131,51 +131,51 @@ public class RecruitmentController {
 
     // 행정구역별 모집 플랜 최신순 가져오기
     @GetMapping("/recruitment/recent/frontLocation")
-    public ApiResponse<?> getRecentPlansByFrontLocation(@RequestParam(defaultValue = "0") int page,
-                                                        @RequestParam(defaultValue = "12") int size,
-                                                        @RequestParam String frontLocation) {
+    public ApiResponse<?> getRecentPlansByFrontLocation(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                        @RequestParam(name = "size", defaultValue = "12") int size,
+                                                        @RequestParam(name = "frontLocation") String frontLocation) {
         PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansWithFrontLocation(page, size, frontLocation, true);
         return new ApiResponse<>(true, "행정구역별 최신순 플랜 조회에 성공했습니다.", planList);
     }
 
     // 행정구역+도시별 모집 플랜 최신순 가져오기
     @GetMapping("/recruitment/recent/location")
-    public ApiResponse<?> getRecentPlansByLocation(@RequestParam(defaultValue = "0") int page,
-                                                   @RequestParam(defaultValue = "12") int size,
-                                                   @RequestParam String frontLocation,
-                                                   @RequestParam String location) {
+    public ApiResponse<?> getRecentPlansByLocation(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                   @RequestParam(name = "size", defaultValue = "12") int size,
+                                                   @RequestParam(name = "frontLocation") String frontLocation,
+                                                   @RequestParam(name = "location") String location) {
         PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansWithAllLocation(page, size, frontLocation, location, true);
         return new ApiResponse<>(true, "행정구역+도시별 최신순 플랜 조회에 성공했습니다.", planList);
     }
 
     // 모집 플랜 날짜, 최신순으로 가져오기 (Public, Recruitment)
     @GetMapping("/recruitment/recent/startDate")
-    public ApiResponse<?> getRecentPlansByStartDate(@RequestParam(defaultValue = "0") int page,
-                                         @RequestParam(defaultValue = "12") int size,
-                                         @RequestParam LocalDate startDate) {
+    public ApiResponse<?> getRecentPlansByStartDate(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                    @RequestParam(name = "size", defaultValue = "12") int size,
+                                                    @RequestParam(name = "startDate") LocalDate startDate) {
         PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansRecruitmentByStartDate(page, size, true, startDate);
 
-        return new ApiResponse<>(true, "최신순 플랜 조회에 성공했습니다.", planList);
+        return new ApiResponse<>(true, "날짜, 최신순 플랜 조회에 성공했습니다.", planList);
     }
 
     // 날짜, 행정구역별 모집 플랜 최신순 가져오기
     @GetMapping("/recruitment/recent/frontLocation/startDate")
-    public ApiResponse<?> getRecentPlansByFrontLocationAndStartDate(@RequestParam(defaultValue = "0") int page,
-                                                        @RequestParam(defaultValue = "12") int size,
-                                                        @RequestParam String frontLocation,
-                                                        @RequestParam LocalDate startDate) {
+    public ApiResponse<?> getRecentPlansByFrontLocationAndStartDate(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                                    @RequestParam(name = "size", defaultValue = "12") int size,
+                                                                    @RequestParam(name = "frontLocation") String frontLocation,
+                                                                    @RequestParam(name = "startDate") LocalDate startDate) {
         PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansWithFrontLocationAndStartDate(page, size, frontLocation, true, startDate);
-        return new ApiResponse<>(true, "행정구역별 최신순 플랜 조회에 성공했습니다.", planList);
+        return new ApiResponse<>(true, "날짜, 행정구역별 최신순 플랜 조회에 성공했습니다.", planList);
     }
 
     // 날짜, 행정구역+도시별 모집 플랜 최신순 가져오기
     @GetMapping("/recruitment/recent/location/startDate")
-    public ApiResponse<?> getRecentPlansByLocationAndStartDate(@RequestParam(defaultValue = "0") int page,
-                                                   @RequestParam(defaultValue = "12") int size,
-                                                   @RequestParam String frontLocation,
-                                                   @RequestParam String location,
-                                                   @RequestParam LocalDate startDate) {
+    public ApiResponse<?> getRecentPlansByLocationAndStartDate(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                               @RequestParam(name = "size", defaultValue = "12") int size,
+                                                               @RequestParam(name = "frontLocation") String frontLocation,
+                                                               @RequestParam(name = "location") String location,
+                                                               @RequestParam(name = "startDate") LocalDate startDate) {
         PagedResponseDto<PlanListResponseDto> planList = planService.getRecentPlansWithAllLocationAndStartDate(page, size, frontLocation, location, true, startDate);
-        return new ApiResponse<>(true, "행정구역+도시별 최신순 플랜 조회에 성공했습니다.", planList);
+        return new ApiResponse<>(true, "날짜, 행정구역+도시별 최신순 플랜 조회에 성공했습니다.", planList);
     }
 }
