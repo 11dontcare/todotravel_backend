@@ -14,7 +14,7 @@ public interface ChatRoomUserService {
 
     List<ChatRoomListResponseDto> getChatRoomsByUserId(Long userId);
 
-    ChatRoomUser getUserByUserId(User user);
+    ChatRoomUser getChatRoomUserByUserAndRoom(User user, ChatRoom chatRoom);
 
     List<ChatRoomUserResponseDto> getUsersByRoomId(Long roomId);
 

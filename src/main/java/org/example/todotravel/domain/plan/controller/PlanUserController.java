@@ -77,9 +77,9 @@ public class PlanUserController {
             planService.deletePlan(plan);
         }
         else if (plan.getPlanUser().getUserId().equals(userId)){
-            User user = planUserService.getAllPlanUser(planId).getFirst().getUser();
+            List<PlanUser> planUsers = planUserService.getAllPlanUser(planId);
             plan = plan.toBuilder()
-                    .planUser(user)
+                    .planUser(planUsers.getFirst().getUser())
                     .build();
             planService.savePlan(plan);
         }//플랜에 참여자가 있고 나간 사용자가 플랜 생성자면 플랜 생성자 변경
