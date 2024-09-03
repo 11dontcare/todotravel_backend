@@ -86,12 +86,12 @@ class RefreshTokenServiceImplTest {
 
     @Test
     @DisplayName("리프레시 토큰 삭제 테스트")
-    void deleteRefreshToken() {
+    void removeRefreshToken() {
         // given
         when(refreshTokenRepository.findByUser_UserId(1L)).thenReturn(Optional.of(refreshToken));
 
         // when
-        refreshTokenService.deleteRefreshToken(1L);
+        refreshTokenService.removeRefreshToken(1L);
 
         // then
         verify(refreshTokenRepository, times(1)).delete(refreshToken);
@@ -99,12 +99,12 @@ class RefreshTokenServiceImplTest {
 
     @Test
     @DisplayName("존재하지 않는 리프레시 토큰 삭제 시도 테스트")
-    void deleteRefreshToken_NotFound() {
+    void removeRefreshToken_NotFound() {
         // given
         when(refreshTokenRepository.findByUser_UserId(2L)).thenReturn(Optional.empty());
 
         // when
-        refreshTokenService.deleteRefreshToken(2L);
+        refreshTokenService.removeRefreshToken(2L);
 
         // then
         // 'RefreshToken 타입의 어떤 객체에 대해서도 delete 메서드가 호출되지 않았음'을 검증

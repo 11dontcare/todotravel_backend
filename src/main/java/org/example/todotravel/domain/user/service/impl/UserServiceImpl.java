@@ -169,7 +169,7 @@ public class UserServiceImpl implements UserService {
     // 이름, 생년월일, 이메일로 사용자 찾기
     @Override
     @Transactional(readOnly = true)
-    public PasswordSearchResponseDto findUserByNameAndBirthAndEmail(PasswordSearchRequestDto dto) {
+    public PasswordSearchResponseDto getUserByNameAndBirthAndEmail(PasswordSearchRequestDto dto) {
         User user = userRepository.findByNameAndBirthDateAndEmail(dto.getName(), dto.getBirthDate(), dto.getEmail())
             .orElseThrow(() -> new UserNotFoundException("입력하신 정보와 일치하는 회원이 없어 인증번호를 발송할 수 없습니다."));
 

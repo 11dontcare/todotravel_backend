@@ -105,7 +105,7 @@ public class UserController {
 
     // 아이디 찾기 인증확인
     @PostMapping("/find-username")
-    public ApiResponse<?> findUsername(@Valid @RequestBody UsernameRequestDto dto) {
+    public ApiResponse<?> getUsername(@Valid @RequestBody UsernameRequestDto dto) {
         Object response = userService.getUsernameOrEmail(dto);
 
         if (response instanceof UsernameResponseDto) {
@@ -131,8 +131,8 @@ public class UserController {
     // 로그아웃
     @PostMapping("/logout")
     public ApiResponse<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        jwtTokenizer.deleteRefreshTokenCookie(request, response);
-        jwtTokenizer.deleteRefreshTokenFromDB(request);
+        jwtTokenizer.removeRefreshTokenCookie(request, response);
+        jwtTokenizer.removeRefreshTokenFromDB(request);
 
         // 클라이언트에게 AccessToken 삭제 지시 (프론트엔드에서 처리)
         return new ApiResponse<>(true, "로그아웃을 성공했습니다.");
