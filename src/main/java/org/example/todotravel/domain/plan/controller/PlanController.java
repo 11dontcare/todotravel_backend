@@ -84,7 +84,7 @@ public class PlanController {
 
         // 플랜 삭제 시 채팅방도 삭제
         ChatRoom chatRoom = chatRoomService.getChatRoomByPlanId(planId);
-        chatRoomService.deleteChatRoomAndMessage(chatRoom.getRoomId());
+        chatRoomService.removeChatRoomAndMessage(chatRoom.getRoomId());
         planUserService.removePlanUserFromOwnPlan(plan);
         planService.removePlan(plan);
 

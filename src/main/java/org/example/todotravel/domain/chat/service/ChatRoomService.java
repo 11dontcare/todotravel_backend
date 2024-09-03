@@ -36,8 +36,8 @@ public interface ChatRoomService {
     void removeUserFromChatRoom(Long roomId, Long userId);
 
     // 채팅방만 제거
-    void deleteChatRoom(Long roomId);
+    void removeChatRoom(Long roomId);
 
     // 채팅방과 메시지도 함께 제거
-    void deleteChatRoomAndMessage(Long roomId);
+    void removeChatRoomAndMessage(Long roomId);
 }
