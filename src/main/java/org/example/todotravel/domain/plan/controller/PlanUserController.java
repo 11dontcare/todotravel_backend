@@ -9,11 +9,7 @@ import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
 import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.plan.service.PlanUserService;
-import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.global.controller.ApiResponse;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -60,7 +56,7 @@ public class PlanUserController {
 
     // 플랜 나가기, 초대 취소
     @DeleteMapping("/plan/{plan_id}/participant/{user_id}")
-    public ApiResponse<PlanUser> deletePlanUser(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId) {
+    public ApiResponse<PlanUser> removePlanUser(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId) {
         // PlanUser에서 해당 사용자 제거
         planUserService.removePlanUser(planId, userId);
 
@@ -74,7 +70,7 @@ public class PlanUserController {
         if(planUserService.getAllPlanUser(planId).stream().noneMatch(planUser -> planUser.getStatus() == PlanUser.StatusType.ACCEPTED)){
             chatRoomService.deleteChatRoom(chatRoom.getRoomId());
             planUserService.removePlanUserFromOwnPlan(plan);
-            planService.deletePlan(plan);
+            planService.removePlan(plan);
         }
         else if (plan.getPlanUser().getUserId().equals(userId)){
             List<PlanUser> planUsers = planUserService.getAllPlanUser(planId);

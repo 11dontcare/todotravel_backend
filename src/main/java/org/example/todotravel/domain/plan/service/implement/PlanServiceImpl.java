@@ -131,7 +131,7 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     @Transactional
-    public void deletePlan(Plan plan) {
+    public void removePlan(Plan plan) {
         commentService.removeAllByPlan(plan);
         bookmarkService.removeAllByPlan(plan);
         likeService.removeAllByPlan(plan);
