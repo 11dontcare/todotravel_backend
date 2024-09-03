@@ -37,8 +37,7 @@ public class VoteServiceImpl implements VoteService{
     public Vote createVote(Long planId, User user, VoteRequestDto dto) {
         Plan plan = planService.getPlan(planId);
 
-        Location location = locationService.findByLocationId(dto.getLocationId())
-                .orElseThrow(() -> new RuntimeException("장소 등록이 안된 요청입니다."));
+        Location location = locationService.findByLocationId(dto.getLocationId());
 
         PlanUser planUser = plan.getPlanUsers().stream()
                 .filter(pu -> pu.getUser().equals(user) && pu.getStatus() == PlanUser.StatusType.ACCEPTED)

@@ -16,12 +16,10 @@ public interface ScheduleService {
     Schedule createSchedule(Long planId, ScheduleCreateRequestDto dto);
     void destroySchedule(Long scheduleId);
     ScheduleResponseDto getSchedule(Long scheduleId);
-
+    Schedule updateDescription(Long scheduleId, String description);
     Schedule updateStatus(Long scheduleId);
     Schedule updateVehicle(Long scheduleId, Schedule.VehicleType vehicle);
-    Schedule deleteVehicle(Long scheduleId);
     Schedule updatePrice(Long scheduleId, Long price);
-    Schedule deletePrice(Long scheduleId);
 
     //플랜 상세 조회 - 김민정
     List<ScheduleResponseDto> getSchedulesByPlan(Long planId);
