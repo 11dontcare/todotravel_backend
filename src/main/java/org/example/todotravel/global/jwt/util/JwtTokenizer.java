@@ -176,7 +176,7 @@ public class JwtTokenizer {
             .compact();
     }
 
-    public void deleteRefreshTokenCookie(HttpServletRequest request, HttpServletResponse response) {
+    public void removeRefreshTokenCookie(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -191,14 +191,14 @@ public class JwtTokenizer {
         }
     }
 
-    public void deleteRefreshTokenFromDB(HttpServletRequest request) {
+    public void removeRefreshTokenFromDB(HttpServletRequest request) {
         String accessToken = request.getHeader("Authorization");
         if (accessToken != null && accessToken.startsWith("Bearer ")) {
             accessToken = accessToken.substring(7);
             try {
                 Claims claims = parseAccessToken(accessToken);
                 Long userId = Long.valueOf((Integer) claims.get("userId"));
-                refreshTokenService.deleteRefreshToken(userId);
+                refreshTokenService.removeRefreshToken(userId);
             } catch (Exception e) {
                 log.error("Failed to delete refresh token", e);
             }

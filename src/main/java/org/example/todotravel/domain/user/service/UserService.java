@@ -55,7 +55,7 @@ public interface UserService {
     User getUserIdByNickname(String nickname);
 
     // 이름, 생년월일, 이메일로 사용자 찾기
-    PasswordSearchResponseDto findUserByNameAndBirthAndEmail(PasswordSearchRequestDto dto);
+    PasswordSearchResponseDto getUserByNameAndBirthAndEmail(PasswordSearchRequestDto dto);
 
     // 닉네임 업데이트
     void updateNickname(User user, String newNickname);

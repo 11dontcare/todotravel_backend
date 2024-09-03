@@ -28,7 +28,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     @Transactional
-    public void deleteRefreshToken(Long userId) {
+    public void removeRefreshToken(Long userId) {
         getRefreshTokenByUserId(userId).ifPresent(refreshTokenRepository::delete);
     }
 }
