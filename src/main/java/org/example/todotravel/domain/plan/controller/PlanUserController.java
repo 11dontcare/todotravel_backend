@@ -68,7 +68,7 @@ public class PlanUserController {
 
         //플랜에 참여자가 없으면 플랜 삭제
         if(planUserService.getAllPlanUser(planId).stream().noneMatch(planUser -> planUser.getStatus() == PlanUser.StatusType.ACCEPTED)){
-            chatRoomService.deleteChatRoom(chatRoom.getRoomId());
+            chatRoomService.removeChatRoom(chatRoom.getRoomId());
             planUserService.removePlanUserFromOwnPlan(plan);
             planService.removePlan(plan);
         }

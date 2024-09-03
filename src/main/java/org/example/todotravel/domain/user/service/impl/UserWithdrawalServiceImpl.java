@@ -129,7 +129,7 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
             .flatMapIterable(rooms -> rooms)
             .flatMap(chatRoom -> {
                 deletedChatRoomIds.add(chatRoom.getRoomId()); // 삭제되는 채팅방 추적
-                return chatMessageService.deleteAllMessageForChatRoom(chatRoom.getRoomId());
+                return chatMessageService.removeAllMessageForChatRoom(chatRoom.getRoomId());
             })
             .then();
     }
@@ -141,7 +141,7 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
         List<ChatRoom> chatRooms = chatRoomService.getAllChatRoomByPlan(userPlans);
         for (ChatRoom chatRoom : chatRooms) {
             chatRoomUserService.removeAllUserFromChatRoom(chatRoom);
-            chatRoomService.deleteChatRoom(chatRoom.getRoomId());
+            chatRoomService.removeChatRoom(chatRoom.getRoomId());
         }
 
         // 사용자가 생성한 플랜에 대해 모두 삭제
@@ -170,11 +170,11 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
 
             // 메시지 삭제를 비동기로 처리
             CompletableFuture.runAsync(() ->
-                chatMessageService.deleteAllMessageForChatRoom(chatRoom.getRoomId()).block()
+                chatMessageService.removeAllMessageForChatRoom(chatRoom.getRoomId()).block()
             );
 
             chatRoomUserService.removeAllUserFromChatRoom(chatRoom);
-            chatRoomService.deleteChatRoom(chatRoom.getRoomId());
+            chatRoomService.removeChatRoom(chatRoom.getRoomId());
             deletedChatRoomIds.add(chatRoom.getRoomId()); // 삭제되는 채팅방 추적
         } else {
             updateUserInPlan(user, plan, chatRoom);

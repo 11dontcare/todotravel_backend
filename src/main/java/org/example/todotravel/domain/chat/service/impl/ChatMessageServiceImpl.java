@@ -42,7 +42,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
     // 이전 채팅 내용 조회
     @Transactional
-    public Flux<ChatMessageResponseDto> findChatMessages(Long roomId) {
+    public Flux<ChatMessageResponseDto> getChatMessages(Long roomId) {
         Flux<ChatMessage> chatMessages = chatMessageRepository.findAllByRoomId(roomId);
         return chatMessages.map(ChatMessageResponseDto::of);
     }
@@ -76,7 +76,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
     // 회원 탈퇴 시 사용자가 생성한 채팅방의 모든 메시지 삭제
     @Override
-    public Mono<Void> deleteAllMessageForChatRoom(Long roomId) {
+    public Mono<Void> removeAllMessageForChatRoom(Long roomId) {
         log.info("Starting to delete all messages for room ID: {}", roomId);
         return transactionalOperator.execute(tx ->
                 chatMessageRepository.findAllByRoomId(roomId)
