@@ -103,6 +103,16 @@ public class PlanUserController {
         return new ApiResponse<>(true, "플랜에 사용자 존재 여부 조회 성공", existsPlanUser);
     }
 
+    //플랜이 초대 가능한 상태인지 확인
+    @GetMapping("/plan/{plan_id}/invitable/{user_id}")
+    public ApiResponse<Boolean> isInvitablePlanByUser(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId){
+        Plan plan = planService.getPlan(planId);
+        if (!plan.getRecruitment() && plan.getPlanUser().getUserId().equals(userId)){
+            return new ApiResponse<>(true, "플랜에 사용자 존재 여부 조회 성공", true);
+        }
+        return new ApiResponse<>(true, "플랜에 사용자 존재 여부 조회 성공", false);
+    }
+
     //수락,거절을 위한 사용자의 플랜 참가, 초대 목록 가져오기
     @GetMapping("/participant/pending/{user_id}")
     public ApiResponse<List<PendingPlanUserDto>> getPendingParticipantsByUser(@PathVariable("user_id") Long userId){
