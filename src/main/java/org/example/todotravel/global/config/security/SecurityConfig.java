@@ -32,33 +32,30 @@ public class SecurityConfig {
 
     // 모든 유저 허용 URL
     String[] allAllowPage = new String[]{
-            "/api/plan/**", // 우선 "/api/plan/**" 전부 허용해두었습니다.
-            "/index.html", // 프론트 구현 완료시 삭제
-            "/api/location/**",
-            "/api/invite/**",
-            "/api/chat/**",
-            "/api/notification/**",
-            "/api/mypage/**",
-            "/api/token/refresh",
-            "/api/recruitment/**",
-            "/api/auth/logout",
-            "/api/auth/profile-image/**",
-            "/ws/**",
+        "/index.html", // 프론트 구현 완료시 삭제
+        "/api/chat/rooms/**",
+        "/ws/**",
+        "/api/plan/{plan_id}",
+        "/api/plan/public",
+        "/api/plan/popular/**",
+        "/api/plan/recent/**",
+        "/api/plan/search/{keyword}",
+        "/api/plan/recruitment",
+        "/api/recruitment/recent/**",
+        "/api/auth/logout",
     };
 
     // 비로그인 유저 허용 URL
     String[] notLoggedAllowPage = new String[]{
+        "/api/send-mail/**",
         "/api/auth/signup",
+        "/api/auth/oauth2/**",
         "/api/auth/check-username",
         "/api/auth/check-email",
         "/api/auth/check-nickname",
         "/api/auth/login",
         "/api/auth/find-username",
         "/api/auth/password-reset",
-        "/api/auth/oauth2/**",
-        "/oauth2/**",
-        "/api/send-mail/**",
-        "/api/notification/**",
     };
 
     /**
