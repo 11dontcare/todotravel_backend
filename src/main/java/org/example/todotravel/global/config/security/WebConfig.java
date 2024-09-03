@@ -1,4 +1,4 @@
-package org.example.todotravel.global.config;
+package org.example.todotravel.global.config.security;
 
 
 import org.springframework.context.annotation.Configuration;

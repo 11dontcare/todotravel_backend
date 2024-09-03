@@ -1,4 +1,4 @@
-package org.example.todotravel.global.config;
+package org.example.todotravel.global.config.security;
 
 import lombok.RequiredArgsConstructor;
 import org.example.todotravel.global.exception.CustomAuthenticationEntryPoint;
