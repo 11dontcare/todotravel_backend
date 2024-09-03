@@ -11,13 +11,13 @@ import java.util.Set;
 public interface ChatMessageService {
 
     // 이전 채팅 내역 조회
-    Flux<ChatMessageResponseDto> findChatMessages(Long roomId);
+    Flux<ChatMessageResponseDto> getChatMessages(Long roomId);
 
     // 메시지 저장
     Mono<ChatMessage> saveChatMessage(ChatMessageRequestDto dto);
 
     // 회원 탈퇴 시 사용자가 생성한 채팅방의 모든 메시지 삭제
-    Mono<Void> deleteAllMessageForChatRoom(Long roomId);
+    Mono<Void> removeAllMessageForChatRoom(Long roomId);
 
     // 회원 탈퇴 완료 후 deleted_messages 컬렉션에서 해당 채팅방의 메시지 제거
     Mono<Void> removeDeletedMessagesForRooms(Set<Long> roomIds);
