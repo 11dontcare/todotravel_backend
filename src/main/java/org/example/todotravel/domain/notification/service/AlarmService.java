@@ -6,6 +6,7 @@ import org.example.todotravel.domain.notification.entity.Alarm;
 import java.util.List;
 
 public interface AlarmService {
+    Alarm createAlarm(AlarmRequestDto dto);
     List<Alarm> getByUserId(Long userId);
     Alarm getByAlarmId(Long alarmId);
     void updateAlarm(Long alarmId);
