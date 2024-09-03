@@ -27,9 +27,7 @@ import java.util.List;
 public class VoteServiceImpl implements VoteService{
     private final VoteRepository voteRepository;
     private final PlanService planService;
-    private final UserService userService;
     private final LocationService locationService;
-    private final JwtTokenizer jwtTokenizer;
 
     //투표 생성
     @Override
@@ -37,7 +35,7 @@ public class VoteServiceImpl implements VoteService{
     public Vote createVote(Long planId, User user, VoteRequestDto dto) {
         Plan plan = planService.getPlan(planId);
 
-        Location location = locationService.findByLocationId(dto.getLocationId());
+        Location location = locationService.getByLocationId(dto.getLocationId());
 
         PlanUser planUser = plan.getPlanUsers().stream()
                 .filter(pu -> pu.getUser().equals(user) && pu.getStatus() == PlanUser.StatusType.ACCEPTED)
@@ -79,7 +77,7 @@ public class VoteServiceImpl implements VoteService{
     //투표 삭제
     @Override
     @Transactional
-    public void deleteVote(Long planId, User user) {
+    public void removeVote(Long planId, User user) {
         Plan plan = planService.getPlan(planId);
         PlanUser planUser = plan.getPlanUsers().stream()
                 .filter(pu -> pu.getUser().equals(user) && pu.getStatus() == PlanUser.StatusType.ACCEPTED)

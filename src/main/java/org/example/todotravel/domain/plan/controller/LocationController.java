@@ -16,8 +16,8 @@ public class LocationController {
 
     //여행 장소 저장하기
     @PostMapping
-    public ApiResponse<Location> insertLocation(@Valid @RequestBody LocationRequestDto dto) {
-        Location location = locationService.createLocation(
+    public ApiResponse<Location> addLocation(@Valid @RequestBody LocationRequestDto dto) {
+        Location location = locationService.addLocation(
                 dto.getName(), dto.getLatitude(), dto.getLongitude()
         );
         return new ApiResponse<>(true, "장소 저장 성공", location);
@@ -25,8 +25,8 @@ public class LocationController {
 
     //여행 장소 검색하기
     @GetMapping("/{location_id}")
-    public ApiResponse<Location> findByLocationId(@PathVariable("location_id") Long locationId) {
-        Location location = locationService.findByLocationId(locationId);
+    public ApiResponse<Location> getByLocationId(@PathVariable("location_id") Long locationId) {
+        Location location = locationService.getByLocationId(locationId);
         return new ApiResponse<>(true, "장소 검색 성공", location);
     }
 }
