@@ -25,7 +25,7 @@ public class UserDetailResponseDto {
     private LocalDate birthDate;
     private SocialType socialType;
 
-    public static UserDetailResponseDto from(User user) {
+    public static UserDetailResponseDto fromEntity(User user) {
         return UserDetailResponseDto.builder()
             .username(user.getUsername())
             .email(user.getEmail())

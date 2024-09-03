@@ -45,7 +45,7 @@ public class UserController {
             // accessToken, refreshToken 생성
             String accessToken = jwtTokenizer.issueTokenAndSetCookies(response, updatedUser);
 
-            LoginResponseDto loginResponseDto = LoginResponseDto.of(updatedUser, accessToken);
+            LoginResponseDto loginResponseDto = LoginResponseDto.from(updatedUser, accessToken);
             return new ApiResponse<>(true, "추가 정보 업데이트에 성공했습니다.", loginResponseDto);
         } catch (Exception e) {
             return new ApiResponse<>(false, "추가 정보 업데이트에 실패했습니다.");
@@ -63,7 +63,7 @@ public class UserController {
             // accessToken, refreshToken 생성
             String accessToken = jwtTokenizer.issueTokenAndSetCookies(response, user);
 
-            LoginResponseDto loginResponseDto = LoginResponseDto.of(user, accessToken);
+            LoginResponseDto loginResponseDto = LoginResponseDto.from(user, accessToken);
             return new ApiResponse<>(true, "OAuth2 로그인을 성공했습니다.", loginResponseDto);
         } catch (Exception e) {
             return new ApiResponse<>(false, "OAuth2 로그인을 실패했습니다. : " + e.getMessage(), null);
@@ -99,7 +99,7 @@ public class UserController {
         // accessToken, refreshToken 생성
         String accessToken = jwtTokenizer.issueTokenAndSetCookies(response, loginUser);
 
-        LoginResponseDto loginResponseDto = LoginResponseDto.of(loginUser, accessToken);
+        LoginResponseDto loginResponseDto = LoginResponseDto.from(loginUser, accessToken);
         return new ApiResponse<>(true, "로그인을 성공했습니다.", loginResponseDto);
     }
 
