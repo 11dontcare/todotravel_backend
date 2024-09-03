@@ -95,7 +95,7 @@ public class ChatRoomController {
         chatRoomService.deleteChatRoomAndMessage(roomId);
         if (plan != null) {
             planUserService.removePlanUserFromOwnPlan(plan);
-            planService.deletePlan(plan);
+            planService.removePlan(plan);
         }
         return new ApiResponse<>(true, "채팅방 삭제 성공");
     }

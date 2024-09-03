@@ -49,7 +49,7 @@ public class CommentController {
 
     //댓글 삭제
     @DeleteMapping("/comment/{comment_id}")
-    public ApiResponse<Comment> deleteComment(@PathVariable("comment_id") Long commentId){
+    public ApiResponse<Comment> removeComment(@PathVariable("comment_id") Long commentId){
         commentService.removeComment(commentId);
         return new ApiResponse<>(true, "댓글 삭제 성공");
     }

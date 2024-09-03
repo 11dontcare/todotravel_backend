@@ -15,15 +15,10 @@ import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.plan.service.PlanUserService;
 import org.example.todotravel.global.controller.ApiResponse;
 import org.example.todotravel.global.dto.PagedResponseDto;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -71,7 +66,7 @@ public class RecruitmentController {
 
     //플랜 모집글 리스트 조회
     @GetMapping("/plan/recruitment")
-    public ApiResponse<List<PlanListResponseDto>> viewRecruitmentPlans(){
+    public ApiResponse<List<PlanListResponseDto>> getRecruitmentPlans(){
         List<PlanListResponseDto> recruitmentList = planService.getRecruitmentPlans();
         return new ApiResponse<>(true, "플랜 모집글 리스트 조회 성공", recruitmentList);
     }
@@ -103,7 +98,7 @@ public class RecruitmentController {
 
     //참가 요청 승인 (모집중인 플랜의 생성자가 승인)
     @PutMapping("/recruitment/{plan_participant_id}/accept")
-    public ApiResponse<Long> acceptInvite(@PathVariable("plan_participant_id") Long planParticipantId) {
+    public ApiResponse<Long> acceptRecruitment(@PathVariable("plan_participant_id") Long planParticipantId) {
         // 플랜 모집 참가 수락 처리
         PlanUser planUser = planUserService.accepted(planParticipantId);
 

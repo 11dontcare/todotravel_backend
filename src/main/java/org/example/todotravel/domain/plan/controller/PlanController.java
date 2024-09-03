@@ -14,7 +14,6 @@ import org.example.todotravel.domain.plan.entity.PlanUser;
 import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.plan.service.PlanUserService;
 import org.example.todotravel.domain.plan.service.ScheduleService;
-import org.example.todotravel.domain.user.dto.request.UserProfileImageRequestDTO;
 import org.example.todotravel.domain.user.dto.response.UserListResponseDto;
 import org.example.todotravel.domain.user.entity.Follow;
 import org.example.todotravel.domain.user.entity.User;
@@ -80,14 +79,14 @@ public class PlanController {
 
     //플랜 삭제
     @DeleteMapping("/{plan_id}")
-    public ApiResponse<Plan> deletePlan(@PathVariable("plan_id") Long planId) {
+    public ApiResponse<Plan> removePlan(@PathVariable("plan_id") Long planId) {
         Plan plan = planService.getPlan(planId);
 
         // 플랜 삭제 시 채팅방도 삭제
         ChatRoom chatRoom = chatRoomService.getChatRoomByPlanId(planId);
         chatRoomService.deleteChatRoomAndMessage(chatRoom.getRoomId());
         planUserService.removePlanUserFromOwnPlan(plan);
-        planService.deletePlan(plan);
+        planService.removePlan(plan);
 
         return new ApiResponse<>(true, "플랜 삭제 성공");
     }
@@ -127,7 +126,7 @@ public class PlanController {
 
     //전체 플랜 조회 - 공개 상태인 플랜만
     @GetMapping("/public")
-    public ApiResponse<List<PlanListResponseDto>> viewPublicPlans() {
+    public ApiResponse<List<PlanListResponseDto>> getPublicPlans() {
         List<PlanListResponseDto> planList = planService.getPublicPlans();
         return new ApiResponse<>(true, "플랜 목록 조회 성공", planList);
     }
