@@ -113,7 +113,7 @@ public class MypageController {
 
     // 회원 탈퇴 - 모든 정보를 삭제
     @DeleteMapping("/{user_id}/withdraw")
-    public ApiResponse<?> deleteAllUserInformation(@PathVariable("user_id") Long userId, Authentication authentication,
+    public ApiResponse<?> removeAllUserInformation(@PathVariable("user_id") Long userId, Authentication authentication,
                                                    HttpServletRequest request, HttpServletResponse response) {
         try {
             // 해당 사용자 찾은 후 본인 확인 수행
@@ -122,7 +122,7 @@ public class MypageController {
 
             // 회원 탈퇴 작업 수행
             userWithdrawalService.withdrawUser(user);
-            jwtTokenizer.deleteRefreshTokenCookie(request, response);
+            jwtTokenizer.removeRefreshTokenCookie(request, response);
 
             return new ApiResponse<>(true, "회원 탈퇴가 완료되었습니다. 그동안 저희 서비스를 이용해 주셔서 감사합니다.");
         } catch (Exception e) {

@@ -57,7 +57,7 @@ public class EmailController {
     // 이메일 인증 - 이름, 생년월일, 이메일에 해당하는 유저 찾은 후 이메일 전송
     @PostMapping("/find-password")
     public ApiResponse<?> sendMailToFindPassword(@RequestBody PasswordSearchRequestDto dto) {
-        PasswordSearchResponseDto passwordSearchResponseDto = userService.findUserByNameAndBirthAndEmail(dto);
+        PasswordSearchResponseDto passwordSearchResponseDto = userService.getUserByNameAndBirthAndEmail(dto);
 
         EmailMessage emailMessage = setEmailMessage(dto.getEmail());
         String code = emailService.sendMail(emailMessage, "email", passwordEncoder);

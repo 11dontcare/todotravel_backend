@@ -56,7 +56,7 @@ public class PlanUserController {
 
     // 플랜 나가기, 초대 취소
     @DeleteMapping("/plan/{plan_id}/participant/{user_id}")
-    public ApiResponse<PlanUser> deletePlanUser(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId) {
+    public ApiResponse<PlanUser> removePlanUser(@PathVariable("plan_id") Long planId, @PathVariable("user_id") Long userId) {
         // PlanUser에서 해당 사용자 제거
         planUserService.removePlanUser(planId, userId);
 
@@ -70,7 +70,7 @@ public class PlanUserController {
         if(planUserService.getAllPlanUser(planId).stream().noneMatch(planUser -> planUser.getStatus() == PlanUser.StatusType.ACCEPTED)){
             chatRoomService.removeChatRoom(chatRoom.getRoomId());
             planUserService.removePlanUserFromOwnPlan(plan);
-            planService.deletePlan(plan);
+            planService.removePlan(plan);
         }
         else if (plan.getPlanUser().getUserId().equals(userId)){
             List<PlanUser> planUsers = planUserService.getAllPlanUser(planId);

@@ -9,5 +9,5 @@ public interface RefreshTokenService {
 
     Optional<RefreshToken> getRefreshTokenByUserId(Long userId);
 
-    void deleteRefreshToken(Long userId);
+    void removeRefreshToken(Long userId);
 }
