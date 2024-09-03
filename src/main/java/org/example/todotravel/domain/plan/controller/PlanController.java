@@ -14,7 +14,6 @@ import org.example.todotravel.domain.plan.entity.PlanUser;
 import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.plan.service.PlanUserService;
 import org.example.todotravel.domain.plan.service.ScheduleService;
-import org.example.todotravel.domain.user.dto.request.UserProfileImageRequestDTO;
 import org.example.todotravel.domain.user.dto.response.UserListResponseDto;
 import org.example.todotravel.domain.user.entity.Follow;
 import org.example.todotravel.domain.user.entity.User;
@@ -85,7 +84,7 @@ public class PlanController {
 
         // 플랜 삭제 시 채팅방도 삭제
         ChatRoom chatRoom = chatRoomService.getChatRoomByPlanId(planId);
-        chatRoomService.deleteChatRoomAndMessage(chatRoom.getRoomId());
+        chatRoomService.removeChatRoomAndMessage(chatRoom.getRoomId());
         planUserService.removePlanUserFromOwnPlan(plan);
         planService.deletePlan(plan);
 

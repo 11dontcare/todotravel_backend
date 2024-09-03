@@ -9,11 +9,7 @@ import org.example.todotravel.domain.plan.entity.Plan;
 import org.example.todotravel.domain.plan.entity.PlanUser;
 import org.example.todotravel.domain.plan.service.PlanService;
 import org.example.todotravel.domain.plan.service.PlanUserService;
-import org.example.todotravel.domain.user.entity.User;
 import org.example.todotravel.global.controller.ApiResponse;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -72,7 +68,7 @@ public class PlanUserController {
 
         //플랜에 참여자가 없으면 플랜 삭제
         if(planUserService.getAllPlanUser(planId).stream().noneMatch(planUser -> planUser.getStatus() == PlanUser.StatusType.ACCEPTED)){
-            chatRoomService.deleteChatRoom(chatRoom.getRoomId());
+            chatRoomService.removeChatRoom(chatRoom.getRoomId());
             planUserService.removePlanUserFromOwnPlan(plan);
             planService.deletePlan(plan);
         }
