@@ -23,20 +23,19 @@ public class AlarmServiceImpl implements AlarmService {
     //모든 알림 찾기 - userId
     @Override
     @Transactional(readOnly = true)
-    public List<Alarm> findByUserId(Long userId) {
+    public List<Alarm> getByUserId(Long userId) {
         return alarmRepository.findByAlarmUser_UserId(userId);
     }
 
     //알림 찾기 - alarmId
     @Override
     @Transactional(readOnly = true)
-    public Alarm findByAlarmId(Long alarmId) {
+    public Alarm getByAlarmId(Long alarmId) {
         return alarmRepository.findById(alarmId)
                 .orElseThrow(() -> new RuntimeException("알림을 찾을 수 없습니다."));
     }
 
     //알림 생성하기
-    @Override
     @Transactional
     public Alarm createAlarm(AlarmRequestDto dto) {
         User user = userService.getUserByUserId(dto.getUserId())
@@ -55,7 +54,7 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     @Transactional
     public void updateAlarm(Long alarmId) {
-        Alarm alarm = findByAlarmId(alarmId);
+        Alarm alarm = getByAlarmId(alarmId);
         alarm.setStatus(true);
         alarmRepository.save(alarm);
     }
@@ -70,15 +69,15 @@ public class AlarmServiceImpl implements AlarmService {
     //알림 삭제하기
     @Override
     @Transactional
-    public void deleteAlarm(Long alarmId) {
+    public void removeAlarm(Long alarmId) {
         alarmRepository.deleteById(alarmId);
     }
 
     //모든 알림 삭제하기
     @Override
     @Transactional
-    public void deleteAllAlarm(Long userId) {
-        List<Alarm> alarmList = findByUserId(userId);
+    public void removeAllAlarm(Long userId) {
+        List<Alarm> alarmList = getByUserId(userId);
         alarmRepository.deleteAll(alarmList);
     }
 }

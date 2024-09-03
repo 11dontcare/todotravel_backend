@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 public interface VoteService {
     Vote createVote(Long planId, User user, VoteRequestDto dto);
     Vote updateVote(Long planId, Long voteId, User user, VoteRequestDto dto) ;
-    void deleteVote(Long planId, User user);
+    void removeVote(Long planId, User user);
     Page<VoteResponseDto> getAllVoteList(Long planId, Pageable pageable);
     Vote getVote(Long voteId);
 }
