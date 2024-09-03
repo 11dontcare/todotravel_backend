@@ -96,7 +96,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       - run: aws s3 cp deployment.zip s3://todotravel-github-actions-s3-bucket/
 
-      # (6) S3 버킷에 있는 파일을 대상으로 CodeDeploy 실행 - 각 이름도 secrets로 설정 필요 ????????? 각 이름에 맞게 설정은 필요
+      # (6) S3 버킷에 있는 파일을 대상으로 CodeDeploy 실행
       - name: Deploy with CodeDeploy
         env:
           SPRING_PROFILES_ACTIVE: prod
