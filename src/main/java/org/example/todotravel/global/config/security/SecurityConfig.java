@@ -32,7 +32,6 @@ public class SecurityConfig {
 
     // 모든 유저 허용 URL
     String[] allAllowPage = new String[]{
-        "/index.html", // 프론트 구현 완료시 삭제
         "/api/chat/rooms/**",
         "/ws/**",
         "/api/plan/{plan_id}",

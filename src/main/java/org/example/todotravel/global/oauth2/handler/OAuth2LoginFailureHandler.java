@@ -1,6 +1,7 @@
 package org.example.todotravel.global.oauth2.handler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -17,6 +18,9 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @Component
 public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
+
+    @Value("${app.cors.allowed-origins}")
+    private String frontendUrl;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
@@ -36,7 +40,6 @@ public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
 
         log.error("OAuth2 로그인 실패 - {}", exception.getMessage());
 
-        String frontendUrl = "http://localhost:3000"; // 프론트엔드 URL, 추후 환경변수로 변경 필요
         String redirectUrl = frontendUrl + "/oauth2/redirect?error=" + errorMessage;
         response.sendRedirect(redirectUrl);
     }
