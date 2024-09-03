@@ -56,7 +56,7 @@ public class VoteController {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         User user = userService.getUserByUsername(userDetails.getUsername());
 
-        voteService.deleteVote(voteId, user);
+        voteService.removeVote(voteId, user);
         return new ApiResponse<>(true, "투표를 삭제했습니다.", null);
     }
 

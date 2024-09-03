@@ -20,8 +20,8 @@ public class AlarmController {
 
     //사용자에 대한 모든 알림 가져오기
     @GetMapping("/{user_id}")
-    public ApiResponse<List<AlarmResponseDto>> showAllAlarms(@PathVariable("user_id") Long userId) {
-        List<Alarm> alarmList = alarmService.findByUserId(userId);
+    public ApiResponse<List<AlarmResponseDto>> getAllAlarms(@PathVariable("user_id") Long userId) {
+        List<Alarm> alarmList = alarmService.getByUserId(userId);
         List<AlarmResponseDto> responseDtoList = alarmList.stream()
                 .map(AlarmResponseDto::fromEntity)
                 .collect(Collectors.toList());
@@ -44,15 +44,15 @@ public class AlarmController {
 
     //알림 삭제하기
     @DeleteMapping("/delete/{alarm_id}")
-    public ApiResponse<Void> deleteAlarm(@PathVariable("alarm_id") Long alarmId) {
-        alarmService.deleteAlarm(alarmId);
+    public ApiResponse<Void> removeAlarm(@PathVariable("alarm_id") Long alarmId) {
+        alarmService.removeAlarm(alarmId);
         return new ApiResponse<>(true,"알림이 삭제되었습니다.");
     }
 
     //모든 알림 삭제하기
     @DeleteMapping("/deleteAll/{user_id}")
-    public ApiResponse<Void> deleteAllAlarm(@PathVariable("user_id") Long userId) {
-        alarmService.deleteAllAlarm(userId);
+    public ApiResponse<Void> removeAllAlarm(@PathVariable("user_id") Long userId) {
+        alarmService.removeAllAlarm(userId);
         return new ApiResponse<>(true,"모든 알림이 삭제되었습니다.");
     }
 }

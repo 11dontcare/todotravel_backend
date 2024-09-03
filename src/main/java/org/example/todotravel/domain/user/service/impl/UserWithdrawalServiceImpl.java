@@ -95,7 +95,7 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
             chatMessageDeletionFuture.join();
 
             chatRoomUserService.removeUserFromAllChatRoom(user);
-            alarmService.deleteAllAlarm(user.getUserId());
+            alarmService.removeAllAlarm(user.getUserId());
             refreshTokenService.removeRefreshToken(user.getUserId());
             followService.removeAllFollowRelationships(user);
 
@@ -205,7 +205,7 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
         likeService.removeAllLikeByPlan(plan);
         bookmarkService.removeAllBookmarksByPlan(plan);
         planUserService.removePlanUserFromOwnPlan(plan);
-        scheduleService.deleteAllSchedulesByPlan(plan);
+        scheduleService.removeAllSchedulesByPlan(plan);
         planService.removeJustPlan(plan);
     }
 
