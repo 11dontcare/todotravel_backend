@@ -85,7 +85,7 @@ public class MypageController {
         User user = userService.getUserById(userId);
         verifyAuthenticatedUser(authentication, user);
 
-        UserDetailResponseDto userDetailResponseDto = UserDetailResponseDto.from(user);
+        UserDetailResponseDto userDetailResponseDto = UserDetailResponseDto.fromEntity(user);
         return new ApiResponse<>(true, "사용자 개인 정보 조회에 성공했습니다.", userDetailResponseDto);
     }
 

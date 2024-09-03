@@ -16,7 +16,7 @@ public class LoginResponseDto {
     private String role;
     private String accessToken;
 
-    public static LoginResponseDto of(User user, String accessToken) {
+    public static LoginResponseDto from(User user, String accessToken) {
         return LoginResponseDto.builder()
             .userId(user.getUserId())
             .nickname(user.getNickname())

@@ -1,4 +1,4 @@
-package org.example.todotravel.global.config;
+package org.example.todotravel.global.config.jpa;
 
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.annotation.Bean;
