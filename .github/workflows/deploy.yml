@@ -1,0 +1,111 @@
+name: Backend Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main # 배포할 브랜치 설정
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest # 실행 환경
+    steps:
+      # (1) 기본 체크아웃
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      # (2) JDK 21 세팅
+      - name: Set up JDK 21
+        uses: actions/setup-java@v2
+        with:
+          java-version: "21"
+          distribution: "adopt"
+
+      # (3) Gradle build
+      - name: Build with Gradle
+        env:
+          SPRING_PROFILES_ACTIVE: prod
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MYSQL_URL: ${{ secrets.MYSQL_URL }}
+          MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          SMTP_MAIL_USERNAME: ${{ secrets.SMTP_MAIL_USERNAME }}
+          SMTP_MAIL_PASSWORD: ${{ secrets.SMTP_MAIL_PASSWORD }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
+          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          KAKAO_REDIRECT_URI: ${{ secrets.KAKAO_REDIRECT_URI }}
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+          NAVER_REDIRECT_URI: ${{ secrets.NAVER_REDIRECT_URI }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          JWT_REFRESH_KEY: ${{ secrets.JWT_REFRESH_KEY }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_CREDENTIALS_ACCESS_KEY: ${{ secrets.AWS_CREDENTIALS_ACCESS_KEY }}
+          AWS_CREDENTIALS_SECRET_KEY: ${{ secrets.AWS_CREDENTIALS_SECRET_KEY }}
+          CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}
+          # 테스트 없이 application-prod 로 빌드
+        run: |
+          chmod 755 ./gradlew
+          ./gradlew build -Dspring.profiles.active=prod -x test
+
+      # (4) 환경 변수 파일 생성
+      - name: Create env file
+        run: |
+          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
+          echo "MYSQL_URL=${{ secrets.MYSQL_URL }}" >> .env
+          echo "MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}" >> .env
+          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
+          echo "SMTP_MAIL_USERNAME=${{ secrets.SMTP_MAIL_USERNAME }}" >> .env
+          echo "SMTP_MAIL_PASSWORD=${{ secrets.SMTP_MAIL_PASSWORD }}" >> .env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+          echo "GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}" >> .env
+          echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env
+          echo "KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}" >> .env
+          echo "KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}" >> .env
+          echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> .env
+          echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env
+          echo "NAVER_REDIRECT_URI=${{ secrets.NAVER_REDIRECT_URI }}" >> .env
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
+          echo "JWT_REFRESH_KEY=${{ secrets.JWT_REFRESH_KEY }}" >> .env
+          echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> .env
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
+          echo "AWS_CREDENTIALS_ACCESS_KEY=${{ secrets.AWS_CREDENTIALS_ACCESS_KEY }}" >> .env
+          echo "AWS_CREDENTIALS_SECRET_KEY=${{ secrets.AWS_CREDENTIALS_SECRET_KEY }}" >> .env
+          echo "CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }}" >> .env
+
+      # (4) 배포 패키지 준비
+      - name: Prepare deployment package
+        run: |
+          mkdir -p deployment
+          cp appspec.yml deployment/
+          cp -r scripts deployment/
+          cp build/libs/todotravel-0.0.1-SNAPSHOT.jar deployment/
+          cp .env deployment/
+          cd deployment
+          zip -r ../deployment.zip .
+
+      # (5) AWS 인증(IAM 사용자 Access Key, Secret Key 활용) 및 빌드 결과물을 S3 버킷에 업로드
+      - name: Upload to S3
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - run: aws s3 cp deployment.zip s3://todotravel-github-actions-s3-bucket/
+
+      # (6) S3 버킷에 있는 파일을 대상으로 CodeDeploy 실행 - 각 이름도 secrets로 설정 필요 ????????? 각 이름에 맞게 설정은 필요
+      - name: Deploy with CodeDeploy
+        env:
+          SPRING_PROFILES_ACTIVE: prod
+        run: |
+          aws deploy create-deployment \
+            --application-name ${{ secrets.CODEDEPLOY_APPLICATION_NAME }} \
+            --deployment-group-name ${{ secrets.CODEDEPLOY_GROUP_NAME }} \
+            --s3-location bucket=${{ secrets.CODEDEPLOY_S3_BUCKET }}, key=deployment.zip, bundleType=zip \
+#            --deployment-config-name CodeDeployDefault.OneAtTime \
+            --description "Deployment with environment variables" \
+            --environment-variables SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
+
