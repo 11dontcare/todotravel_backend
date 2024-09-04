@@ -77,15 +77,13 @@ public class VoteServiceImpl implements VoteService{
     //투표 삭제
     @Override
     @Transactional
-    public void removeVote(Long planId, User user) {
+    public void removeVote(Long planId, Long voteId, User user) {
         Plan plan = planService.getPlan(planId);
         PlanUser planUser = plan.getPlanUsers().stream()
                 .filter(pu -> pu.getUser().equals(user) && pu.getStatus() == PlanUser.StatusType.ACCEPTED)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("플랜에 참여하지 않았거나 승인이 되지 않은 사용자입니다."));
-
-        List<Vote> votes = voteRepository.findAllByPlanAndPlanUser(plan, planUser);
-        voteRepository.deleteAll(votes);
+        voteRepository.deleteById(voteId);
     }
 
     //투표 전체 보기
