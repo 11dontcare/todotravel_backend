@@ -6,6 +6,8 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "votes")
@@ -40,6 +42,9 @@ public class Vote {
 
     @Column(nullable = false, name = "end_date")
     private LocalDateTime endDate;
+
+    @OneToMany(mappedBy = "vote", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VoteLog> voteLogs = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
