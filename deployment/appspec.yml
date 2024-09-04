@@ -1,8 +1,9 @@
 version: 0.0
 os: linux
 files:
-  - source: build/libs/todotravel-0.0.1-SNAPSHOT.jar
+  - source: /
     destination: /home/ec2-user/app
+    overwrite: yes
 
 hooks:
   ApplicationStop:
