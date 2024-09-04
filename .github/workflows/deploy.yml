@@ -79,12 +79,17 @@ jobs:
       # (4) 배포 패키지 준비
       - name: Prepare deployment package
         run: |
-          mkdir -p deployment
-          cp appspec.yml deployment/
-          cp -r scripts deployment/
-          cp build/libs/todotravel-0.0.1-SNAPSHOT.jar deployment/
-          cp .env deployment/
-          cd deployment
+          mkdir -p deployment_package
+          cp deployment/appspec.yml deployment_package/
+          if [ -d deployment/scripts ]; then
+            cp -r deployment/scripts deployment_package/
+          else
+            echo "scripts directory not found in deployment folder"
+            exit 1
+          fi
+          cp build/libs/*-0.0.1-SNAPSHOT.jar deployment_package/
+          cp .env deployment_package/
+          cd deployment_package
           zip -r ../deployment.zip .
 
       # (5) AWS 인증(IAM 사용자 Access Key, Secret Key 활용) 및 빌드 결과물을 S3 버킷에 업로드
@@ -94,18 +99,13 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-      - run: aws s3 cp deployment.zip s3://todotravel-github-actions-s3-bucket/
+      - run: aws s3 cp deployment.zip s3://${{ secrets.CODEDEPLOY_S3_BUCKET }}/
 
-      # (6) S3 버킷에 있는 파일을 대상으로 CodeDeploy 실행
       - name: Deploy with CodeDeploy
-        env:
-          SPRING_PROFILES_ACTIVE: prod
         run: |
           aws deploy create-deployment \
             --application-name ${{ secrets.CODEDEPLOY_APPLICATION_NAME }} \
             --deployment-group-name ${{ secrets.CODEDEPLOY_GROUP_NAME }} \
-            --s3-location bucket=${{ secrets.CODEDEPLOY_S3_BUCKET }}, key=deployment.zip, bundleType=zip \
-#            --deployment-config-name CodeDeployDefault.OneAtTime \
-            --description "Deployment with environment variables" \
-            --environment-variables SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
+            --s3-location bucket=${{ secrets.CODEDEPLOY_S3_BUCKET }},key=deployment.zip,bundleType=zip \
+            --description "Deployment with environment variables"
 
