@@ -21,19 +21,13 @@ import java.util.Optional;
 public class VoteLogServiceImpl implements VoteLogService {
     private final VoteRepository voteRepository;
     private final VoteLogRepository voteLogRepository;
-    private final PlanService planService;
     private final UserService userService;
-    private final LocationService locationService;
     private final JwtTokenizer jwtTokenizer;
-
 
     // 투표하기
     @Override
     @Transactional
-    public void castVote(Long voteId, String token) {
-        Long userId = jwtTokenizer.getUserIdFromToken(token);
-        User user = userService.getUserById(userId);
-
+    public void castVote(Long voteId, User user) {
         Vote vote = voteRepository.findById(voteId)
                 .orElseThrow(() -> new RuntimeException("해당 투표를 찾을 수 없습니다."));
 

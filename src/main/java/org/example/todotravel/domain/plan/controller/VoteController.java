@@ -50,13 +50,14 @@ public class VoteController {
     }
 
     //투표 삭제
-    @DeleteMapping("/{vote_id}")
-    public ApiResponse<Void> deleteVote(@PathVariable("vote_id") Long voteId) {
+    @DeleteMapping("/{plan_id}/{vote_id}")
+    public ApiResponse<Void> deleteVote(@PathVariable("plan_id") Long planId,
+                                        @PathVariable("vote_id") Long voteId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         User user = userService.getUserByUsername(userDetails.getUsername());
 
-        voteService.removeVote(voteId, user);
+        voteService.removeVote(planId, voteId, user);
         return new ApiResponse<>(true, "투표를 삭제했습니다.", null);
     }
 
