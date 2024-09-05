@@ -205,8 +205,8 @@ $ npm start
 | ![image](https://github.com/user-attachments/assets/28227ce0-592a-4dee-9d8d-b32bf6b1980c) | 채팅 |
 | ![image](https://github.com/user-attachments/assets/26a61de0-d8b0-46be-8820-1ec8578856e8) | 마이페이지 |
 | ![image](https://github.com/user-attachments/assets/c1a4b978-bb42-4a1c-bdc9-6b3632f57319) | 플랜 만들기 |
-| ![image](https://github.com/user-attachments/assets/74dcf701-df69-4988-8708-986b995501e7) | 플랜 함께하기 리스트 |
-| ![image](https://github.com/user-attachments/assets/fb91c668-0462-4375-93f0-98d58ba6024f) | 모집 함께하기 리스트 |
+| ![image](https://github.com/user-attachments/assets/74dcf701-df69-4988-8708-986b995501e7) | 플랜 모집하기 리스트 |
+| ![image](https://github.com/user-attachments/assets/fb91c668-0462-4375-93f0-98d58ba6024f) | 플랜 공유하기 리스트 |
 | ![image](https://github.com/user-attachments/assets/0294158c-ee1c-4d88-972b-beba0f9afc91) | 플랜 상세보기 |
 
 
