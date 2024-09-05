@@ -40,6 +40,7 @@ public class SecurityConfig {
         "/api/plan/recent/**",
         "/api/plan/search/{keyword}",
         "/api/plan/recruitment",
+        "/api/plan/{plan_id}/course/{schedule_id}",
         "/api/recruitment/recent/**",
         "/api/auth/logout",
         "/api/token/refresh",
