@@ -31,6 +31,8 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
 
     @EntityGraph(attributePaths = "planUser")
     List<Plan> findAllByIsPublicTrue();
+
+    @EntityGraph(attributePaths = "planUser")
     List<Plan> findAllByIsPublicTrueAndTitleContains(String keyword);
     List<Plan> findByPlanUser(User user);
 
@@ -86,7 +88,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
                                                @Param("location") String location, Pageable pageable);
 
     // 기본 최신순 조회
-    @EntityGraph(attributePaths = "planUser")
+    @EntityGraph(attributePaths = {"planUser", "planUsers"})
     @Query("""
         SELECT p FROM Plan p
         WHERE p.recruitment = :recruitment AND p.isPublic = true
@@ -95,7 +97,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     Page<Plan> findRecentPlansByRecruitment(@Param("recruitment") Boolean recruitment, Pageable pageable);
 
     // 행정구역과 최신순 조회
-    @EntityGraph(attributePaths = "planUser")
+    @EntityGraph(attributePaths = {"planUser", "planUsers"})
     @Query("""
         SELECT p FROM Plan p
         WHERE p.recruitment = :recruitment AND p.isPublic = true
@@ -105,7 +107,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     Page<Plan> findRecentPlansWithFrontLocation(@Param("frontLocation") String frontLocation, @Param("recruitment") Boolean recruitment, Pageable pageable);
 
     // 행정구역 + 도시와 최신순 조회
-    @EntityGraph(attributePaths = "planUser")
+    @EntityGraph(attributePaths = {"planUser", "planUsers"})
     @Query("""
         SELECT p FROM Plan p
         WHERE p.recruitment = :recruitment AND p.isPublic = true
@@ -117,6 +119,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
                                               @Param("recruitment") Boolean recruitment, Pageable pageable);
 
     // 여행 시작 날짜, 최신순 조회 (Public, Recruitment)
+    @EntityGraph(attributePaths = {"planUser", "planUsers"})
     @Query("""
         SELECT p FROM Plan p
         WHERE p.recruitment = :recruitment AND p.isPublic = true
@@ -126,6 +129,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     Page<Plan> findRecentPlansRecruitmentByStartDate(@Param("recruitment") Boolean recruitment,
                                                      @Param("startDate") LocalDate startDate, Pageable pageable);
     // 여행 시작 날짜, 행정구역과 최신순 조회
+    @EntityGraph(attributePaths = {"planUser", "planUsers"})
     @Query("""
         SELECT p FROM Plan p
         WHERE p.recruitment = :recruitment AND p.isPublic = true
@@ -136,6 +140,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
                                                             @Param("recruitment") Boolean recruitment,
                                                             @Param("startDate") LocalDate startDate, Pageable pageable);
     // 여행 시작 날짜, 행정구역 + 도시와 최신순 조회
+    @EntityGraph(attributePaths = {"planUser", "planUsers"})
     @Query("""
         SELECT p FROM Plan p
         WHERE p.recruitment = :recruitment AND p.isPublic = true
