@@ -36,13 +36,7 @@ public class Schedule {
     private VehicleType vehicle;
 
     public enum VehicleType {
-        CAR,
-        AIRPLANE,
-        TRAIN,
-        BUS,
-        BIKE,
-        WALK,
-        TAXI
+        CAR, AIRPLANE, TRAIN, BUS, BIKE, WALK, TAXI, SUBWAY
     }
 
     @Column(name = "price", nullable = true)
