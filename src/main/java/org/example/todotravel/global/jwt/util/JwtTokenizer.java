@@ -146,6 +146,8 @@ public class JwtTokenizer {
         tokenCookie.setHttpOnly(true);
         tokenCookie.setMaxAge(Math.toIntExact(expirationTime / 1000)); // milliseconds to seconds
         tokenCookie.setSecure(true);
+        tokenCookie.setAttribute("Samesite", "None");
+        tokenCookie.setDomain("kro.kr");
         response.addCookie(tokenCookie);
     }
 
