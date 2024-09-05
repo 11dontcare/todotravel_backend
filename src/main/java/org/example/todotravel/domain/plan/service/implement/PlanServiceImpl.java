@@ -245,6 +245,8 @@ public class PlanServiceImpl implements PlanService {
                 .description(plan.getDescription())
                 .startDate(plan.getStartDate())
                 .endDate(plan.getEndDate())
+                .planUserNickname(plan.getPlanUser().getNickname())
+                .planThumbnailUrl(plan.getPlanThumbnailUrl())
                 .bookmarkNumber(bookmarkService.countBookmark(plan))
                 .likeNumber(likeService.countLike(plan))
                 .build());

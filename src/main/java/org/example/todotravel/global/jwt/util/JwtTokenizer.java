@@ -145,6 +145,7 @@ public class JwtTokenizer {
         tokenCookie.setPath("/");
         tokenCookie.setHttpOnly(true);
         tokenCookie.setMaxAge(Math.toIntExact(expirationTime / 1000)); // milliseconds to seconds
+        tokenCookie.setSecure(true);
         response.addCookie(tokenCookie);
     }
 
