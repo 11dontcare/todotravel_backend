@@ -42,6 +42,7 @@ public class SecurityConfig {
         "/api/plan/recruitment",
         "/api/recruitment/recent/**",
         "/api/auth/logout",
+        "/api/token/refresh",
     };
 
     // 비로그인 유저 허용 URL
